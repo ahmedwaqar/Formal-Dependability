@@ -1,18 +1,17 @@
 (*------------------------------------------------------ *)
 (* Formal Failure Analysis ASN Gateway			 *)
-(*  						   	   						*)
-(* 		    by Waqar Ahmed 		   	   					*)
-(* 		    Phd Candidate		   	   					*)
+(*  	     						 *)
+(* 		    by Waqar Ahmed 		   	 *)
 (* School of Electrical Engineering and Computer Sciences  *)
 (* National University of Sciences and Technology (NUST)   *)
-(* 	    	        Islamabad, Pakistan 	  	   		   *)
+(* 	    	        Islamabad, Pakistan 	  	   *)
 (*---------------------------------------------------------*)
 
-app load ["arithmeticTheory", "realTheory", "prim_recTheory", "seqTheory",
+(*app load ["arithmeticTheory", "realTheory", "prim_recTheory", "seqTheory",
     	  "pred_setTheory","res_quanTheory", "res_quanTools", "listTheory", "probabilityTheory", "numTheory",
 	  "transcTheory", "rich_listTheory", "pairTheory",
 	  "combinTheory","limTheory","sortingTheory", "realLib", "optionTheory","satTheory",
-	  "util_probTheory", "extrealTheory", "measureTheory", "lebesgueTheory","real_sigmaTheory","dep_rewrite","RBDTheory","FT_deepTheory","VDCTheory"];
+	  "util_probTheory", "extrealTheory", "measureTheory", "lebesgueTheory","real_sigmaTheory","dep_rewrite","RBDTheory","FT_deepTheory","VDCTheory"];*)
 open HolKernel Parse boolLib bossLib limTheory arithmeticTheory realTheory prim_recTheory probabilityTheory 
      seqTheory pred_setTheory res_quanTheory sortingTheory res_quanTools listTheory transcTheory
      rich_listTheory pairTheory combinTheory realLib  optionTheory
@@ -41,7 +40,7 @@ val op<< = op THENL;
 val op|| = op ORELSE;
 val op>> = op THEN1;
 val std_ss' = simpLib.++ (std_ss, boolSimps.ETA_ss);
-
+val op by = BasicProvers.byA;
 (*---------------------------*)
 fun SET_TAC L =
     POP_ASSUM_LIST(K ALL_TAC) THEN REPEAT COND_CASES_TAC THEN
@@ -100,9 +99,9 @@ REPEAT (POP_ASSUM MP_TAC)
 ++ REPEAT (POP_ASSUM MP_TAC)
 ++ RW_TAC pset_elt_ss ths;
 
-(* ------------------------------------------------------------------------- *)
+(* ------------------------------------------- *)
 (* Definition                                  *)
-(* ------------------------------------------------------------------------- *)
+(* ------------------------------------------- *)
 val fail_event_list_def = Define
  `fail_event_list p L t =  
   MAP (\a. fail_event p a t) L`;
@@ -110,47 +109,47 @@ val fail_event_list_def = Define
 val list_fail_event_list_def = Define
  `list_fail_event_list p L t =  
   MAP (\a. fail_event_list p a t) L`;
-(* ------------------------------------------------------------------------- *)
-(*   			exp_func                                 *)
-(* ------------------------------------------------------------------------- *)
+(* ------------------------------------------- *)
+(*   			exp_func               *)
+(* --------------------------------------------*)
 val exp_func_def = Define
-   `exp_func  (x:real) (c:real) = exp(-(c * x))`;
+   `exp_func (x:real) (c:real) = exp(-(c * x))`;
 
-(* ------------------------------------------------------------------------- *)
-(*  One Minus exponential                                *)
-(* ------------------------------------------------------------------------- *)
+(* --------------------------------------------*)
+(*  One Minus exponential                      *)
+(* --------------------------------------------*)
 val one_minus_exp_def = Define `
     one_minus_exp t C = 
     MAP (\c. 1 - exp(-(t * (c:real)))) C`;
 
-(* ------------------------------------------------------------------------- *)
-(*  One Minus exponential product                               *)
-(* ------------------------------------------------------------------------- *)
+(* --------------------------------------------*)
+(*  One Minus exponential product              *)
+(* --------------------------------------------*)
 val one_minus_exp_prod_def = Define 
 `(one_minus_exp_prod t C = 
   MAP (\a. 1- list_prod (one_minus_list (exp_func_list a t))) C ) `;
-(* ------------------------------------------------------------------------- *)
-(*   			list_sum                                  *)
-(* ------------------------------------------------------------------------- *)
+(* --------------------------------------------*)
+(*   			list_sum               *)
+(* --------------------------------------------*)
 
 val list_sum_def =  Define
     		     	`(list_sum [] = 0) /\ 
 		         (!h t. list_sum (h::t) = 
 			 ((h:real) + list_sum(t)))`;
 
-(* ------------------------------------------------------------------------- *)
-(* Definition : Exponential Distribution Function                                *)
-(* ------------------------------------------------------------------------- *)
+(* ----------------------------------------------------*)
+(* Definition : Exponential Distribution Function      *)
+(* ----------------------------------------------------*)
 val exp_distribution_def = Define
    `exp_dist p X l = 
    !x:real. CDF p X (x) = (if (0 <=  x) then 1 -
    	    	    	      exp(-l * x) else 0)`;
-(* ------------------------------------------------------------------------- *)
-(* Definition : List of Exponential Distribution Functions                               *)
-(* ------------------------------------------------------------------------- *)
+(* ------------------------------------------------------------*)
+(* Definition : List of Exponential Distribution Functions     *)
+(* ------------------------------------------------------------*)
 val list_exp_def =  Define
-    		     	`(list_exp p [] L = T ) /\
-		(list_exp p (h::t) L = ( exp_dist p (HD(L)) (h)) /\ (list_exp p (t) (TL L)))`; 
+`(list_exp p [] L = T ) /\
+(list_exp p (h::t) L = (exp_dist p (HD(L)) (h)) /\ (list_exp p (t) (TL L)))`; 
 
 (*=================probability of B1=====================================*)
 val B1_FT_def = Define
@@ -567,7 +566,8 @@ val ASN_gateway_thm = store_thm("ASN_gateway_thm",
            [notshw];[ED;EQ1];[EN1;EN2;EN3;EN4];[human]])) ==>
 	   (prob p (ASN_gateway_FT p t FD AP FF1 D1 D4 D7 D10 E1 E2 E3 E4 E5 E6 E7 E8
        E9 E10 E11 E12 E13 E14 E15 E16 E17 E18 E19 E20 E21 C5 C6 C7 C8
-       notshw AL SL PD Others time ED EQ1 EN1 EN2 EN3 EN4 human) = 1 -
+       notshw AL SL PD Others time ED EQ1 EN1 EN2 EN3 EN4 human) =
+1 -
 list_prod
   (one_minus_exp_prod t
      [[C_ED; C_EQ1]; [C_EN1; C_EN2; C_EN3; C_EN4]; [C_human]]) *
@@ -594,7 +594,7 @@ list_prod
       [[C_AL; C_time]; [C_SL; C_time]; [C_PD; C_time];
        [C_Others; C_time]])))``,
 RW_TAC std_ss[ASN_FT_eq_parallel_series_RBD]
-++ DEP_REWRITE_TAC[rel_parallel_series_rbd]
+++ DEP_ONCE_REWRITE_TAC[rel_parallel_series_rbd]
 ++ RW_TAC std_ss[]
 >> (FULL_SIMP_TAC list_ss[list_fail_event_list_def,fail_event_list_def])
 ++ RW_TAC std_ss[ASN_gateway_lemma1]
@@ -616,7 +616,6 @@ RW_TAC std_ss[ASN_FT_eq_parallel_series_RBD]
 >> (FULL_SIMP_TAC list_ss[list_exp_def])
 ++ RW_TAC std_ss[GSYM REAL_MUL_ASSOC]
 ++ AP_TERM_TAC
-
 ++ DEP_ONCE_ASM_REWRITE_TAC[B1_FT_lemma6]
 ++ RW_TAC list_ss[]
 >> (FULL_SIMP_TAC list_ss[list_exp_def])

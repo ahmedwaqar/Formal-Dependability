@@ -4,7 +4,7 @@
 (* Description: Formal Reliability Analysis of Data Transport Protocol       *)
 (*                 using Theorem Proving  			             *)
 (*                                                                           *)
-(*                HOL4-Kananaskis 10 		 			     *)
+(*                HOL4-Kananaskis 12 		 			     *)
 (*							          	     *)
 (*		Author :  Waqar Ahmad             		     	     *)
 (*                                              			     *)
@@ -16,11 +16,11 @@
 
 (*loadPath := "/home/waqar/Downloads/RBD" :: !loadPath;*)
 
-app load ["arithmeticTheory", "realTheory", "prim_recTheory", "seqTheory",
+(*app load ["arithmeticTheory", "realTheory", "prim_recTheory", "seqTheory",
     	  "pred_setTheory","res_quanTheory", "res_quanTools", "listTheory", "probabilityTheory", "numTheory",
 	  "transcTheory", "rich_listTheory", "pairTheory",
 	  "combinTheory","limTheory","sortingTheory", "realLib", "optionTheory","satTheory",
-	  "util_probTheory", "extrealTheory", "measureTheory", "lebesgueTheory","real_sigmaTheory","dep_rewrite","RBDTheory","FT_deepTheory","VDCTheory","smart_gridTheory","ASN_gatewayTheory"];
+	  "util_probTheory", "extrealTheory", "measureTheory", "lebesgueTheory","real_sigmaTheory","dep_rewrite","RBDTheory","FT_deepTheory","VDCTheory","smart_gridTheory","ASN_gatewayTheory"];*)
 open HolKernel Parse boolLib bossLib limTheory arithmeticTheory realTheory prim_recTheory probabilityTheory 
      seqTheory pred_setTheory res_quanTheory sortingTheory res_quanTools listTheory transcTheory
      rich_listTheory pairTheory combinTheory realLib  optionTheory
@@ -52,7 +52,7 @@ val op<< = op THENL;
 val op|| = op ORELSE;
 val op>> = op THEN1;
 val std_ss' = simpLib.++ (std_ss, boolSimps.ETA_ss);
-
+val op by = BasicProvers.byA;
 (*---------------------------*)
 fun SET_TAC L =
     POP_ASSUM_LIST(K ALL_TAC) THEN REPEAT COND_CASES_TAC THEN

@@ -1,0 +1,732 @@
+THEORY_AND_PARENTS
+"Availability" 1541280061 946413
+["VDC" 1541274219 7208, "FT_deep" 1541261543 907940]
+
+INCORPORATE_TYPES
+[]
+
+IDS
+["min" "fun", "min" "bool", "realax" "real", "list" "list", "pair" "prod",
+ "extreal" "extreal", "num" "num", "bool" "!", "pair" ",", "seq" "-->",
+ "real" "/", "bool" "/\\", "num" "0", "prim_rec" "<", "arithmetic" "<=",
+ "min" "=", "min" "==>", "bool" "?", "FT_deep" "AND", "FT_deep" "gate",
+ "Availability" "AND_unavail_FT_gate", "list" "APPEND",
+ "pred_set" "BIGUNION", "arithmetic" "BIT1", "list" "CONS",
+ "pred_set" "DIFF", "pred_set" "DISJOINT", "list" "EL", "pred_set" "EMPTY",
+ "extreal" "EXTREAL_SUM_IMAGE", "list" "FLAT", "pair" "FST",
+ "FT_deep" "FTree", "pred_set" "GSPEC", "list" "HD", "pred_set" "IMAGE",
+ "bool" "IN", "pred_set" "INTER", "list" "LENGTH", "list" "LIST_TO_SET",
+ "list" "MAP", "Availability" "NAND_unavail_FT_gate", "list" "NIL",
+ "Availability" "NOR_unavail_FT_gate", "list" "NULL",
+ "arithmetic" "NUMERAL", "extreal" "Normal", "FT_deep" "OR",
+ "Availability" "OR_unavail_FT_gate", "sorting" "PERM",
+ "pred_set" "PREIMAGE", "pair" "SND", "bool" "T", "list" "TL",
+ "pred_set" "UNION", "Availability" "UNIONL", "FT_deep" "XOR_FT_gate",
+ "Availability" "XOR_unavail_FT_gate", "arithmetic" "ZERO", "bool" "\\/",
+ "FT_deep" "atomic", "Availability" "avail_event",
+ "Availability" "avail_event_list", "Availability" "cdf",
+ "RBD" "compl_list", "Availability" "compl_steady_state_avail",
+ "pred_set" "count", "probability" "distribution", "probability" "events",
+ "transc" "exp", "Availability" "expec", "Availability" "expec_avail",
+ "Availability" "expec_avail1", "extreal" "extreal_add",
+ "extreal" "extreal_le", "extreal" "extreal_lt",
+ "extreal" "extreal_of_num", "FT_deep" "gate_list", "probability" "indep",
+ "Availability" "inst_avail_exp", "Availability" "inst_avail_exp1",
+ "Availability" "inst_avail_exp2", "Availability" "inst_avail_exp3",
+ "Availability" "inst_avail_exp_list",
+ "Availability" "inst_avail_exp_list1",
+ "Availability" "inst_avail_exp_list2", "Availability" "inst_unavail_exp",
+ "Availability" "inst_unavail_exp_list", "seq" "lim", "RBD" "list_prob",
+ "RBD" "list_prod", "Availability" "list_union_avail_event_list",
+ "RBD" "mutual_indep", "combin" "o", "RBD" "of", "RBD" "rbd",
+ "RBD" "one_minus_list", "probability" "p_space", "RBD" "parallel",
+ "probability" "prob", "probability" "prob_space", "RBD" "rbd_list",
+ "RBD" "rbd_struct", "realax" "real_add", "realax" "real_lt",
+ "real" "real_lte", "realax" "real_mul", "realax" "real_neg",
+ "real" "real_of_num", "real" "real_sub", "Availability" "rel_event1",
+ "Availability" "reliability", "RBD" "series",
+ "Availability" "steady_state_avail",
+ "Availability" "steady_state_avail_list",
+ "Availability" "steady_state_avail_prod",
+ "Availability" "steady_state_unavail",
+ "Availability" "steady_state_unavail_list", "real" "sum",
+ "Availability" "two_dim_inst_avail_exp",
+ "Availability" "two_dim_inst_unavail_exp",
+ "Availability" "two_dim_steady_state_avail_list",
+ "Availability" "two_dim_steady_state_avail_prod",
+ "Availability" "unavail_event", "Availability" "union_avail_event_list",
+ "Availability" "union_avail_event_list1",
+ "Availability" "union_avail_events", "Availability" "union_avail_events1",
+ "Availability" "union_unavail_event_list",
+ "Availability" "union_unavail_events", "bool" "~"]
+
+TYPES
+[TYOP 1, TYV "'a", TYOP 0 1 0, TYOP 2, TYOP 0 3 2, TYOP 5, TYOP 0 1 5,
+ TYOP 4 6 6, TYOP 3 7, TYOP 0 8 4, TYOP 0 2 3, TYOP 0 2 0, TYOP 4 11 10,
+ TYOP 4 2 12, TYOP 0 13 9, TYOP 3 2, TYOP 0 3 15, TYOP 3 8, TYOP 0 17 16,
+ TYOP 0 13 18, TYOP 6, TYOP 0 20 4, TYOP 0 8 21, TYOP 0 20 16,
+ TYOP 0 17 23, TYOP 0 5 2, TYOP 0 20 25, TYOP 0 8 26, TYOP 0 13 27,
+ TYOP 4 3 3, TYOP 3 29, TYOP 3 30, TYOP 0 31 3, TYOP 3 3, TYOP 3 33,
+ TYOP 0 31 34, TYOP 0 31 0, TYOP 3 17, TYOP 0 37 36, TYOP 0 13 38,
+ TYOP 0 30 33, TYOP 0 29 3, TYOP 0 30 3, TYOP 0 5 3, TYOP 0 6 43,
+ TYOP 0 13 44, TYOP 0 6 25, TYOP 0 13 46, TYOP 3 15, TYOP 0 3 48,
+ TYOP 0 37 49, TYOP 0 30 0, TYOP 0 17 51, TYOP 0 13 52, TYOP 0 29 0,
+ TYOP 0 8 54, TYOP 0 13 55, TYOP 0 20 51, TYOP 0 17 57, TYOP 0 13 58,
+ TYOP 0 20 54, TYOP 0 8 60, TYOP 0 13 61, TYOP 0 20 43, TYOP 0 8 63,
+ TYOP 0 13 64, TYOP 0 20 3, TYOP 0 66 3, TYOP 0 20 67, TYOP 0 5 15,
+ TYOP 0 20 69, TYOP 0 17 70, TYOP 0 8 9, TYOP 0 13 72, TYOP 0 15 2,
+ TYOP 0 17 4, TYOP 0 13 75, TYOP 0 17 75, TYOP 0 13 77, TYOP 3 1, TYV "'b",
+ TYOP 0 80 0, TYOP 0 81 0, TYOP 0 5 0, TYOP 0 83 0, TYOP 0 11 0,
+ TYOP 0 6 0, TYOP 0 86 0, TYOP 0 66 0, TYOP 0 88 0, TYOP 0 79 0,
+ TYOP 0 90 0, TYOP 0 15 0, TYOP 0 92 0, TYOP 0 37 0, TYOP 0 94 0,
+ TYOP 0 17 0, TYOP 0 96 0, TYOP 0 36 0, TYOP 0 8 0, TYOP 0 99 0,
+ TYOP 0 51 0, TYOP 0 20 0, TYOP 0 102 0, TYOP 0 13 0, TYOP 0 104 0,
+ TYOP 0 54 0, TYOP 0 3 0, TYOP 0 107 0, TYOP 4 1 0, TYOP 0 0 109,
+ TYOP 0 1 110, TYOP 4 5 0, TYOP 0 0 112, TYOP 0 5 113, TYOP 4 20 20,
+ TYOP 0 20 115, TYOP 0 20 116, TYOP 0 66 107, TYOP 0 3 3, TYOP 0 3 119,
+ TYOP 0 0 0, TYOP 0 0 121, TYOP 0 20 102, TYOP 0 5 83, TYOP 0 2 11,
+ TYOP 0 15 92, TYOP 0 48 0, TYOP 0 48 127, TYOP 0 34 0, TYOP 0 34 129,
+ TYOP 0 33 0, TYOP 0 33 131, TYOP 0 3 107, TYOP 19 1, TYOP 3 134,
+ TYOP 0 135 134, TYOP 0 15 15, TYOP 0 15 137, TYOP 0 30 30, TYOP 0 30 139,
+ TYOP 0 11 2, TYOP 0 20 20, TYOP 0 2 137, TYOP 0 37 37, TYOP 0 17 144,
+ TYOP 0 17 17, TYOP 0 8 146, TYOP 0 31 31, TYOP 0 30 148, TYOP 0 34 34,
+ TYOP 0 33 150, TYOP 0 29 139, TYOP 0 33 33, TYOP 0 3 153, TYOP 0 2 2,
+ TYOP 0 2 155, TYOP 0 37 17, TYOP 0 20 157, TYOP 0 31 30, TYOP 0 20 159,
+ TYOP 0 8 7, TYOP 0 20 161, TYOP 0 102 5, TYOP 0 20 5, TYOP 0 164 163,
+ TYOP 0 48 15, TYOP 0 7 6, TYOP 0 134 2, TYOP 0 13 168, TYOP 0 1 109,
+ TYOP 0 170 2, TYOP 0 5 112, TYOP 0 172 83, TYOP 0 30 29, TYOP 0 102 11,
+ TYOP 0 20 2, TYOP 0 176 175, TYOP 0 1 11, TYOP 0 2 85, TYOP 0 15 93,
+ TYOP 0 29 106, TYOP 0 79 20, TYOP 0 15 20, TYOP 0 37 20, TYOP 0 17 20,
+ TYOP 0 31 20, TYOP 0 8 20, TYOP 0 30 20, TYOP 0 15 11, TYOP 0 48 92,
+ TYOP 0 30 54, TYOP 0 37 48, TYOP 0 17 15, TYOP 0 193 192, TYOP 0 8 2,
+ TYOP 0 195 193, TYOP 0 31 33, TYOP 0 42 197, TYOP 0 41 40, TYOP 0 3 5,
+ TYOP 0 79 90, TYOP 0 83 2, TYOP 0 6 202, TYOP 0 134 168, TYOP 0 13 204,
+ TYOP 0 2 134, TYOP 0 13 137, TYOP 0 83 3, TYOP 0 6 208, TYOP 0 13 209,
+ TYOP 0 13 11, TYOP 0 5 5, TYOP 0 5 212, TYOP 0 15 135, TYOP 0 13 125,
+ TYOP 0 15 33, TYOP 0 13 216, TYOP 0 33 3, TYOP 0 13 92, TYOP 0 176 66,
+ TYOP 0 10 220, TYOP 0 48 3, TYOP 0 48 33, TYOP 0 223 222, TYOP 0 218 224,
+ TYOP 95 1, TYOP 0 48 226, TYOP 0 15 226, TYOP 0 228 227, TYOP 3 226,
+ TYOP 0 230 226, TYOP 0 231 229, TYOP 0 15 3, TYOP 0 233 223,
+ TYOP 0 153 234, TYOP 0 233 222, TYOP 0 218 236, TYOP 0 13 2, TYOP 0 13 10,
+ TYOP 0 15 230, TYOP 0 226 2, TYOP 0 13 241, TYOP 0 115 67]
+
+INCORPORATE_CONSTS
+["union_unavail_events" 14, "union_unavail_event_list" 19,
+"union_avail_events1" 9, "union_avail_events" 22,
+"union_avail_event_list1" 18, "union_avail_event_list" 24,
+"unavail_event" 28, "two_dim_steady_state_avail_prod" 32,
+"two_dim_steady_state_avail_list" 35, "two_dim_inst_unavail_exp" 39,
+"two_dim_inst_avail_exp" 39, "steady_state_unavail_list" 40,
+"steady_state_unavail" 41, "steady_state_avail_prod" 42,
+"steady_state_avail_list" 40, "steady_state_avail" 41, "reliability" 45,
+"rel_event1" 47, "list_union_avail_event_list" 50,
+"inst_unavail_exp_list" 53, "inst_unavail_exp" 56,
+"inst_avail_exp_list2" 53, "inst_avail_exp_list1" 53,
+"inst_avail_exp_list" 59, "inst_avail_exp3" 56, "inst_avail_exp2" 56,
+"inst_avail_exp1" 62, "inst_avail_exp" 62, "expec_avail1" 65,
+"expec_avail" 65, "expec" 68, "compl_steady_state_avail" 42, "cdf" 45,
+"avail_event_list" 71, "avail_event" 27, "XOR_unavail_FT_gate" 73,
+"UNIONL" 74, "OR_unavail_FT_gate" 76, "NOR_unavail_FT_gate" 76,
+"NAND_unavail_FT_gate" 78, "AND_unavail_FT_gate" 76]
+
+TERMS
+[TMV "A" 2, TMV "L" 79, TMV "L" 37, TMV "L" 17, TMV "L" 8, TMV "L1" 79,
+ TMV "L1" 17, TMV "L2" 17, TMV "M" 31, TMV "M" 30, TMV "M1" 30,
+ TMV "M2" 30, TMV "X" 6, TMV "X" 8, TMV "X1" 8, TMV "X2" 8, TMV "Y" 8,
+ TMV "a" 15, TMV "a" 17, TMV "a" 8, TMV "a" 30, TMV "a" 20, TMV "a" 29,
+ TMV "a" 3, TMV "b" 20, TMV "b" 3, TMV "c" 3, TMV "f" 66, TMV "h" 17,
+ TMV "h" 8, TMV "h" 30, TMV "h" 29, TMV "l" 15, TMV "m" 29, TMV "m1" 29,
+ TMV "m2" 29, TMV "n" 20, TMV "p" 13, TMV "s" 2, TMV "s" 6, TMV "ss" 15,
+ TMV "t" 1, TMV "t" 80, TMV "t" 5, TMV "t" 37, TMV "t" 17, TMV "t" 31,
+ TMV "t" 30, TMV "t" 20, TMV "t" 3, TMV "t'" 20, TMV "v" 1, TMV "x" 1,
+ TMV "x" 5, TMV "y" 5, TMV "z" 2, TMV "z" 15, TMV "z" 29, TMC 7 11,
+ TMC 7 82, TMC 7 84, TMC 7 85, TMC 7 87, TMC 7 89, TMC 7 91, TMC 7 93,
+ TMC 7 95, TMC 7 97, TMC 7 98, TMC 7 100, TMC 7 101, TMC 7 103, TMC 7 105,
+ TMC 7 106, TMC 7 108, TMC 8 111, TMC 8 114, TMC 8 117, TMC 9 118,
+ TMC 10 120, TMC 11 122, TMC 12 20, TMC 13 123, TMC 14 123, TMC 15 122,
+ TMC 15 124, TMC 15 125, TMC 15 126, TMC 15 128, TMC 15 130, TMC 15 132,
+ TMC 15 123, TMC 15 133, TMC 16 122, TMC 17 85, TMC 18 136, TMC 20 76,
+ TMC 21 138, TMC 21 140, TMC 22 141, TMC 23 142, TMC 24 143, TMC 24 145,
+ TMC 24 147, TMC 24 149, TMC 24 151, TMC 24 152, TMC 24 154, TMC 25 156,
+ TMC 26 125, TMC 27 158, TMC 27 160, TMC 27 162, TMC 28 2, TMC 29 165,
+ TMC 30 166, TMC 30 159, TMC 31 167, TMC 31 41, TMC 32 169, TMC 33 171,
+ TMC 33 173, TMC 34 159, TMC 34 161, TMC 34 174, TMC 35 177, TMC 36 178,
+ TMC 36 179, TMC 36 180, TMC 36 181, TMC 37 156, TMC 38 182, TMC 38 183,
+ TMC 38 184, TMC 38 185, TMC 38 186, TMC 38 187, TMC 38 188, TMC 39 189,
+ TMC 39 190, TMC 39 191, TMC 40 194, TMC 40 196, TMC 40 198, TMC 40 199,
+ TMC 41 78, TMC 42 15, TMC 42 37, TMC 42 17, TMC 42 31, TMC 42 34,
+ TMC 42 30, TMC 42 33, TMC 43 76, TMC 44 90, TMC 44 92, TMC 44 99,
+ TMC 45 142, TMC 46 200, TMC 47 136, TMC 48 76, TMC 49 201, TMC 50 203,
+ TMC 51 167, TMC 51 41, TMC 52 0, TMC 53 148, TMC 53 139, TMC 54 156,
+ TMC 55 74, TMC 56 205, TMC 57 73, TMC 58 20, TMC 59 122, TMC 60 206,
+ TMC 61 27, TMC 62 71, TMC 63 45, TMC 64 207, TMC 65 42, TMC 66 123,
+ TMC 67 210, TMC 68 211, TMC 69 119, TMC 70 68, TMC 71 65, TMC 72 65,
+ TMC 73 213, TMC 74 124, TMC 75 124, TMC 76 164, TMC 77 214, TMC 78 215,
+ TMC 79 62, TMC 80 62, TMC 81 56, TMC 82 56, TMC 83 59, TMC 84 53,
+ TMC 85 53, TMC 86 56, TMC 87 53, TMC 88 67, TMC 89 217, TMC 90 218,
+ TMC 91 50, TMC 92 219, TMC 93 221, TMC 93 225, TMC 94 232, TMC 94 235,
+ TMC 94 237, TMC 96 153, TMC 97 238, TMC 98 231, TMC 99 239, TMC 100 104,
+ TMC 101 240, TMC 102 242, TMC 103 120, TMC 104 133, TMC 105 133,
+ TMC 106 120, TMC 107 119, TMC 108 66, TMC 109 120, TMC 110 47, TMC 111 45,
+ TMC 112 231, TMC 113 41, TMC 114 40, TMC 115 42, TMC 116 41, TMC 117 40,
+ TMC 118 243, TMC 119 39, TMC 120 39, TMC 121 35, TMC 122 32, TMC 123 28,
+ TMC 124 24, TMC 125 18, TMC 126 22, TMC 127 9, TMC 128 19, TMC 129 14,
+ TMC 130 121]
+
+THEOREMS
+"UNIONL_def"
+["Availability", 0, "list", 486]
+["DISK_THM"]
+["%80%86%169%146@2%113@2%61%38%65%40%86%169%101$1@$0@3%168$1@%169$0@3|@|@2"
+]
+"avail_event_def"
+["Availability", 2]
+[]
+[
+"%69%4%71%36%60%43%86%175$2@$1@$0@2%120%52%75$0@%80%188%114%21%187%117%112$0@$4@2$1@2%163%112$0@$4@2$1@2|@%180$2@3$1@2%189$1@%187%114%21%187%117%112$0@$4@2$1@2%163%112$0@$4@2$1@2|@%180$2@3%117%112$2@$3@2$0@5|@2|@|@|@"
+]
+"union_avail_events_def"
+["Availability", 3]
+[]
+[
+"%69%4%71%36%74%49%86%242$2@$1@$0@2%99%125%21%175$3@$0@%158$1@2|@%180$1@4|@|@|@"
+]
+"union_avail_events1_def"
+["Availability", 4]
+[]
+["%69%4%74%49%86%243$1@$0@2%99%125%21%175$2@$0@%158$1@2|@%180%136$1@5|@|@"]
+"union_avail_event_list_def"
+["Availability", 5]
+[]
+["%67%3%71%36%74%49%87%240$2@$1@$0@2%142%19%242$0@$2@$1@|@$2@2|@|@|@"]
+"union_avail_event_list1_def"
+["Availability", 6]
+[]
+["%67%3%74%49%87%241$1@$0@2%142%19%243$0@$1@|@$1@2|@|@"]
+"list_union_avail_event_list_def"
+["Availability", 7]
+[]
+["%66%2%74%49%88%205$1@$0@2%141%18%241$0@$1@|@$1@2|@|@"]
+"avail_event_list_def"
+["Availability", 8]
+[]
+["%67%3%71%36%60%43%87%176$2@$1@$0@2%142%19%175$0@$2@$1@|@$2@2|@|@|@"]
+"expec_avail_def"
+["Availability", 9]
+[]
+[
+"%72%37%69%4%71%36%60%43%92%185$3@$2@$1@$0@2%234%77%81@$1@2%21%215$4@%175$3@$0@$1@2|@2|@|@|@|@"
+]
+"expec_avail1_def"
+["Availability", 10]
+[]
+[
+"%72%37%69%4%71%36%60%43%92%186$3@$2@$1@$0@2%234%77%81@$1@2%207%215$3@2%21%175$3@$0@$1@|@3|@|@|@|@"
+]
+"cdf_def"
+["Availability", 11]
+[]
+[
+"%72%37%62%12%60%43%92%177$2@$1@$0@2%181$2@$1@%121%54%76$0@%188$0@$1@2|@3|@|@|@"
+]
+"reliability_def"
+["Availability", 12]
+[]
+[
+"%72%37%62%12%60%43%92%227$2@$1@$0@2%225%224%157%100%172@4%177$2@$1@$0@3|@|@|@"
+]
+"rel_event1_def"
+["Availability", 13]
+[]
+[
+"%72%37%62%12%60%43%86%226$2@$1@$0@2%130%162$1@%121%54%76$0@%189$1@$0@2|@3%213$2@3|@|@|@"
+]
+"expec_def"
+["Availability", 14]
+[]
+["%71%36%63%27%92%184$1@$0@2%234%77%81@$1@2$0@2|@|@"]
+"inst_avail_exp_def"
+["Availability", 15]
+[]
+[
+"%72%37%69%4%71%36%73%33%84%193$3@$2@$1@$0@2%74%49%92%184$2@%21%215$5@%175$4@$0@%158$1@3|@2%219%79%164$1@2%219%164$1@2%118$1@4%222%79%118$1@2%219%164$1@2%118$1@4%183%222%223%219%164$1@2%118$1@4$0@5|@2|@|@|@|@"
+]
+"inst_avail_exp1_def"
+["Availability", 16]
+[]
+[
+"%72%37%69%4%71%36%73%33%84%194$3@$2@$1@$0@2%71%48%92%215$4@%242$3@$2@%224$0@4%219%79%164$1@2%219%164$1@2%118$1@4%222%79%118$1@2%219%164$1@2%118$1@4%183%222%223%219%164$1@2%118$1@4%224$0@6|@2|@|@|@|@"
+]
+"inst_avail_exp2_def"
+["Availability", 17]
+[]
+[
+"%72%37%69%4%73%33%84%195$2@$1@$0@2%71%48%92%215$3@%243$2@%224$0@4%219%79%164$1@2%219%164$1@2%118$1@4%222%79%118$1@2%219%164$1@2%118$1@4%183%222%223%219%164$1@2%118$1@4%224$0@6|@2|@|@|@"
+]
+"inst_avail_exp3_def"
+["Availability", 18]
+[]
+[
+"%72%37%69%4%73%33%84%196$2@$1@$0@2%71%48%92%215$3@%130%243$2@%224$0@3%213$3@4%219%79%164$1@2%219%164$1@2%118$1@4%222%79%118$1@2%219%164$1@2%118$1@4%183%222%223%219%164$1@2%118$1@4%224$0@6|@2|@|@|@"
+]
+"inst_avail_exp_list_def"
+["Availability", 19, "list", 486]
+["DISK_THM"]
+[
+"%80%72%37%71%36%70%9%84%197$2@%148@$1@$0@2%165@|@|@|@2%72%37%69%29%67%45%71%36%70%9%84%197$4@%103$3@$2@2$1@$0@2%80%193$4@$3@$1@%124$0@3%197$4@$2@$1@%167$0@4|@|@|@|@|@2"
+]
+"inst_avail_exp_list1_def"
+["Availability", 20, "list", 486]
+["DISK_THM"]
+[
+"%80%72%37%70%9%84%198$1@%148@$0@2%165@|@|@2%72%37%69%29%67%45%70%9%84%198$3@%103$2@$1@2$0@2%80%195$3@$2@%124$0@3%198$3@$1@%167$0@4|@|@|@|@2"
+]
+"inst_avail_exp_list2_def"
+["Availability", 21, "list", 486]
+["DISK_THM"]
+[
+"%80%72%37%70%9%84%199$1@%148@$0@2%165@|@|@2%72%37%69%29%67%45%70%9%84%199$3@%103$2@$1@2$0@2%80%196$3@$2@%124$0@3%199$3@$1@%167$0@4|@|@|@|@2"
+]
+"two_dim_inst_avail_exp_def"
+["Availability", 22, "list", 486]
+["DISK_THM"]
+[
+"%80%72%37%68%8%84%235$1@%147@$0@2%165@|@|@2%72%37%67%28%66%44%68%8%84%235$3@%102$2@$1@2$0@2%80%198$3@$2@%122$0@3%235$3@$1@%166$0@4|@|@|@|@2"
+]
+"steady_state_avail_def"
+["Availability", 23]
+[]
+["%73%33%92%229$0@2%79%164$0@2%219%164$0@2%118$0@4|@"]
+"steady_state_avail_list_def"
+["Availability", 24, "list", 486]
+["DISK_THM"]
+[
+"%80%90%230%151@2%152@2%73%31%70%47%90%230%106$1@$0@3%107%229$1@2%230$0@3|@|@2"
+]
+"two_dim_steady_state_avail_list_def"
+["Availability", 25, "list", 486]
+["DISK_THM"]
+[
+"%80%89%237%149@2%150@2%70%30%68%46%89%237%104$1@$0@3%105%230$1@2%237$0@3|@|@2"
+]
+"steady_state_avail_prod_def"
+["Availability", 26, "list", 486]
+["DISK_THM"]
+[
+"%80%92%231%151@2%224%157%100%172@5%73%31%70%47%92%231%106$1@$0@3%222%229$1@2%231$0@3|@|@2"
+]
+"two_dim_steady_state_avail_prod_def"
+["Availability", 27, "list", 486]
+["DISK_THM"]
+[
+"%80%92%238%149@2%224%157%100%172@5%70%30%68%46%92%238%104$1@$0@3%222%231$1@2%238$0@3|@|@2"
+]
+"compl_steady_state_avail_def"
+["Availability", 28, "list", 486]
+["DISK_THM"]
+[
+"%80%92%179%151@2%224%157%100%172@5%73%31%70%47%92%179%106$1@$0@3%222%225%224%157%100%172@4%229$1@3%179$0@3|@|@2"
+]
+"unavail_event_def"
+["Availability", 50]
+[]
+[
+"%72%37%69%4%71%36%60%43%86%239$3@$2@$1@$0@2%108%213$3@2%130%175$2@$1@$0@2%213$3@4|@|@|@|@"
+]
+"union_unavail_events_def"
+["Availability", 51]
+[]
+[
+"%72%37%69%4%74%49%86%245$2@$1@$0@2%108%213$2@2%130%243$1@$0@2%213$2@4|@|@|@"
+]
+"union_unavail_event_list_def"
+["Availability", 52]
+[]
+["%72%37%67%3%74%49%87%244$2@$1@$0@2%142%19%245$3@$0@$1@|@$1@2|@|@|@"]
+"steady_state_unavail_def"
+["Availability", 53]
+[]
+["%73%33%92%232$0@2%79%118$0@2%219%164$0@2%118$0@4|@"]
+"steady_state_unavail_list_def"
+["Availability", 54]
+[]
+["%70%9%90%233$0@2%144%22%232$0@|@$0@2|@"]
+"inst_unavail_exp_def"
+["Availability", 55]
+[]
+[
+"%72%37%69%4%73%33%84%200$2@$1@$0@2%71%48%92%215$3@%245$3@$2@%224$0@4%225%79%118$1@2%219%164$1@2%118$1@4%222%79%118$1@2%219%164$1@2%118$1@4%183%222%223%219%164$1@2%118$1@4%224$0@6|@2|@|@|@"
+]
+"inst_unavail_exp_list_def"
+["Availability", 56, "list", 486]
+["DISK_THM"]
+[
+"%80%72%37%70%9%84%201$1@%148@$0@2%165@|@|@2%72%37%69%29%67%45%70%9%84%201$3@%103$2@$1@2$0@2%80%200$3@$2@%124$0@3%201$3@$1@%167$0@4|@|@|@|@2"
+]
+"two_dim_inst_unavail_exp_def"
+["Availability", 57, "list", 486]
+["DISK_THM"]
+[
+"%80%72%37%68%8%84%236$1@%147@$0@2%165@|@|@2%72%37%67%28%66%44%68%8%84%236$3@%102$2@$1@2$0@2%80%201$3@$2@%122$0@3%236$3@$1@%166$0@4|@|@|@|@2"
+]
+"AND_unavail_FT_gate_def"
+["Availability", 58]
+[]
+["%72%37%67%3%74%49%86%96$2@$1@$0@2%119$2@%95%191%244$2@$1@$0@5|@|@|@"]
+"OR_unavail_FT_gate_def"
+["Availability", 59]
+[]
+["%72%37%67%3%74%49%86%160$2@$1@$0@2%119$2@%159%191%244$2@$1@$0@5|@|@|@"]
+"NOR_unavail_FT_gate_def"
+["Availability", 60]
+[]
+[
+"%72%37%67%3%74%49%86%153$2@$1@$0@2%108%213$2@2%119$2@%159%191%244$2@$1@$0@6|@|@|@"
+]
+"NAND_unavail_FT_gate_def"
+["Availability", 61]
+[]
+[
+"%72%37%67%6%67%7%74%49%86%145$3@$2@$1@$0@2%119$3@%95%191%97%178$3@%244$3@$2@$0@3%244$3@$1@$0@6|@|@|@|@"
+]
+"XOR_unavail_FT_gate_def"
+["Availability", 62]
+[]
+[
+"%72%37%69%13%69%16%74%49%86%171$3@$2@$1@$0@2%170$3@%174%245$3@$2@$0@3%174%245$3@$1@$0@4|@|@|@|@"
+]
+"in_events_normal_events"
+["Availability", 68, "bool", 25, 55, 56, 62, "pred_set", 65, 94,
+"probability", 51]
+["DISK_THM"]
+[
+"%72%37%61%0%59%42%93%80%216$2@2%127%108%213$2@2%130$1@%213$2@4%182$2@4%127%130$1@%213$2@3%182$2@3|@|@|@"
+]
+"steady_state_NOR_unavail_FT_gate"
+["Availability", 67, "Availability", 60, 65, "FT_deep", 45, 51, "bool", 2,
+15, 25, 26, 27, 47, 50, 52, 53, 55, 57, 62, 73, 74, 98, 99, 104, 123,
+"probability", 38, "real", 179, "sat", 1, 3, 5, 6, 7, 11, 12, 13, 14, 15,
+17, 18, "seq", 9, 10, 13]
+["DISK_THM"]
+[
+"%72%37%67%3%70%9%93%80%216$2@2%80%73%57%93%129$0@%140$1@3%80%220%224%81@2%118$0@3%220%224%81@2%164$0@4|@2%80%91%134$1@2%137$0@3%80%71%50%80%246%155%244$3@$2@%224$0@5%80%61%55%93%127$0@%138%244$4@$3@%224$1@5%127$0@%182$4@3|@2%206$3@%244$3@$2@%224$0@5|@2%201$2@$1@$0@6%92%202%48%215$3@%153$3@$2@%224$0@3|@2%204%212%233$0@5|@|@|@"
+]
+"OR_steady_state_unavail"
+["Availability", 66, "Availability", 59, 65, "FT_deep", 51, "bool", 25, 27,
+47, 50, 52, 53, 55, 57, 62, 73, 74, 104, 123, "sat", 1, 3, 5, 6, 7, 11, 13,
+14, 15, 17, 18, "seq", 2, 7, 9, 10, 13]
+["DISK_THM"]
+[
+"%72%37%67%3%70%9%93%80%216$2@2%80%73%57%93%129$0@%140$1@3%80%220%224%81@2%118$0@3%220%224%81@2%164$0@4|@2%80%91%134$1@2%137$0@3%80%71%50%80%246%155%244$3@$2@%224$0@5%80%61%55%93%127$0@%138%244$4@$3@%224$1@5%127$0@%182$4@3|@2%206$3@%244$3@$2@%224$0@5|@2%201$2@$1@$0@6%92%202%48%215$3@%160$3@$2@%224$0@3|@2%225%224%157%100%172@4%204%212%233$0@6|@|@|@"
+]
+"IN_UNIONL"
+["Availability", 1, "Availability", 0, "bool", 13, 14, 25, 26, 27, 29, 36,
+46, 47, 50, 51, 52, 53, 55, 57, 62, 71, 73, 75, 77, 79, 80, 83, 92, 93, 95,
+145, "list", 47, 126, "pred_set", 18, 48, "sat", 1, 3, 5, 6, 7, 11, 12, 13,
+14, 15, 17, 18, 19, 20, 23]
+["DISK_THM"]
+["%65%32%58%51%84%126$0@%169$1@3%94%38%80%127$0@%138$2@3%126$1@$0@2|@2|@|@"
+]
+"compl_rel_event_eq_fail_event1"
+["Availability", 29, "VDC", 24, "bool", 18, 25, 26, 27, 47, 52, 53, 57, 62,
+95, 104, 123, 142, "pair", 4, "pred_set", 3, 6, 60, 85, 549, "sat", 1, 3,
+5, 6, 7, 11, 12, 13, 15, 17, 18]
+["DISK_THM"]
+[
+"%72%37%60%43%62%39%93%216$2@2%86%108%213$2@2%130%162$0@%121%54%76$0@%189$2@$0@2|@3%213$2@4%130%162$0@%121%54%76$0@%188$0@$2@2|@3%213$2@4|@|@|@"
+]
+"compl_fail_event_eq_rel_event1"
+["Availability", 30, "Availability", 13, "bool", 25, 26, 27, 47, 52, 53,
+57, 62, 95, 142, "extreal", 34, "pair", 4, "pred_set", 3, 6, 60, 85, 549,
+"sat", 1, 3, 5, 6, 7, 11, 12, 13, 15, 17, 18]
+["DISK_THM"]
+[
+"%62%12%60%43%72%37%86%108%213$0@2%130%162$2@%121%54%76$0@%188$0@$2@2|@3%213$0@4%226$0@$2@$1@2|@|@|@"
+]
+"avail_ge_rel"
+["Availability", 31, "Availability", 2, 9, 11, 12, 13, 29, 30,
+"arithmetic", 17, 22, 25, 66, "bool", 25, 26, 27, 35, 50, 52, 53, 55, 57,
+62, 104, 123, 142, "extreal", 144, 268, "list", 17, 18, 23, 50, 134,
+"numeral", 3, "pair", 4, "pred_set", 3, 6, 64, 306, 456, 551, "prim_rec",
+6, "probability", 11, 34, 38, 43, 45, 48, 50, "real", 7, 122, 280, 282, 287
+]
+["DISK_THM"]
+[
+"%72%37%60%43%69%4%93%80%188%190%81@2$1@2%80%246%156$0@3%80%71%36%127%175$1@$0@$2@2%182$3@2|@2%216$2@5%221%227$2@%117%123$0@3$1@2%185$2@$0@%136$0@2$1@3|@|@|@"
+]
+"avail_ge_rel1"
+["Availability", 32, "Availability", 3, 9, 31, "bool", 25, 26, 27, 35, 52,
+53, 55, 56, 57, 62, 104, 123, "combin", 5, "pred_set", 218, "probability",
+61]
+["DISK_THM"]
+[
+"%72%37%74%49%69%4%93%80%188%190%81@2%158$1@3%80%246%156$0@3%80%71%21%71%24%93%246%91$1@$0@3%109%175$2@$1@%158$3@3%175$2@$0@%158$3@4|@|@2%80%71%36%127%175$1@$0@%158$2@3%182$3@2|@2%216$2@6%221%227$2@%117%123$0@3%158$1@3%215$2@%242$0@%136$0@2$1@4|@|@|@"
+]
+"neg_exp_tend0_new"
+["Availability", 33, "bool", 25, 26, 27, 29, 50, 51, 52, 53, 55, 57, 62,
+63, 104, 123, "numeral", 3, 6, "real", 12, 43, 74, 118, 119, 130, 135, 158,
+162, 204, 339, 436, "seq", 37, "transc", 16, 20, 24, 25]
+["DISK_THM"]
+[
+"%58%41%74%26%93%220%224%81@2$0@2%78%48%183%222%224$0@2%223$1@3|@%224%81@3|@|@"
+]
+"steady_avail_temp"
+["Availability", 34, "arithmetic", 46, 60, 81, 213, "bool", 25, 42, 50, 52,
+53, 55, 57, 62, 95, "numeral", 3, "real", 4, 6, 7, 8, 12, 18, 27, 28, 38,
+39, 46, 59, 60, 61, 62, 131, 308, 309, 310, 311, 312, 313, 314, 326, 328,
+"sat", 1, 3, 5, 6, 7, 11, 12, 14, 15]
+["DISK_THM"]
+[
+"%74%23%74%25%93%80%220%224%81@2$1@2%220%224%81@2$0@3%220%224%81@2%219$1@$0@3|@|@"
+]
+"steady_state_avail"
+["Availability", 35, "Availability", 9, 14, 15, 33, 34, "bool", 25, 34, 36,
+50, 55, 57, 62, 104, "real", 15, 27, 40, 307, 308, "seq", 2, 3, 4, 9, 10,
+13]
+["DISK_THM"]
+[
+"%72%37%69%4%71%36%73%33%59%42%93%80%80%220%224%81@2%118$1@3%220%224%81@2%164$1@4%193$4@$3@$2@$1@3%92%202%48%185$5@$4@$3@%158%224$0@3|@2%79%164$1@2%219%164$1@2%118$1@5|@|@|@|@|@"
+]
+"steady_state_avail1"
+["Availability", 36, "Availability", 3, 9, 35, "bool", 25, 26, 27, 35, 36,
+50, 52, 53, 55, 56, 57, 62, 104, 123, "combin", 5, "pred_set", 218, 307,
+"probability", 61]
+["DISK_THM"]
+[
+"%72%37%69%4%71%36%73%33%93%80%216$3@2%80%74%49%80%71%21%71%24%93%246%91$1@$0@3%109%175$5@$1@%158$2@3%175$5@$0@%158$2@4|@|@2%71%36%127%175$4@$0@%158$1@3%182$5@2|@2|@2%80%80%220%224%81@2%118$0@3%220%224%81@2%164$0@4%193$3@$2@$1@$0@5%92%202%48%215$4@%242$3@$2@%224$0@3|@2%79%164$0@2%219%164$0@2%118$0@5|@|@|@|@"
+]
+"EXT_LE_LT"
+["Availability", 37, "bool", 25, 52, 55, 57, 92, 94, 104, 123, "extreal",
+100]
+["DISK_THM"]
+[
+"%60%53%60%54%84%173%188$1@$0@2%189$0@$1@3%173%85$1@$0@2%173%189$1@$0@2%189$0@$1@4|@|@"
+]
+"PERM_refl"
+["Availability", 38, "bool", 13, 25, 26, 27, 29, 46, 47, 50, 51, 52, 53,
+55, 57, 62, 70, 74, 77, 79, 83, 93, 145, "sat", 1, 3, 5, 6, 7, 11, 12, 13,
+14, 15, "sorting", 0]
+["DISK_THM"]
+["%64%1%161$0@$0@|@"]
+"LET_ANTISYM"
+["Availability", 39, "VDC", 24, "bool", 25, 29, 53, 62, 95]
+["DISK_THM"]
+["%60%53%60%54%246%80%189$1@$0@2%188$0@$1@3|@|@"]
+"not_null_leng"
+["Availability", 40, "arithmetic", 41, 46, 73, 95, 179, 182, 186, "bool",
+25, 35, 52, 53, 57, 62, 95, 100, 103, 104, 123, "numeral", 3, 8,
+"rich_list", 32]
+["DISK_THM"]
+["%64%5%93%246%154$0@3%83%157%100%172@3%131$0@3|@"]
+"series_expec_tends_prod_avail"
+["Availability", 41, "Availability", 6, 17, 20, 23, 26, 33, 34, "RBD", 33,
+34, "arithmetic", 24, 25, 73, 178, 179, 186, "bool", 14, 25, 26, 27, 35,
+36, 42, 50, 52, 53, 55, 57, 62, 95, 100, 103, 104, 123, "list", 18, 19, 23,
+24, 47, 97, 126, "num", 7, "numeral", 3, 8, "prim_rec", 1, "real", 15, 27,
+40, 307, 308, "seq", 2, 3, 4]
+["DISK_THM"]
+[
+"%72%37%67%3%70%9%93%80%216$2@2%80%73%57%93%129$0@%140$1@3%80%220%224%81@2%118$0@3%220%224%81@2%164$0@4|@2%80%91%134$1@2%137$0@3%198$2@$1@$0@5%78%48%204%203$3@%241$2@%224$0@4|@%231$0@3|@|@|@"
+]
+"series_rbd_avail"
+["Availability", 42, "Availability", 41, "RBD", 43, "bool", 25, 26, 27, 50,
+52, 53, 55, 57, 62, 104, 123, "seq", 9, 10, 13]
+["DISK_THM"]
+[
+"%72%37%67%3%70%9%93%80%216$2@2%80%73%57%93%129$0@%140$1@3%80%220%224%81@2%118$0@3%220%224%81@2%164$0@4|@2%80%91%134$1@2%137$0@3%80%71%50%80%246%155%241$2@%224$0@5%80%61%55%93%127$0@%138%241$3@%224$1@5%127$0@%182$4@3|@2%206$3@%241$2@%224$0@5|@2%198$2@$1@$0@6%92%202%48%215$3@%218$3@%228%217%241$2@%224$0@6|@2%231$0@3|@|@|@"
+]
+"lim_inst_parall_tend_steady"
+["Availability", 43, "Availability", 6, 17, 20, 23, 28, 33, 34, "RBD", 33,
+34, 37, "arithmetic", 24, 25, 73, 178, 179, 186, "bool", 14, 25, 26, 27,
+35, 36, 42, 50, 52, 53, 55, 57, 62, 95, 100, 103, 104, 123, "list", 18, 19,
+23, 24, 47, 97, 126, "num", 7, "numeral", 3, 8, "prim_rec", 1, "real", 15,
+27, 40, 307, 308, "seq", 2, 3, 4, 7]
+["DISK_THM"]
+[
+"%72%37%67%3%70%9%93%80%216$2@2%80%73%57%93%129$0@%140$1@3%80%220%224%81@2%118$0@3%220%224%81@2%164$0@4|@2%80%91%134$1@2%137$0@3%198$2@$1@$0@5%78%48%204%212%203$3@%241$2@%224$0@5|@%179$0@3|@|@|@"
+]
+"compl_steady_state_avail_equi"
+["Availability", 44, "Availability", 24, 28, "RBD", 33, 37, "bool", 14, 25,
+55, "list", 47]
+["DISK_THM"]
+["%70%9%92%179$0@2%204%212%230$0@4|@"]
+"parallel_rbd_avail"
+["Availability", 45, "Availability", 43, 44, "RBD", 71, "bool", 25, 26, 27,
+50, 52, 53, 55, 57, 62, 104, 123, "seq", 2, 7, 9, 10, 13]
+["DISK_THM"]
+[
+"%72%37%67%3%70%9%93%80%216$2@2%80%73%57%93%129$0@%140$1@3%80%220%224%81@2%118$0@3%220%224%81@2%164$0@4|@2%80%91%134$1@2%137$0@3%80%71%50%80%246%155%241$2@%224$0@5%80%61%55%93%127$0@%138%241$3@%224$1@5%127$0@%182$4@3|@2%206$3@%241$2@%224$0@5|@2%198$2@$1@$0@6%92%202%48%215$3@%218$3@%214%217%241$2@%224$0@6|@2%225%224%157%100%172@4%204%212%230$0@6|@|@|@"
+]
+"lim_inst_parall_series_tend_steady"
+["Availability", 46, "Availability", 7, 22, 41, "RBD", 31, 33, 37,
+"arithmetic", 24, 25, 37, 73, 178, 179, 186, "bool", 14, 25, 26, 27, 35,
+42, 50, 52, 53, 55, 57, 62, 95, 100, 103, 104, 123, "combin", 8, "list",
+18, 19, 22, 23, 24, 26, 47, 97, 134, 246, "num", 7, "numeral", 3, 8,
+"pred_set", 18, 48, "prim_rec", 1, 6, 7, "seq", 2, 4, 7]
+["DISK_THM"]
+[
+"%72%37%66%2%68%8%93%80%216$2@2%80%73%57%93%129$0@%140%116$1@4%80%220%224%81@2%118$0@3%220%224%81@2%164$0@4|@2%80%91%133$1@2%135$0@3%80%71%36%93%82$0@%133$2@3%91%134%110$0@$2@3%137%111$0@$1@4|@2%235$2@$1@$0@6%78%48%208%204@%210%212@%17%204%203$4@$0@2|@2%205$2@%224$0@3|@%204%212%143%20%231$0@|@$0@5|@|@|@"
+]
+"steady_state_parallel_series_ABD"
+["Availability", 47, "Availability", 46, "RBD", 106, "bool", 25, 27, 47,
+52, 53, 55, 57, 62, 73, 74, 99, "combin", 8, "sat", 1, 3, 5, 6, 7, 11, 13,
+14, 15, 17, 18, "seq", 2, 7, 9, 10, 13]
+["DISK_THM"]
+[
+"%72%37%66%2%68%8%93%80%216$2@2%80%73%57%93%129$0@%140%116$1@4%80%220%224%81@2%118$0@3%220%224%81@2%164$0@4|@2%80%91%133$1@2%135$0@3%80%71%36%93%82$0@%133$2@3%91%134%110$0@$2@3%137%111$0@$1@4|@2%80%71%50%80%65%56%93%128$0@%139%205$3@%224$1@5%246%155$0@3|@2%80%61%55%93%127$0@%138%115%205$3@%224$1@6%127$0@%182$4@3|@2%206$3@%115%205$2@%224$0@6|@2%235$2@$1@$0@7%92%202%48%215$3@%218$3@%209%214@%17%228%217$0@2|@%205$2@%224$0@5|@2%225%224%157%100%172@4%204%212%143%20%231$0@|@$0@6|@|@|@"
+]
+"lim_inst_series_parall_tend_steady"
+["Availability", 48, "Availability", 7, 22, 43, "RBD", 31, 33, 37,
+"arithmetic", 24, 25, 37, 73, 178, 179, 186, "bool", 14, 25, 26, 27, 35,
+42, 50, 52, 53, 55, 57, 62, 95, 100, 103, 104, 123, "combin", 8, "list",
+18, 19, 22, 23, 24, 26, 32, 47, 97, 246, "num", 7, "numeral", 3, 8,
+"pred_set", 18, 48, "prim_rec", 1, 6, 7, "seq", 2, 4, 7]
+["DISK_THM"]
+[
+"%72%37%66%2%68%8%93%80%216$2@2%80%73%57%93%129$0@%140%116$1@4%80%220%224%81@2%118$0@3%220%224%81@2%164$0@4|@2%80%91%133$1@2%135$0@3%80%71%36%93%82$0@%133$2@3%91%134%110$0@$2@3%137%111$0@$1@4|@2%235$2@$1@$0@6%78%48%211%204@%17%225%224%157%100%172@4%204%212%203$4@$0@4|@%205$2@%224$0@3|@%204%212%143%20%179$0@|@$0@5|@|@|@"
+]
+"steady_state_series_parallel_avail"
+["Availability", 49, "Availability", 48, "RBD", 111, "bool", 25, 27, 47,
+50, 52, 53, 55, 57, 62, 73, 74, 104, 123, "sat", 1, 3, 5, 6, 7, 11, 13, 14,
+15, 17, 18, "seq", 9, 10, 13]
+["DISK_THM"]
+[
+"%72%37%66%2%68%8%93%80%216$2@2%80%73%57%93%129$0@%140%116$1@4%80%220%224%81@2%118$0@3%220%224%81@2%164$0@4|@2%80%91%133$1@2%135$0@3%80%71%36%93%82$0@%133$2@3%91%134%110$0@$2@3%137%111$0@$1@4|@2%80%71%50%80%65%56%93%128$0@%139%205$3@%224$1@5%246%155$0@3|@2%80%61%55%93%127$0@%138%115%205$3@%224$1@6%127$0@%182$4@3|@2%206$3@%115%205$2@%224$0@6|@2%235$2@$1@$0@7%92%202%48%215$3@%218$3@%209%228@%17%214%217$0@2|@%205$2@%224$0@5|@2%204%212%143%20%179$0@|@$0@5|@|@|@"
+]
+"AND_inst_avail_prod_tends_steady"
+["Availability", 63, "Availability", 33, 34, 52, 53, 54, 55, 56, "RBD", 33,
+34, "arithmetic", 24, 25, 73, 178, 179, 186, "bool", 14, 25, 26, 27, 35,
+36, 42, 50, 52, 53, 55, 57, 62, 95, 100, 103, 104, 123, "list", 18, 19, 23,
+24, 47, 97, 126, "num", 7, "numeral", 3, 8, "prim_rec", 1, "real", 15, 40,
+162, 307, 308, "seq", 2, 4, 7]
+["DISK_THM"]
+[
+"%72%37%67%3%70%9%93%80%216$2@2%80%73%57%93%129$0@%140$1@3%80%220%224%81@2%118$0@3%220%224%81@2%164$0@4|@2%80%91%134$1@2%137$0@3%201$2@$1@$0@5%78%48%204%203$3@%244$3@$2@%224$0@4|@%204%233$0@4|@|@|@"
+]
+"AND_gate_unavail"
+["Availability", 64, "Availability", 58, 63, "FT_deep", 34, "bool", 25, 27,
+47, 50, 52, 53, 55, 57, 62, 73, 74, 104, 123, "sat", 1, 3, 5, 6, 7, 11, 13,
+14, 15, 17, 18, "seq", 9, 10, 13]
+["DISK_THM"]
+[
+"%72%37%67%3%70%9%93%80%216$2@2%80%73%57%93%129$0@%140$1@3%80%220%224%81@2%118$0@3%220%224%81@2%164$0@4|@2%80%91%134$1@2%137$0@3%80%71%50%80%246%155%244$3@$2@%224$0@5%80%61%55%93%127$0@%138%244$4@$3@%224$1@5%127$0@%182$4@3|@2%206$3@%244$3@$2@%224$0@5|@2%201$2@$1@$0@6%92%202%48%215$3@%96$3@$2@%224$0@3|@2%204%233$0@4|@|@|@"
+]
+"lim_inst_OR_tend_steady"
+["Availability", 69, "Availability", 18, 21, 23, 24, 33, 34, 51, 52, "RBD",
+33, 34, 36, "arithmetic", 24, 25, 73, 178, 179, 186, "bool", 2, 14, 25, 26,
+27, 35, 36, 42, 50, 51, 52, 53, 55, 57, 62, 95, 98, 100, 103, 104, 123,
+"combin", 3, 5, 19, 20, "list", 18, 19, 23, 24, 26, 47, 97, 126, "num", 7,
+"numeral", 3, 8, "pred_set", 65, 94, 103, "prim_rec", 1, "real", 15, 27,
+40, 307, 308, "sat", 1, 3, 5, 6, 7, 11, 12, 13, 14, 15, 17, 18, 19, 20, 23,
+"seq", 2, 3, 4]
+["DISK_THM"]
+[
+"%72%37%67%3%70%9%93%80%216$2@2%80%73%57%93%129$0@%140$1@3%80%220%224%81@2%118$0@3%220%224%81@2%164$0@4|@2%80%91%134$1@2%137$0@3%80%71%50%61%55%93%127$0@%138%244$4@$3@%224$1@5%127$0@%182$4@3|@|@2%199$2@$1@$0@6%78%48%204%203$3@%178$3@%244$3@$2@%224$0@5|@%204%230$0@4|@|@|@"
+]
+"NAND_steady_state_avail"
+["Availability", 70, "Availability", 61, 63, 69, "FT_deep", 54, "bool", 25,
+35, 50, 52, 55, 57, 62, 104, 123, "list", 61, 86, "seq", 4, 9, 10, 13]
+["DISK_THM"]
+[
+"%72%37%67%6%67%7%70%10%70%11%93%80%216$4@2%80%73%57%93%129$0@%140%98$2@$1@4%80%220%224%81@2%118$0@3%220%224%81@2%164$0@4|@2%80%80%91%134$3@2%137$1@3%91%134$2@2%137$0@4%80%71%50%80%83%157%100%172@3%132%97%244$5@$4@%224$0@3%244$5@$3@%224$0@6%80%61%55%93%127$0@%138%97%244$6@$5@%224$1@3%244$6@$4@%224$1@6%127$0@%182$6@3|@2%206$5@%97%244$5@$4@%224$0@3%244$5@$3@%224$0@6|@2%80%199$4@$3@$1@2%201$4@$2@$0@7%92%202%48%215$5@%145$5@$4@$3@%224$0@3|@2%222%204%230$1@3%204%233$0@5|@|@|@|@|@"
+]
+"inst_XOR_tends_steadty"
+["Availability", 71, "Availability", 33, 34, 53, 55, "bool", 25, 36, 50,
+55, 57, 62, 104, "real", 15, 40, 162, 307, 308, "seq", 2, 4, 7]
+["DISK_THM"]
+[
+"%72%37%69%14%73%34%93%80%200$2@$1@$0@2%80%220%224%81@2%118$0@3%220%224%81@2%164$0@5%78%48%215$3@%245$3@$2@%224$0@3|@%232$0@3|@|@|@"
+]
+"XOR_steady_unavail"
+["Availability", 72, "Availability", 71, "FT_deep", 65, "bool", 25, 27, 47,
+52, 53, 55, 57, 62, "sat", 1, 3, 7, 17, 18, "seq", 2, 3, 4, 7, 9, 10, 13]
+["DISK_THM"]
+[
+"%72%37%69%14%69%15%73%34%73%35%59%42%93%80%216$5@2%80%71%50%80%127%245$6@$5@%224$0@3%182$6@3%80%127%245$6@$4@%224$0@3%182$6@3%192$6@%245$6@$5@%224$0@3%245$6@$4@%224$0@5|@2%80%80%220%224%81@2%118$2@3%220%224%81@2%164$2@4%80%80%220%224%81@2%118$1@3%220%224%81@2%164$1@4%80%200$5@$4@$2@2%200$5@$3@$1@7%92%202%48%215$6@%170$6@%174%245$6@$5@%224$0@4%174%245$6@$4@%224$0@5|@2%219%222%232$2@2%225%224%157%100%172@4%232$1@4%222%232$1@2%225%224%157%100%172@4%232$2@6|@|@|@|@|@|@"
+]
+
+CLASSES
+["UNIONL_def" Def, "avail_event_def" Def, "union_avail_events_def" Def,
+"union_avail_events1_def" Def, "union_avail_event_list_def" Def,
+"union_avail_event_list1_def" Def, "list_union_avail_event_list_def" Def,
+"avail_event_list_def" Def, "expec_avail_def" Def, "expec_avail1_def" Def,
+"cdf_def" Def, "reliability_def" Def, "rel_event1_def" Def,
+"expec_def" Def, "inst_avail_exp_def" Def, "inst_avail_exp1_def" Def,
+"inst_avail_exp2_def" Def, "inst_avail_exp3_def" Def,
+"inst_avail_exp_list_def" Def, "inst_avail_exp_list1_def" Def,
+"inst_avail_exp_list2_def" Def, "two_dim_inst_avail_exp_def" Def,
+"steady_state_avail_def" Def, "steady_state_avail_list_def" Def,
+"two_dim_steady_state_avail_list_def" Def,
+"steady_state_avail_prod_def" Def,
+"two_dim_steady_state_avail_prod_def" Def,
+"compl_steady_state_avail_def" Def, "unavail_event_def" Def,
+"union_unavail_events_def" Def, "union_unavail_event_list_def" Def,
+"steady_state_unavail_def" Def, "steady_state_unavail_list_def" Def,
+"inst_unavail_exp_def" Def, "inst_unavail_exp_list_def" Def,
+"two_dim_inst_unavail_exp_def" Def, "AND_unavail_FT_gate_def" Def,
+"OR_unavail_FT_gate_def" Def, "NOR_unavail_FT_gate_def" Def,
+"NAND_unavail_FT_gate_def" Def, "XOR_unavail_FT_gate_def" Def,
+"in_events_normal_events" Thm, "steady_state_NOR_unavail_FT_gate" Thm,
+"OR_steady_state_unavail" Thm, "IN_UNIONL" Thm,
+"compl_rel_event_eq_fail_event1" Thm, "compl_fail_event_eq_rel_event1" Thm,
+"avail_ge_rel" Thm, "avail_ge_rel1" Thm, "neg_exp_tend0_new" Thm,
+"steady_avail_temp" Thm, "steady_state_avail" Thm,
+"steady_state_avail1" Thm, "EXT_LE_LT" Thm, "PERM_refl" Thm,
+"LET_ANTISYM" Thm, "not_null_leng" Thm,
+"series_expec_tends_prod_avail" Thm, "series_rbd_avail" Thm,
+"lim_inst_parall_tend_steady" Thm, "compl_steady_state_avail_equi" Thm,
+"parallel_rbd_avail" Thm, "lim_inst_parall_series_tend_steady" Thm,
+"steady_state_parallel_series_ABD" Thm,
+"lim_inst_series_parall_tend_steady" Thm,
+"steady_state_series_parallel_avail" Thm,
+"AND_inst_avail_prod_tends_steady" Thm, "AND_gate_unavail" Thm,
+"lim_inst_OR_tend_steady" Thm, "NAND_steady_state_avail" Thm,
+"inst_XOR_tends_steadty" Thm, "XOR_steady_unavail" Thm]
+
+LOADABLE_THYDATA
+[
+"compute"
+"Availability.UNIONL_def Availability.union_unavail_event_list_def"
+" Availability.XOR_unavail_FT_gate_def Availability.NAND_unavail_F"
+"T_gate_def Availability.NOR_unavail_FT_gate_def Availability.OR_u"
+"navail_FT_gate_def Availability.AND_unavail_FT_gate_def Availabil"
+"ity.two_dim_inst_unavail_exp_def Availability.inst_unavail_exp_li"
+"st_def Availability.inst_unavail_exp_def Availability.steady_stat"
+"e_unavail_list_def Availability.steady_state_unavail_def Availabi"
+"lity.union_unavail_events_def Availability.unavail_event_def Avai"
+"lability.two_dim_steady_state_avail_list_def Availability.compl_s"
+"teady_state_avail_def Availability.two_dim_steady_state_avail_pro"
+"d_def Availability.steady_state_avail_prod_def Availability.stead"
+"y_state_avail_def Availability.steady_state_avail_list_def Availa"
+"bility.two_dim_inst_avail_exp_def Availability.rel_event1_def Ava"
+"ilability.inst_avail_exp_list2_def Availability.inst_avail_exp_li"
+"st1_def Availability.inst_avail_exp_list_def Availability.inst_av"
+"ail_exp3_def Availability.inst_avail_exp2_def Availability.inst_a"
+"vail_exp1_def Availability.inst_avail_exp_def Availability.expec_"
+"def Availability.reliability_def Availability.cdf_def Availabilit"
+"y.expec_avail1_def Availability.expec_avail_def Availability.avai"
+"l_event_def Availability.avail_event_list_def Availability.list_u"
+"nion_avail_event_list_def Availability.union_avail_event_list1_de"
+"f Availability.union_avail_event_list_def Availability.union_avai"
+"l_events1_def Availability.union_avail_events_def",
+"TermGrammarDeltas"
+"OO6.UNIONL4.%169OO11.avail_event4.%175OO18.union_avail_events4.%2"
+"42OO19.union_avail_events14.%243OO22.union_avail_event_list4.%240"
+"OO23.union_avail_event_list14.%241OO27.list_union_avail_event_lis"
+"t4.%205OO16.avail_event_list4.%176OO11.expec_avail4.%185OO12.expe"
+"c_avail14.%186OO3.cdf4.%177OO11.reliability4.%227OO10.rel_event14"
+".%226OO5.expec4.%184OO14.inst_avail_exp4.%193OO15.inst_avail_exp1"
+"4.%194OO15.inst_avail_exp24.%195OO15.inst_avail_exp34.%196OO19.in"
+"st_avail_exp_list4.%197OO20.inst_avail_exp_list14.%198OO20.inst_a"
+"vail_exp_list24.%199OO22.two_dim_inst_avail_exp4.%235OO18.steady_"
+"state_avail4.%229OO23.steady_state_avail_list4.%230OO31.two_dim_s"
+"teady_state_avail_list4.%237OO23.steady_state_avail_prod4.%231OO3"
+"1.two_dim_steady_state_avail_prod4.%238OO24.compl_steady_state_av"
+"ail4.%179OO13.unavail_event4.%239OO20.union_unavail_events4.%245O"
+"O24.union_unavail_event_list4.%244OO20.steady_state_unavail4.%232"
+"OO25.steady_state_unavail_list4.%233OO16.inst_unavail_exp4.%200OO"
+"21.inst_unavail_exp_list4.%201OO24.two_dim_inst_unavail_exp4.%236"
+"OO19.AND_unavail_FT_gate3.%96OO18.OR_unavail_FT_gate4.%160OO19.NO"
+"R_unavail_FT_gate4.%153OO20.NAND_unavail_FT_gate4.%145OO19.XOR_un"
+"avail_FT_gate4.%171"]
+

@@ -1,30 +1,24 @@
 (* ========================================================================= *)
-(* File Name: Availability.sml		                                     	 *)
+(* File Name: Availability.sml		                                     *)
 (*---------------------------------------------------------------------------*)
 (* Description: Formal Availability Analysis using Theorem Proving           *)
-(*                   				                                         *)
+(*                   				                             *)
 (*                                                                           *)
-(*                HOL4-Kananaskis 10 		 			      				 *)
-(*									     									 *)
-(*		Author :  Waqar Ahmed             		     	     				 *)
-(*                                              			     			 *)
-(* 	    School of Electrical Engineering and Computer Sciences (SEECS)   	 *)
-(*	    National University of Sciences and Technology (NUST), PAKISTAN  	 *)
-(*                                          		               	     	 *)
+(*                HOL4-Kananaskis 12 		 			     *)
+(*									     *)
+(*		Author :  Waqar Ahmed             		     	     *)
+(*                                              			     *)
+(* 	    School of Electrical Engineering and Computer Sciences (SEECS)   *)
+(*	    National University of Sciences and Technology (NUST), PAKISTAN  *)
+(*                                          		               	     *)
 (*                                                                           *)
 (* ========================================================================= *)
 
-
-
-
-
-
-
-app load ["arithmeticTheory", "realTheory", "prim_recTheory", "seqTheory",
+(*app load ["arithmeticTheory", "realTheory", "prim_recTheory", "seqTheory",
     	  "pred_setTheory","res_quanTheory", "res_quanTools", "listTheory", "probabilityTheory", "numTheory",
 	  "transcTheory", "rich_listTheory", "pairTheory",
 	  "combinTheory","limTheory","sortingTheory", "realLib", "optionTheory","satTheory",
-	  "util_probTheory", "extrealTheory", "measureTheory", "lebesgueTheory","real_sigmaTheory","dep_rewrite","RBDTheory","FT_deepTheory","VDCTheory"];
+	  "util_probTheory", "extrealTheory", "measureTheory", "lebesgueTheory","real_sigmaTheory","dep_rewrite","RBDTheory","FT_deepTheory","VDCTheory"];*)
 open HolKernel Parse boolLib bossLib limTheory arithmeticTheory realTheory prim_recTheory probabilityTheory 
      seqTheory pred_setTheory res_quanTheory sortingTheory res_quanTools listTheory transcTheory
      rich_listTheory pairTheory combinTheory realLib  optionTheory
@@ -56,7 +50,7 @@ val op<< = op THENL;
 val op|| = op ORELSE;
 val op>> = op THEN1;
 val std_ss' = simpLib.++ (std_ss, boolSimps.ETA_ss);
-
+val op by = BasicProvers.byA;
 (*---------------------------*)
 fun SET_TAC L =
     POP_ASSUM_LIST(K ALL_TAC) THEN REPEAT COND_CASES_TAC THEN
@@ -119,11 +113,11 @@ REPEAT (POP_ASSUM MP_TAC)
 (*----------------------------*)
 val avail_event_def = Define 
 `avail_event (L:(('a->extreal) # ('a->extreal)) list) n t = 
-{x | (EXTREAL_SUM_IMAGE 
-     	  (\a. (FST (EL a L)) x + (SND (EL a L)) x) (count n)  <= t) /\ 
-     (t < EXTREAL_SUM_IMAGE
-     	  (\a. (FST (EL a L)) x + (SND (EL a L)) x) (count n) + 
-     (FST (EL (n) L)) x)}`;
+{x |
+(EXTREAL_SUM_IMAGE (\a. (FST (EL a L)) x + (SND (EL a L)) x) (count n)  <= t) /\ 
+(t <
+ EXTREAL_SUM_IMAGE (\a. (FST (EL a L)) x + (SND (EL a L)) x) (count n) + 
+ (FST (EL (n) L)) x)}`;
 (*----------------------------*)
 val union_avail_events_def = Define 
 `union_avail_events L n t = 
@@ -335,7 +329,7 @@ val avail_ge_rel1 = store_thm("avail_ge_rel1",
          ((reliability p (FST (HD L)) (Normal t)) <=
 	  prob p (union_avail_events L (LENGTH L) (t)))  ``,
 RW_TAC std_ss[]
-++ (`prob p (union_avail_events L (LENGTH L) t) = sum (0,LENGTH L) (prob p o (\a. avail_event L a (Normal t)))`  by MATCH_MP_TAC EQ_SYM)
+++ (`prob p (union_avail_events L (LENGTH L) t) = sum (0,LENGTH L) (prob p o (\a. avail_event L a (Normal t)))`  by (MATCH_MP_TAC EQ_SYM))
 >> (MATCH_MP_TAC PROB_FINITELY_ADDITIVE
    ++ RW_TAC std_ss[]
    ++ RW_TAC std_ss[union_avail_events_def]
@@ -359,24 +353,24 @@ GEN_TAC
 ++ RW_TAC real_ss[]
 ++ RW_TAC real_ss[abs]
 >> (RW_TAC real_ss[EXP_NEG]
-   ++ KNOW_TAC(--`(inv (exp c) < (1:real)) = 
-   		(inv (exp c) < (inv (1:real)))`--)
+   ++ KNOW_TAC(``(inv (exp c) < (1:real)) = 
+   		(inv (exp c) < (inv (1:real)))``)
        >> (RW_TAC real_ss[REAL_INV_1OVER])
     ++ DISCH_TAC ++ PURE_ONCE_ASM_REWRITE_TAC [] ++ POP_ASSUM K_TAC
-    ++ KNOW_TAC(--`abs (inv (exp (c:real))) = abs (inv (exp c) - 0)`--)
+    ++ KNOW_TAC(``abs (inv (exp (c:real))) = abs (inv (exp c) - 0)``)
     >> (RW_TAC real_ss[])
     ++ DISCH_TAC ++ PURE_ONCE_ASM_REWRITE_TAC [] ++ POP_ASSUM K_TAC
-    ++ KNOW_TAC(--`(inv (exp c) < (inv (1:real))) = (1 < exp (c:real))`--)
+    ++ KNOW_TAC(``(inv (exp c) < (inv (1:real))) = (1 < exp (c:real))``)
     >> (MATCH_MP_TAC REAL_INV_LT_ANTIMONO
        ++ RW_TAC real_ss[EXP_POS_LT])
     ++ DISCH_TAC ++ PURE_ONCE_ASM_REWRITE_TAC [] ++ POP_ASSUM K_TAC
     ++ RW_TAC real_ss[EXP_LT_1])
 ++ RW_TAC std_ss[EXP_NEG]
-++ KNOW_TAC(--`(-inv (exp c) < (1:real)) = (-1:real) < -(-inv (exp c)) `--)
+++ KNOW_TAC(``(-inv (exp c) < (1:real)) = (-1:real) < -(-inv (exp c)) ``)
    >> (RW_TAC real_ss[REAL_LT_NEG])
 ++ RW_TAC real_ss[]
 ++ MATCH_MP_TAC REAL_LT_TRANS
-++ EXISTS_TAC(--`0:real`--)
+++ EXISTS_TAC(``0:real``)
 ++ RW_TAC real_ss[]
 ++ RW_TAC real_ss[EXP_POS_LT]);
 (*-----------------steady_avail_temp------------------------------------------*)
@@ -386,10 +380,13 @@ REAL_ARITH_TAC);
 
 (*---------------------------------------------*)
 val steady_state_avail = store_thm("steady_state_avail",
-  ``!p L n m t.  ((0 < FST m)/\ (0 < SND m)) /\ inst_avail_exp p L n m ==> (lim(\t.  (expec_avail p L n (Normal &t))) = SND m / (SND m + FST m))``,
+  ``!p L n m t.
+      ((0 < FST m) /\ (0 < SND m)) /\ inst_avail_exp p L n m ==>
+      (lim (\t.  (expec_avail p L n (Normal &t))) =
+       SND m / (SND m + FST m))``,
 RW_TAC std_ss[]
 ++ MATCH_MP_TAC SEQ_UNIQ
-++ EXISTS_TAC (--`((\t. expec_avail p L n (Normal &t)))`--)
+++ EXISTS_TAC (``((\t. expec_avail p L n (Normal &t)))``)
 ++ STRIP_TAC
 >> (RW_TAC std_ss[GSYM SEQ_LIM,convergent]
    ++ RW_TAC std_ss [expec_avail_def]
@@ -400,11 +397,15 @@ RW_TAC std_ss[]
      (\t. SND m / (SND m + FST m)) t +
      (\t. FST m / (SND m + FST m) * exp (-(SND m + FST m) * &t))t)` by RW_TAC std_ss[])
    ++ POP_ORW
-   ++ EXISTS_TAC (--`SND (m:real#real) / (SND m + FST m) + 0`--)
+   ++ EXISTS_TAC (``SND (m:real#real) / (SND m + FST m) + 0``)
    ++ DEP_REWRITE_TAC[SEQ_ADD]
    ++ RW_TAC std_ss[]
    >> (RW_TAC std_ss[SEQ_CONST])
-   >> ((`((\t. FST m / (SND m + FST m) * exp (-(SND m + FST m) * &t)) --> 0) = ((\t. (\t. FST m / (SND m + FST m))t * (\t. exp (-(SND m + FST m) * &t))t) --> ((FST m / (SND m + FST m)) *0))` by RW_TAC real_ss[])
+   >> ((`((\t. FST m / (SND m + FST m) * exp (-(SND m + FST m) * &t)) --> 0) = 
+      	 ((\t. 
+	     (\t. FST m / (SND m + FST m)) t * 
+	     (\t. exp (-(SND m + FST m) * &t)) t) --> 
+	 ((FST m / (SND m + FST m)) *0))` by (RW_TAC real_ss[]))
       ++ POP_ORW
       ++ MATCH_MP_TAC SEQ_MUL
       ++ RW_TAC real_ss[SEQ_CONST]
@@ -484,7 +485,7 @@ val EXT_LE_LT = store_thm("EXT_LE_LT",
   ``!x y: extreal. (x <=  y) \/ y < x = (x = y) \/ x < y \/ y < x``,
 RW_TAC std_ss []
 ++ RW_TAC std_ss [le_lt]
-++ KNOW_TAC (--`(x < y \/ (x = y)) = ( (x = y) \/ x < y)`--)
+++ KNOW_TAC (``(x < y \/ (x = y)) = ( (x = y) \/ x < y)``)
 >> (RW_TAC std_ss [DISJ_COMM]
    ++ DISCH_TAC ++ REWRITE_TAC [])
 ++ RW_TAC std_ss [DISJ_ASSOC]);
@@ -589,10 +590,10 @@ RW_TAC std_ss[]
    ++ RW_TAC real_ss[])
 ++ POP_ORW
 ++ MATCH_MP_TAC SEQ_UNIQ
-++ EXISTS_TAC(--`(\t. list_prod
-         (list_prob p (union_avail_event_list1 L  (&t))))`--)  
+++ EXISTS_TAC(``(\t. list_prod
+         (list_prob p (union_avail_event_list1 L  (&t))))``)  
 ++ RW_TAC std_ss[GSYM SEQ_LIM,convergent]
->> (EXISTS_TAC(--`steady_state_avail_prod M`--)
+>> (EXISTS_TAC(``steady_state_avail_prod M``)
    ++ MATCH_MP_TAC series_expec_tends_prod_avail
    ++ RW_TAC std_ss[])
 ++ MATCH_MP_TAC series_expec_tends_prod_avail
@@ -661,7 +662,8 @@ GEN_TAC
 
 (*---compl_steady_state_avail_equi---------------------------*)
 val compl_steady_state_avail_equi = store_thm("compl_steady_state_avail_equi",
-  ``!M. compl_steady_state_avail M =  list_prod (one_minus_list (steady_state_avail_list M)) ``,
+  ``!M. compl_steady_state_avail M =
+        list_prod (one_minus_list (steady_state_avail_list M))``,
 Induct
 >> (RW_TAC list_ss[compl_steady_state_avail_def,steady_state_avail_list_def,one_minus_list_def,list_prod_def])
 ++ RW_TAC list_ss[compl_steady_state_avail_def,steady_state_avail_list_def,one_minus_list_def,list_prod_def]);
@@ -689,12 +691,12 @@ RW_TAC std_ss[]
    ++ RW_TAC real_ss[])
 ++ POP_ORW
 ++ MATCH_MP_TAC SEQ_UNIQ
-++ EXISTS_TAC(--`(\t. 1 −
+++ EXISTS_TAC(``(\t. 1 −
        list_prod
          (one_minus_list
-            (list_prob p (union_avail_event_list1 L (&t)))))`--)  
+            (list_prob p (union_avail_event_list1 L (&t)))))``)  
 ++ RW_TAC std_ss[GSYM SEQ_LIM,convergent]
->> (EXISTS_TAC(--` 1 -  list_prod (one_minus_list (steady_state_avail_list M))`--)
+>> (EXISTS_TAC(`` 1 -  list_prod (one_minus_list (steady_state_avail_list M))``)
    ++ (`(\t.
         1 −
         list_prod
@@ -818,11 +820,11 @@ RW_TAC std_ss[]
    ++ METIS_TAC[])
 ++ POP_ORW
 ++ MATCH_MP_TAC SEQ_UNIQ
-++ EXISTS_TAC (--`( \t. 1 −
+++ EXISTS_TAC (``( \t. 1 −
        (list_prod o one_minus_list of (λa. list_prod (list_prob p a))) 
-      		(list_union_avail_event_list L (&t)))`--)
+      		(list_union_avail_event_list L (&t)))``)
 ++ RW_TAC std_ss[GSYM SEQ_LIM,convergent]
->> ( EXISTS_TAC (--`1 - list_prod (one_minus_list (MAP (\a. steady_state_avail_prod a) M))`--)
+>> ( EXISTS_TAC (``1 - list_prod (one_minus_list (MAP (\a. steady_state_avail_prod a) M))``)
    ++ (`(\t.
 	  1 −
    	   (list_prod ((one_minus_list of (λa. list_prod (list_prob p a))) 
@@ -966,12 +968,12 @@ RW_TAC std_ss[]
    ++ METIS_TAC[])
 ++ POP_ORW
 ++ MATCH_MP_TAC SEQ_UNIQ
-++ EXISTS_TAC(--`(\t. 
+++ EXISTS_TAC(``(\t. 
    		   (list_prod of
        		     (λa. 1 − list_prod (one_minus_list (list_prob p a)))) 
-       	    	     	  (list_union_avail_event_list L (&t)))`--)  
+       	    	     	  (list_union_avail_event_list L (&t)))``)  
 ++ RW_TAC std_ss[GSYM SEQ_LIM,convergent]
->> (EXISTS_TAC(--`list_prod (one_minus_list (MAP (\a. compl_steady_state_avail a) M))`--)
+>> (EXISTS_TAC(``list_prod (one_minus_list (MAP (\a. compl_steady_state_avail a) M))``)
    ++ MATCH_MP_TAC lim_inst_series_parall_tend_steady
    ++ RW_TAC std_ss[])
 ++ MATCH_MP_TAC lim_inst_series_parall_tend_steady
@@ -1136,10 +1138,10 @@ RW_TAC std_ss[]
    ++ METIS_TAC[])
 ++ POP_ORW
 ++ MATCH_MP_TAC SEQ_UNIQ
-++ EXISTS_TAC(--`(\t. list_prod
-         (list_prob p (union_unavail_event_list p L  (&t))))`--)  
+++ EXISTS_TAC(``(\t. list_prod
+         (list_prob p (union_unavail_event_list p L  (&t))))``)  
 ++ RW_TAC std_ss[GSYM SEQ_LIM,convergent]
->> (EXISTS_TAC(--`list_prod (steady_state_unavail_list M)`--)
+>> (EXISTS_TAC(``list_prod (steady_state_unavail_list M)``)
    ++ MATCH_MP_TAC AND_inst_avail_prod_tends_steady
    ++ RW_TAC std_ss[])
 ++ MATCH_MP_TAC AND_inst_avail_prod_tends_steady
@@ -1230,10 +1232,10 @@ RW_TAC std_ss[]
    ++ METIS_TAC[])
 ++ POP_ORW
 ++ MATCH_MP_TAC SEQ_UNIQ
-++ EXISTS_TAC(--`(\t. 1 -list_prod
-         (one_minus_list (list_prob p (union_unavail_event_list p L  (&t)))))`--)  
+++ EXISTS_TAC(``(\t. 1 -list_prod
+         (one_minus_list (list_prob p (union_unavail_event_list p L  (&t)))))``)  
 ++ RW_TAC std_ss[GSYM SEQ_LIM,convergent]
->> (EXISTS_TAC(--`1 - list_prod (one_minus_list (steady_state_unavail_list M))`--)
+>> (EXISTS_TAC(``1 - list_prod (one_minus_list (steady_state_unavail_list M))``)
    ++ (`(\t.
    1 −
    list_prod
@@ -1293,11 +1295,11 @@ RW_TAC std_ss[NOR_unavail_FT_gate_def]
 ++ POP_ORW
 ++ RW_TAC real_ss[]
 ++ MATCH_MP_TAC SEQ_UNIQ
-++ EXISTS_TAC (--`( \ t.
+++ EXISTS_TAC (``( \ t.
        list_prod
-         (one_minus_list (list_prob p (union_unavail_event_list p L (&t)))))`--)
+         (one_minus_list (list_prob p (union_unavail_event_list p L (&t)))))``)
 ++ RW_TAC std_ss[GSYM SEQ_LIM,convergent]
->> (EXISTS_TAC (--`list_prod (one_minus_list (steady_state_unavail_list M))`--)
+>> (EXISTS_TAC (``list_prod (one_minus_list (steady_state_unavail_list M))``)
    ++ MATCH_MP_TAC lim_inst_OR_tend_steady
    ++ RW_TAC std_ss[])
 ++ MATCH_MP_TAC lim_inst_OR_tend_steady
@@ -1418,12 +1420,12 @@ RW_TAC std_ss[]
    ++ ASM_REWRITE_TAC[])
 ++ POP_ORW
 ++ MATCH_MP_TAC SEQ_UNIQ
-++ EXISTS_TAC(--`(\t. list_prod
+++ EXISTS_TAC(``(\t. list_prod
          (list_prob p
             (compl_list p (union_unavail_event_list p L1 (&t)))) *
-       list_prod (list_prob p (union_unavail_event_list p L2 (&t))))`--)  
+       list_prod (list_prob p (union_unavail_event_list p L2 (&t))))``)  
 ++ RW_TAC std_ss[GSYM SEQ_LIM,convergent]
->> (EXISTS_TAC(--`( list_prod (steady_state_avail_list M1) *list_prod (steady_state_unavail_list M2))`--)
+>> (EXISTS_TAC(``( list_prod (steady_state_avail_list M1) *list_prod (steady_state_unavail_list M2))``)
    ++ (`(\t.
    list_prod
      (list_prob p (compl_list p (union_unavail_event_list p L1 (&t)))) *
@@ -1517,15 +1519,15 @@ RW_TAC std_ss[]
    ++ METIS_TAC[])
 ++ POP_ORW
 ++ MATCH_MP_TAC SEQ_UNIQ
-++ EXISTS_TAC(--`(\t.
+++ EXISTS_TAC(``(\t.
        prob p (union_unavail_events p X1 (&t)) *
        (1 − prob p (union_unavail_events p X2 (&t))) +
        prob p (union_unavail_events p X2 (&t)) *
-       (1 − prob p (union_unavail_events p X1 (&t))))`--)  
+       (1 − prob p (union_unavail_events p X1 (&t))))``)  
 ++ RW_TAC std_ss[GSYM SEQ_LIM,convergent]
->> (EXISTS_TAC(--`
+>> (EXISTS_TAC(``
 (steady_state_unavail m1 * (1 − steady_state_unavail m2) +
- steady_state_unavail m2 * (1 − steady_state_unavail m1))`--)
+ steady_state_unavail m2 * (1 − steady_state_unavail m1))``)
    ++ (`(\t.
    prob p (union_unavail_events p X1 (&t)) *
    (1 − prob p (union_unavail_events p X2 (&t))) +

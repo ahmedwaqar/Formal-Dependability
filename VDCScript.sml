@@ -5,7 +5,7 @@
 (* Description: Formal Reliability Analysis of Virtual Data Center in HOL    *)
 (*                     		                                             *)
 (*                                                                           *)
-(*                HOL4-Kananaskis 10 		 			     *)
+(*                HOL4-Kananaskis 12 		 			     *)
 (*									     *)
 (*		Author :  Waqar Ahmed             		     	     *)
 (*                                              			     *)
@@ -16,12 +16,12 @@
 (* ========================================================================= *)
 
 
-
+(*
 app load ["arithmeticTheory", "realTheory", "prim_recTheory", "seqTheory",
           "pred_setTheory","res_quanTheory", "res_quanTools", "listTheory", "probabilityTheory", "numTheory", "dep_rewrite", 
           "transcTheory", "rich_listTheory", "pairTheory",
           "combinTheory","limTheory","sortingTheory", "realLib", "optionTheory","satTheory",
-          "util_probTheory", "extrealTheory", "measureTheory", "lebesgueTheory","real_sigmaTheory","RBDTheory"];
+          "util_probTheory", "extrealTheory", "measureTheory", "lebesgueTheory","real_sigmaTheory","RBDTheory"];*)
 
 open HolKernel Parse boolLib bossLib limTheory arithmeticTheory realTheory prim_recTheory probabilityTheory
      seqTheory pred_setTheory res_quanTheory sortingTheory res_quanTools listTheory transcTheory
@@ -51,7 +51,7 @@ val op<< = op THENL;
 val op|| = op ORELSE;
 val op>> = op THEN1;
 val std_ss' = simpLib.++ (std_ss, boolSimps.ETA_ss);
-
+val op by = BasicProvers.byA;
 (*---------------------------*)
 fun SET_TAC L =
     POP_ASSUM_LIST(K ALL_TAC) THEN REPEAT COND_CASES_TAC THEN
@@ -117,22 +117,28 @@ REPEAT (POP_ASSUM MP_TAC)
 (*                                                                            *)
 (* -------------------------------------------------------------------------- *)
 
-val fail_event_def = Define `fail_event p X t = PREIMAGE X {y | y <= Normal t} INTER p_space p `;
+val fail_event_def = Define
+`fail_event p X t = PREIMAGE X {y | y <= Normal t} INTER p_space p `;
 
-val rel_event_def = Define `rel_event p X t = PREIMAGE X {y| Normal t < y} INTER p_space p `;
+val rel_event_def = Define
+`rel_event p X t = PREIMAGE X {y| Normal t < y} INTER p_space p `;
 
 
- val rel_event_list_def =
-Define `rel_event_list p L t = MAP (\a. PREIMAGE a {y| Normal t < y} INTER p_space p) L`;
+ val rel_event_list_def = Define
+ `rel_event_list p L t =
+  MAP (\a. PREIMAGE a {y| Normal t < y} INTER p_space p) L`;
 
-val two_dim_rel_event_list_def = Define `two_dim_rel_event_list p L t =
-    			       	 	 MAP (\a.  rel_event_list p a t) L`;
+val two_dim_rel_event_list_def = Define
+`two_dim_rel_event_list p L t =
+ MAP (\a.  rel_event_list p a t) L`;
 
-val three_dim_rel_event_list_def = Define `three_dim_rel_event_list p L t =
-                                           MAP (\a. two_dim_rel_event_list p a t) L`;
+val three_dim_rel_event_list_def = Define
+`three_dim_rel_event_list p L t =
+ MAP (\a. two_dim_rel_event_list p a t) L`;
 
-val four_dim_rel_event_list_def = Define `four_dim_rel_event_list p L t =
-    				  	  MAP (\a. three_dim_rel_event_list p a t) L `;
+val four_dim_rel_event_list_def = Define
+`four_dim_rel_event_list p L t =
+ MAP (\a. three_dim_rel_event_list p a t) L `;
 
 
 
@@ -144,23 +150,28 @@ val four_dim_rel_event_list_def = Define `four_dim_rel_event_list p L t =
 
 val log_base_def = Define `log_base  (b:real) (x:real) = ln x / ln b `;
 
-val gen_list_def = Define `(gen_list L 0 = []) /\
-(gen_list L (SUC n) = SNOC (L) (gen_list L n))`;
+val gen_list_def = Define
+`(gen_list L 0 = []) /\
+ (gen_list L (SUC n) = SNOC L (gen_list L n))`;
 
-val cloud_server_fail_rate_list_def = Define `cloud_server_fail_rate_list (L: (real) list list) m n =
-    				      	      gen_list (gen_list L m) n `;
+val cloud_server_fail_rate_list_def = Define
+`cloud_server_fail_rate_list (L: (real) list list) m n =
+ gen_list (gen_list L m) n `;
 
-val cloud_server_rv_list_def = Define `cloud_server_rv_list L m n = gen_list (gen_list L m) n`;
+val cloud_server_rv_list_def = Define
+`cloud_server_rv_list L m n = gen_list (gen_list L m) n`;
 
 val CDF_def = Define
  `CDF p X (t:real) = distribution p X {y | y <=  Normal t}`;
 
-val Reliability_def = Define `Reliability p X t = 1 - CDF p X t`;
+val Reliability_def = Define
+`Reliability p X t = 1 - CDF p X t`;
 
-val rel_virt_cloud_server_def = Define `rel_virt_cloud_server p L t = (prob p
-        (rbd_struct p
-           ((series of (\a. parallel (rbd_list (rel_event_list p a t))))
-              L))) `;
+val rel_virt_cloud_server_def = Define
+`rel_virt_cloud_server p L t =
+ prob p
+   (rbd_struct p
+      ((series of (\a. parallel (rbd_list (rel_event_list p a t)))) L))`;
 
  
 (* -------------------------------------------------------------------------- *)
@@ -169,28 +180,35 @@ val rel_virt_cloud_server_def = Define `rel_virt_cloud_server p L t = (prob p
 (*                                                                            *)
 (* -------------------------------------------------------------------------- *)
 
-val exp_func_list_def = Define `exp_func_list C t = MAP (\a:real. exp (- (a*t))) C `;
+val exp_func_list_def = Define
+`exp_func_list C t = MAP (\a:real. exp (- (a*t))) C `;
 
-val exp_dist_def = Define `exp_dist p X l = !t:real. CDF p X (t) =
-    		   	  	      	    	     (if (0 <=  t) then 1 - exp(-l * t) else 0) `;
+val exp_dist_def = Define
+`exp_dist p X l =
+!t:real. CDF p X (t) = (if (0 <=  t) then 1 - exp(-l * t) else 0) `;
 
-val exp_dist_list_def = Define `(exp_dist_list p [] L = T ) /\
-(exp_dist_list p (h::t) L = (exp_dist p h (HD L)) /\
-			    (exp_dist_list p (t) (TL L)))`;
+val exp_dist_list_def = Define
+`(exp_dist_list p [] L = T ) /\
+(exp_dist_list p (h::t) L =
+(exp_dist p h (HD L)) /\ exp_dist_list p t (TL L))`;
 
-val two_dim_exp_dist_list_def = Define `(two_dim_exp_dist_list p [] L = T) /\
-(two_dim_exp_dist_list p (h::t) L = (exp_dist_list p h (HD L)) /\
-		       	 	    (two_dim_exp_dist_list p (t) (TL L)))`;
+val two_dim_exp_dist_list_def = Define
+`(two_dim_exp_dist_list p [] L = T) /\
+ (two_dim_exp_dist_list p (h::t) L =
+ (exp_dist_list p h (HD L)) /\ two_dim_exp_dist_list p t (TL L))`;
 
-val three_dim_exp_dist_list_def = Define `(three_dim_exp_dist_list p [] L = T) /\
-(three_dim_exp_dist_list p (h::t) L = (two_dim_exp_dist_list p h (HD L)) /\
-			   	      (three_dim_exp_dist_list p (t) (TL L)))`;
+val three_dim_exp_dist_list_def = Define
+`(three_dim_exp_dist_list p [] L = T) /\
+(three_dim_exp_dist_list p (h::t) L =
+(two_dim_exp_dist_list p h (HD L)) /\ three_dim_exp_dist_list p t (TL L))`;
 
-val four_dim_exp_dist_list_def = Define `(four_dim_exp_dist_list p [] L = T) /\
-(four_dim_exp_dist_list p (h::t) L = (three_dim_exp_dist_list p h (HD L)) /\
-			  	     (four_dim_exp_dist_list p (t) (TL L)))`;
+val four_dim_exp_dist_list_def = Define
+`(four_dim_exp_dist_list p [] L = T) /\
+ (four_dim_exp_dist_list p (h::t) L =
+ (three_dim_exp_dist_list p h (HD L)) /\ four_dim_exp_dist_list p t (TL L))`;
 
-val gen_rv_list_def = Define `gen_rv_list (X:'a->extreal) n = gen_list X n`;
+val gen_rv_list_def = Define
+`gen_rv_list (X:'a->extreal) n = gen_list X n`;
 
 
 
@@ -209,18 +227,21 @@ RW_TAC std_ss[]
 
 (*-----------------------------*)
 val extreal_not_le = store_thm("extreal_not_le",
-  ``!x y. ~(x < y) = ~(~(y <=  x)) ``,
+  ``!x y. ~(x < y) = ~(~(y <=  x))``,
 RW_TAC std_ss [] 
 ++ PROVE_TAC[extreal_lt_def]);
 (*---------------*)
 val compl_rel_event_eq_fail_event = store_thm("compl_rel_event_eq_fail_event",
-  ``!p t s. prob_space p ==> ((p_space p DIFF PREIMAGE s {y | Normal t < y} ∩ p_space p) = (PREIMAGE s {y | y <= Normal t} ∩ p_space p))  ``,
+  ``!p t s.
+     prob_space p ==>
+     (p_space p DIFF PREIMAGE s {y | Normal t < y} INTER p_space p =
+      PREIMAGE s {y | y <= Normal t} INTER p_space p)``,
 SRW_TAC[][PREIMAGE_def,DIFF_DEF,EXTENSION,GSPECIFICATION,REAL_NOT_LT] 
 ++ SET_TAC[extreal_not_le]);
 
 (*---------------*)
 val gen_list_suc = store_thm("gen_list_suc",
-  ``!L (n:num). (gen_list L (SUC n) = L::gen_list L n)  ``,
+  ``!L (n:num). (gen_list L (SUC n) = L::gen_list L n)``,
 GEN_TAC
 ++ Induct
 >> (RW_TAC list_ss[gen_list_def,SNOC])
@@ -229,14 +250,14 @@ GEN_TAC
 ++ FULL_SIMP_TAC list_ss[gen_list_def, SNOC_APPEND]);
 (*---------------*)
 val compl_fail_event_eq_rel_event = store_thm("compl_fail_event_eq_rel_event",
-  ``!X t p. p_space p DIFF fail_event p X t = rel_event p X t  ``,
+  ``!X t p. p_space p DIFF fail_event p X t = rel_event p X t``,
   RW_TAC std_ss[fail_event_def,rel_event_def]
   ++ SRW_TAC[][IN_DIFF,PREIMAGE_def,EXTENSION,GSPECIFICATION]
   ++ RW_TAC std_ss[GSYM extreal_lt_def]
   ++ METIS_TAC[]);
 (*---------------*)
 val comp_rel_event_eq_fail_event = store_thm("comp_rel_event_eq_fail_event",
-  ``!X t p. p_space p DIFF rel_event p X t = fail_event p X t   ``,
+  ``!X t p. p_space p DIFF rel_event p X t = fail_event p X t``,
 RW_TAC std_ss[fail_event_def,rel_event_def]
 ++ SRW_TAC[][IN_DIFF,PREIMAGE_def,EXTENSION,GSPECIFICATION]
 ++ RW_TAC std_ss[extreal_lt_def]
@@ -245,9 +266,15 @@ RW_TAC std_ss[fail_event_def,rel_event_def]
 
 val rel_series_parallel_RBD_exp_dist_fail_rate_lemma1 = store_thm(
   "rel_series_parallel_RBD_exp_dist_fail_rate_lemma1",
-  ``!p t l c. (0<= t) /\ prob_space p /\ ( (LENGTH l = LENGTH c)) /\ (!x'. MEM x' (((rel_event_list p (l ) t))) ==> (x' IN events p)) /\ (exp_dist_list p l c) ==> ((1 − list_prod (one_minus_list (list_prob p (rel_event_list p l t)))) =
-(1 − list_prod (one_minus_list (exp_func_list c t))))``,
-
+  ``!p t l c.
+       (0 <= t) /\
+       prob_space p /\
+       (LENGTH l = LENGTH c) /\
+       (!x'. MEM x' (((rel_event_list p (l ) t))) ==> (x' IN events p)) /\
+       exp_dist_list p l c ==>
+       ((1 −
+         list_prod (one_minus_list (list_prob p (rel_event_list p l t)))) =
+    	(1 − list_prod (one_minus_list (exp_func_list c t))))``,
 GEN_TAC
 ++ GEN_TAC
 ++ Induct
@@ -331,7 +358,7 @@ GEN_TAC
 >> (FULL_SIMP_TAC list_ss[two_dim_rel_event_list_def])
 >> (FULL_SIMP_TAC list_ss[two_dim_rel_event_list_def]
    ++ DEP_REWRITE_TAC[mutual_indep_front_append]
-   ++ EXISTS_TAC(--`rel_event_list p h' t `--)
+   ++ EXISTS_TAC(``rel_event_list p h' t ``)
    ++ RW_TAC std_ss[])
 ++ FIRST_X_ASSUM (Q.SPECL_THEN [`C':real list list`] MP_TAC)
 ++ RW_TAC std_ss[]
@@ -349,7 +376,7 @@ GEN_TAC
 >> (FULL_SIMP_TAC list_ss[two_dim_rel_event_list_def])
 >> (FULL_SIMP_TAC list_ss[two_dim_rel_event_list_def]
     ++ DEP_REWRITE_TAC[mutual_indep_front_append]
-    ++ EXISTS_TAC(--`rel_event_list p h' t `--)
+    ++ EXISTS_TAC(``rel_event_list p h' t ``)
     ++ RW_TAC std_ss[])
 >> (FULL_SIMP_TAC list_ss[])
 >> (FIRST_X_ASSUM (Q.SPECL_THEN [`SUC n`] MP_TAC)
@@ -457,13 +484,13 @@ val rel_prod_tend_0 = store_thm("rel_prod_tend_0",
   ``!(n:num) p X t . (0 <=  (t:real)) /\ possibly p ((rel_event p X t)) /\   prob_space p ==> (lim (\ (n:num). ( list_prod (one_minus_list (list_prob p (rel_event_list p (gen_rv_list (X:('a -> extreal)) n) t))))) =  (0:real))``,
 RW_TAC std_ss[]
 ++ MATCH_MP_TAC SEQ_UNIQ
-++ EXISTS_TAC(--`(\n.
+++ EXISTS_TAC(``(\n.
        list_prod
          (one_minus_list
-            (list_prob p (rel_event_list p (gen_rv_list X n) t))))`--)
+            (list_prob p (rel_event_list p (gen_rv_list X n) t))))``)
 ++ RW_TAC std_ss[]
 >> (RW_TAC std_ss[GSYM SEQ_LIM,convergent]
-   ++ EXISTS_TAC (--` (0:real)`--)
+   ++ EXISTS_TAC (`` (0:real)``)
    ++ DEP_REWRITE_TAC[seq_rel_prod_tend_0]
    ++ RW_TAC std_ss[])
 ++ DEP_REWRITE_TAC[seq_rel_prod_tend_0]
@@ -586,11 +613,13 @@ RW_TAC std_ss[]
 
 (*-------------------------*)
 val compl_rel_pow_n = store_thm("compl_rel_pow_n",
-  ``!X p t n. prob_space p /\ (rel_event p X t IN events p) ==>
-( list_prod
-    (one_minus_list
-       (list_prob p (rel_event_list p (gen_rv_list X n) t)))  = (1 - Reliability p X t) pow n)   ``,
-
+  ``!X p t n.
+      prob_space p /\
+      (rel_event p X t IN events p) ==>
+      (list_prod
+	(one_minus_list
+	   (list_prob p (rel_event_list p (gen_rv_list X n) t)))  =
+      (1 - Reliability p X t) pow n)``,
 GEN_TAC
 ++ GEN_TAC
 ++ GEN_TAC
@@ -606,22 +635,32 @@ GEN_TAC
 
 (*-------------------------*)
 val virt_config_bounds = store_thm("virt_config_bounds",
-  ``!X_VM X_VMM X_HW p n t. prob_space p /\
- (0 <=  t) /\
- (~NULL (rel_event_list p (gen_rv_list X_VM n) t)) /\
-  ( rel_event p X_VMM t IN events p)  /\
-  ( rel_event p X_VM t IN events p) /\
-((rel_event p X_HW t) IN events p) /\
- (!x'. MEM x' (rel_event_list p (gen_rv_list X_VM n) t) ==> (x' IN events p)) /\
- ((rel_virt_cloud_server p ([X_VMM]::[X_HW] ::[gen_rv_list X_VM n]) t) < Reliability p X_VMM t ) /\
- (Reliability p X_HW t < 1) /\ 
-(0 < Reliability p X_VMM t) /\ 
-(0 < Reliability p X_VM t /\ Reliability p X_VM t < 1) /\
- ( mutual_indep p (rel_event_list p (X_VMM::X_HW::gen_rv_list X_VM n) t))  ==> 
-(&n > log_base (10) (1 - ((rel_virt_cloud_server p ([X_VMM]::[X_HW] ::[gen_rv_list X_VM n]) t) /Reliability p X_VMM t)) / log_base (10) (1 - Reliability p X_VM t  ))  ``,
+  ``!X_VM X_VMM X_HW p n t.
+      prob_space p /\
+      (0 <=  t) /\
+      (~NULL (rel_event_list p (gen_rv_list X_VM n) t)) /\
+      (rel_event p X_VMM t IN events p)  /\
+      (rel_event p X_VM t IN events p) /\
+      (rel_event p X_HW t IN events p) /\
+      (!x'.
+         MEM x' (rel_event_list p (gen_rv_list X_VM n) t) ==>
+	 x' IN events p) /\
+      (rel_virt_cloud_server p ([X_VMM]::[X_HW] ::[gen_rv_list X_VM n]) t <
+        Reliability p X_VMM t) /\
+      (Reliability p X_HW t < 1) /\ 
+      (0 < Reliability p X_VMM t) /\ 
+      (0 < Reliability p X_VM t /\ Reliability p X_VM t < 1) /\
+      mutual_indep p
+        (rel_event_list p (X_VMM::X_HW::gen_rv_list X_VM n) t) ==> 
+      (&n >
+      log_base (10)
+        (1 -
+	 ((rel_virt_cloud_server p ([X_VMM]::[X_HW] ::[gen_rv_list X_VM n]) t) /
+	 Reliability p X_VMM t)) /
+      log_base (10) (1 - Reliability p X_VM t))``,
 RW_TAC std_ss[]
 ++ MATCH_MP_TAC bound_log_inequal
-++ EXISTS_TAC(--`Reliability p X_HW t`--)
+++ EXISTS_TAC(``Reliability p X_HW t``)
 ++ RW_TAC real_ss[]
 >> (RW_TAC real_ss[Reliability_def,CDF_def,distribution_def]
    ++ RW_TAC std_ss[REAL_SUB_LE]
@@ -669,7 +708,9 @@ RW_TAC std_ss[]
 
 (*-------------------------*)
 val mem_flat_map_not_null2 = store_thm("mem_flat_map_not_null2",
-  ``!f L. (!y. ~NULL (f y)) /\ (!z. MEM z ((L)) ==> ~NULL z) ==> (!z. MEM z (((MAP f L))) ==> ~NULL z) ``,
+  ``!f L.
+     (!y. ~NULL (f y)) /\ (!z. MEM z L ==> ~NULL z) ==>
+     (!z. MEM z (MAP f L) ==> ~NULL z) ``,
 GEN_TAC
 ++ Induct
 >> (RW_TAC list_ss[])
@@ -687,7 +728,11 @@ GEN_TAC
 ++ RW_TAC std_ss[not_null_map]);
 (*-----------------------*)
 val mem_flat_map_not_null1 = store_thm("mem_flat_map_not_null1",
-  ``!p t L.  (!z. MEM z (FLAT (L)) ==> ~NULL z) ==> (!z. MEM z (FLAT ((MAP (\a. two_dim_rel_event_list p a t) L))) ==> ~NULL z) ``,
+  ``!p t L.
+     (!z. MEM z (FLAT L) ==> ~NULL z) ==>
+     (!z.
+        MEM z (FLAT (MAP (\a. two_dim_rel_event_list p a t) L)) ==>
+	~NULL z) ``,
 GEN_TAC
 ++ GEN_TAC
 ++ Induct
@@ -695,14 +740,18 @@ GEN_TAC
 ++ RW_TAC std_ss[]
 ++ FULL_SIMP_TAC list_ss[two_dim_rel_event_list_def]
 ++ DEP_REWRITE_TAC[mem_flat_map_not_null3]
-++ EXISTS_TAC(--`p:'a event # 'a event event # ('a event -> real)`--)
-++ EXISTS_TAC(--`t:real`--)
-++ EXISTS_TAC(--`h:('a->extreal) list list`--)
+++ EXISTS_TAC(``p:'a event # 'a event event # ('a event -> real)``)
+++ EXISTS_TAC(``t:real``)
+++ EXISTS_TAC(``h:('a->extreal) list list``)
 ++ FULL_SIMP_TAC list_ss[]);
 
 (*----------------------------*)
 val mem_flat_map_not_null = store_thm("mem_flat_map_not_null",
-  ``!p t L.  (!z. MEM z (FLAT (FLAT L)) ==> ~NULL z) ==> (!z. MEM z (FLAT (FLAT (MAP (\a. three_dim_rel_event_list p a t) L))) ==> ~NULL z) ``,
+  ``!p t L.
+      (!z. MEM z (FLAT (FLAT L)) ==> ~NULL z) ==>
+      (!z.
+         MEM z (FLAT (FLAT (MAP (\a. three_dim_rel_event_list p a t) L))) ==>
+	 ~NULL z) ``,
 GEN_TAC
 ++ GEN_TAC
 ++ Induct
@@ -710,18 +759,21 @@ GEN_TAC
 ++ RW_TAC std_ss[]
 ++ FULL_SIMP_TAC list_ss[three_dim_rel_event_list_def]
 ++ DEP_REWRITE_TAC[mem_flat_map_not_null1]
-++ EXISTS_TAC(--`p:'a event # 'a event event # ('a event -> real)`--)
-++ EXISTS_TAC(--`t:real`--)
-++ EXISTS_TAC(--`h:('a->extreal) list list list`--)
+++ EXISTS_TAC(``p:'a event # 'a event event # ('a event -> real)``)
+++ EXISTS_TAC(``t:real``)
+++ EXISTS_TAC(``h:('a->extreal) list list list``)
 ++ FULL_SIMP_TAC list_ss[]);
 (*-------------------------------*)
 val parallel_series_parallel_rbd_alt_form = store_thm(
   "parallel_series_parallel_rbd_alt_form",
-  `` !p t L. prob_space p ==> ((rbd_struct p
-           ((parallel of series of
-             (\a. parallel (rbd_list a))) (three_dim_rel_event_list p L t))) =  (rbd_struct p
-           ((parallel of series of
-             (\a. parallel (rbd_list (rel_event_list p a t)))) L))) ``,
+  ``!p t L.
+      prob_space p ==>
+      (rbd_struct p
+         ((parallel of series of (\a. parallel (rbd_list a)))
+	    (three_dim_rel_event_list p L t)) =
+       rbd_struct p
+         ((parallel of series of
+            (\a. parallel (rbd_list (rel_event_list p a t)))) L)) ``,
 GEN_TAC
 ++ GEN_TAC
 ++ Induct
@@ -738,11 +790,14 @@ GEN_TAC
 (*-------------------------------*)
 val nested_series_parallel_rbd_alt_form = store_thm(
   "nested_series_parallel_rbd_alt_form",
-  ``!p t L. prob_space p ==> ((rbd_struct p
+  ``!p t L.
+     prob_space p ==>
+     (rbd_struct p
            ((series of parallel of series of
-             (\a. parallel (rbd_list a))) (four_dim_rel_event_list p L t))) =  (rbd_struct p
+             (\a. parallel (rbd_list a))) (four_dim_rel_event_list p L t)) =
+      rbd_struct p
            ((series of parallel of series of
-             (\a. parallel (rbd_list (rel_event_list p a t)))) L))) ``,
+             (\a. parallel (rbd_list (rel_event_list p a t)))) L)) ``,
 GEN_TAC
 ++ GEN_TAC
 ++ Induct
@@ -770,7 +825,8 @@ GEN_TAC
 (*-------------------------------*)
 val mem_flat_fun_eq_mem_flat_null_list2 = store_thm(
   "mem_flat_fun_eq_mem_flat_null_list2",
-  ``!p t L. (!z. MEM z (FLAT (L)) ==> ~NULL z) ==>  (!z. MEM z
+  ``!p t L. (!z. MEM z (FLAT (L)) ==> ~NULL z) ==>
+  (!z. MEM z
         (FLAT
            (MAP
               (\a.
@@ -807,7 +863,11 @@ GEN_TAC
 (*-------------------------------*)
 val mem_flat_fun_eq_mem_flat_null_list = store_thm(
   "mem_flat_fun_eq_mem_flat_null_list",
-  ``!p t L. (!z. MEM z (FLAT (FLAT (L))) ==> ~NULL z) ==>  (!z. MEM z (FLAT (FLAT (four_dim_rel_event_list p L t))) ==> ~NULL z) ``,
+  ``!p t L.
+     (!z. MEM z (FLAT (FLAT L)) ==> ~NULL z) ==>
+     (!z.
+       MEM z (FLAT (FLAT (four_dim_rel_event_list p L t))) ==>
+       ~NULL z) ``,
 GEN_TAC
 ++ GEN_TAC
 ++ Induct
@@ -821,21 +881,34 @@ GEN_TAC
 (*---------------------------*)
 val parallel_series_parallel_prod_rel_exp_dist = store_thm(
   "parallel_series_parallel_prod_rel_exp_dist",
-  ``!p t L C.  (0 <= t) /\ prob_space p /\ (LENGTH C = LENGTH L) /\ mutual_indep p (FLAT (FLAT ((three_dim_rel_event_list p L t)))) /\ (!x'. MEM x' (FLAT (FLAT ((three_dim_rel_event_list p L t)))) ==> x' IN events p) /\ (!z. MEM z (FLAT (L)) ==> ~NULL z) /\ three_dim_exp_dist_list p L C /\ (!n' n. (n' < LENGTH L) /\ (n' < LENGTH C) /\ (n < LENGTH (EL n' L)) /\ (n < LENGTH (EL n' C)) ==> (LENGTH (EL n (EL n' L)) = LENGTH (EL n (EL n' C))))  /\ 
-     (!n. (n < LENGTH L) /\ (n < LENGTH C) ==> (LENGTH (EL n ( (L))) = LENGTH (EL n (( C)))))  ==> ( (1 −
- list_prod
-   (one_minus_list
-      (MAP
-         ((\a. list_prod a) of
-          (\a. 1 − list_prod (one_minus_list (list_prob p a))))
-         (three_dim_rel_event_list p L t)))) = (1 −
- list_prod
-   (one_minus_list
-      (MAP
-         ((\a. list_prod a) of
-          (\a. 1 − list_prod (one_minus_list (exp_func_list a t))))
-         C)))) ``,
-
+  ``!p t L C.
+     (0 <= t) /\ prob_space p /\ (LENGTH C = LENGTH L) /\
+     mutual_indep p (FLAT (FLAT (three_dim_rel_event_list p L t))) /\
+     (!x'.
+        MEM x' (FLAT (FLAT (three_dim_rel_event_list p L t))) ==>
+	x' IN events p) /\ (!z. MEM z (FLAT (L)) ==> ~NULL z) /\
+     three_dim_exp_dist_list p L C /\
+     (!n' n.
+        (n' < LENGTH L) /\ (n' < LENGTH C) /\ (n < LENGTH (EL n' L)) /\
+	(n < LENGTH (EL n' C)) ==>
+	(LENGTH (EL n (EL n' L)) = LENGTH (EL n (EL n' C))))  /\ 
+     (!n.
+        (n < LENGTH L) /\ (n < LENGTH C) ==>
+	(LENGTH (EL n L) = LENGTH (EL n C)))  ==>
+     ((1 −
+       list_prod
+         (one_minus_list
+      	   (MAP
+              ((\a. list_prod a) of
+               (\a. 1 − list_prod (one_minus_list (list_prob p a))))
+              (three_dim_rel_event_list p L t)))) =
+      (1 −
+       list_prod
+        (one_minus_list
+      	  (MAP
+	    ((\a. list_prod a) of
+             (\a. 1 − list_prod (one_minus_list (exp_func_list a t))))
+            C))))``,
 GEN_TAC
 ++ GEN_TAC
 ++ Induct
@@ -860,7 +933,7 @@ GEN_TAC
 >> (FULL_SIMP_TAC list_ss[three_dim_rel_event_list_def])
 >> (FULL_SIMP_TAC list_ss[three_dim_rel_event_list_def]
    ++ DEP_REWRITE_TAC[mutual_indep_front_append]
-   ++ EXISTS_TAC(--`FLAT (FLAT (MAP (\a. two_dim_rel_event_list p a t) L))`--)
+   ++ EXISTS_TAC(``FLAT (FLAT (MAP (\a. two_dim_rel_event_list p a t) L))``)
    ++ MATCH_MP_TAC mutual_indep_append_sym
    ++ RW_TAC std_ss[])
 ++ MP_TAC(Q.ISPECL [`p:('a event # 'a event event # ('a event -> real))`, `t:real`, `h:('a->extreal) list list`,`h':real list list`] (rel_series_parallel_RBD_exp_dist_fail_rate))
@@ -877,7 +950,7 @@ GEN_TAC
 >> (FULL_SIMP_TAC list_ss[three_dim_rel_event_list_def])
 >> (FULL_SIMP_TAC list_ss[three_dim_rel_event_list_def]
    ++ DEP_REWRITE_TAC[mutual_indep_front_append]
-   ++ EXISTS_TAC(--`FLAT (FLAT (MAP (\a. two_dim_rel_event_list p a t) L))`--)
+   ++ EXISTS_TAC(``FLAT (FLAT (MAP (\a. two_dim_rel_event_list p a t) L))``)
    ++ MATCH_MP_TAC mutual_indep_append_sym
    ++ RW_TAC std_ss[])
 >> (FIRST_X_ASSUM (Q.SPECL_THEN [`0:num`] MP_TAC)
@@ -904,7 +977,7 @@ GEN_TAC
           (LENGTH (EL n L) = LENGTH (EL n C')))` by RW_TAC std_ss[])
 >> (FULL_SIMP_TAC list_ss[])
 >> (DEP_REWRITE_TAC[mutual_indep_front_append]
-   ++ EXISTS_TAC(--`(FLAT (two_dim_rel_event_list p h t))`--)
+   ++ EXISTS_TAC(``(FLAT (two_dim_rel_event_list p h t))``)
    ++ FULL_SIMP_TAC list_ss[three_dim_rel_event_list_def])
 >> (FULL_SIMP_TAC list_ss[three_dim_rel_event_list_def])
 >> (FULL_SIMP_TAC list_ss[three_dim_rel_event_list_def])
@@ -925,12 +998,22 @@ val nested_series_parallel_exp_dist = store_thm(
   "nested_series_parallel_exp_dist",
   ``!p t L C.
      (0 <= t) /\ prob_space p /\ (!z. MEM z (FLAT (FLAT L)) ==> ~NULL z) /\
-     (!x'. MEM x' (FLAT (FLAT (FLAT (four_dim_rel_event_list p L t)))) ==> x' IN events p) /\
-     (LENGTH C = LENGTH L) /\
-     (!n. (n < LENGTH L) /\ (n < LENGTH C) ==> (LENGTH (EL n ( (L))) = LENGTH (EL n (( C))))) /\
-     (!n' n. (n' < LENGTH L) /\ (n' < LENGTH C) /\ (n < LENGTH (EL n' L)) /\ (n < LENGTH (EL n' C)) ==> (LENGTH (EL n (EL n' L)) = LENGTH (EL n (EL n' C)))) /\
-     (!n'' n' n. (n'' < LENGTH L) /\ (n'' < LENGTH C)/\ (n' < LENGTH (EL n'' L)) /\ (n' < LENGTH (EL n'' C)) /\ (n < LENGTH (EL n'( EL n'' L))) /\ (n < LENGTH (EL n'( EL n'' C))) ==> (LENGTH (EL n (EL n' (EL n'' L))) = LENGTH (EL n (EL n' (EL n'' C))))) /\
-  four_dim_exp_dist_list p L C /\ 
+     (!x'.
+        MEM x' (FLAT (FLAT (FLAT (four_dim_rel_event_list p L t)))) ==>
+	x' IN events p) /\ (LENGTH C = LENGTH L) /\
+     (!n.
+       (n < LENGTH L) /\ (n < LENGTH C) ==>
+       (LENGTH (EL n L) = LENGTH (EL n C))) /\
+     (!n' n.
+        (n' < LENGTH L) /\ (n' < LENGTH C) /\ (n < LENGTH (EL n' L)) /\
+	(n < LENGTH (EL n' C)) ==>
+	(LENGTH (EL n (EL n' L)) = LENGTH (EL n (EL n' C)))) /\
+     (!n'' n' n.
+        (n'' < LENGTH L) /\ (n'' < LENGTH C)/\ (n' < LENGTH (EL n'' L)) /\
+	(n' < LENGTH (EL n'' C)) /\ (n < LENGTH (EL n'( EL n'' L))) /\
+	(n < LENGTH (EL n'( EL n'' C))) ==>
+	(LENGTH (EL n (EL n' (EL n'' L))) = LENGTH (EL n (EL n' (EL n'' C))))) /\
+     four_dim_exp_dist_list p L C /\ 
      mutual_indep p (FLAT (FLAT (FLAT (four_dim_rel_event_list p L t)))) ==>
      (prob p
         (rbd_struct p
@@ -938,7 +1021,7 @@ val nested_series_parallel_exp_dist = store_thm(
              (\a. parallel (rbd_list (rel_event_list p a t)))) L)) =
       (list_prod of (\a. 1 − list_prod (one_minus_list a)) of
        (\a. list_prod a) of
-       (\a. 1 − list_prod (one_minus_list (exp_func_list a t)))) C)  ``,
+       (\a. 1 − list_prod (one_minus_list (exp_func_list a t)))) C)``,
 GEN_TAC
 ++ GEN_TAC
 ++ Induct
@@ -978,7 +1061,7 @@ GEN_TAC
        ++ RW_TAC list_ss[])
    >> (FULL_SIMP_TAC list_ss[four_dim_rel_event_list_def]
       ++ DEP_REWRITE_TAC[mutual_indep_front_append]
-      ++ EXISTS_TAC(--`FLAT (FLAT (FLAT (MAP (\a. three_dim_rel_event_list p a t) L)))`--)
+      ++ EXISTS_TAC(``FLAT (FLAT (FLAT (MAP (\a. three_dim_rel_event_list p a t) L)))``)
       ++ MATCH_MP_TAC mutual_indep_append_sym
       ++ RW_TAC std_ss[])
   >> (FULL_SIMP_TAC list_ss[four_dim_rel_event_list_def])
@@ -1008,7 +1091,7 @@ GEN_TAC
 >> (FULL_SIMP_TAC list_ss[four_dim_rel_event_list_def])
 >> (FULL_SIMP_TAC list_ss[four_dim_rel_event_list_def]
    ++ DEP_REWRITE_TAC[mutual_indep_front_append]
-   ++ EXISTS_TAC(--`FLAT (FLAT (three_dim_rel_event_list p h t))`--)
+   ++ EXISTS_TAC(``FLAT (FLAT (three_dim_rel_event_list p h t))``)
    ++ RW_TAC std_ss[])
 ++ RW_TAC std_ss[GSYM four_dim_rel_event_list_def]
 ++ DEP_REWRITE_TAC[nested_series_parallel_rbd_alt_form]
@@ -1050,7 +1133,7 @@ GEN_TAC
 >> (FULL_SIMP_TAC list_ss[four_dim_exp_dist_list_def])
 >> (FULL_SIMP_TAC list_ss[four_dim_rel_event_list_def]
     ++ DEP_REWRITE_TAC[mutual_indep_front_append]
-   ++ EXISTS_TAC(--`FLAT (FLAT (three_dim_rel_event_list p h t))`--)
+   ++ EXISTS_TAC(``FLAT (FLAT (three_dim_rel_event_list p h t))``)
    ++ RW_TAC std_ss[])
 ++ FULL_SIMP_TAC std_ss[]
 ++ RW_TAC list_ss[of_DEF,o_DEF,exp_func_list_def]);
@@ -1090,10 +1173,12 @@ GEN_TAC
 (*---------------------*)
 val  cloud_server_rv_list_not_null2 = store_thm(
   "cloud_server_rv_list_not_null2",
-  `` !a b c  n m. ( !z.
+  ``!a b c n m.
+  (!z.
         MEM z (FLAT (gen_list [c] m)) \/
         MEM z (FLAT (FLAT (cloud_server_rv_list [c] m n))) ==>
-        ~NULL z) ==> (!z.
+        ~NULL z) ==>
+  (!z.
         MEM z (FLAT ((gen_list [a::b::c] m))) ==> ~NULL z)  ``,
 GEN_TAC
 ++ GEN_TAC
@@ -1116,13 +1201,14 @@ GEN_TAC
 ++ METIS_TAC[]);
 (*----------------------*)
 val cloud_server_rv_list_not_null3 = store_thm("cloud_server_rv_list_not_null3",
-  ``!a b c  n m. (!z.
-        MEM z (FLAT (FLAT (cloud_server_rv_list [c] m n))) ==> ~NULL z) ==> (!z.
+  ``!a b c n m.
+  (!z.
+        MEM z (FLAT (FLAT (cloud_server_rv_list [c] m n))) ==> ~NULL z) ==>
+  (!z.
         MEM z
          (FLAT
             (FLAT
-               (
-                  (cloud_server_rv_list [a::b::c] m n)))) ==> ~NULL z)  ``,
+               ((cloud_server_rv_list [a::b::c] m n)))) ==> ~NULL z)  ``,
 GEN_TAC
 ++ GEN_TAC 
 ++ GEN_TAC
@@ -1131,20 +1217,22 @@ GEN_TAC
 ++ RW_TAC list_ss[cloud_server_rv_list_def,gen_list_suc]
 >> (POP_ASSUM MP_TAC
    ++ MATCH_MP_TAC cloud_server_rv_list_not_null2
-   ++ EXISTS_TAC(--`n:num`--)
+   ++ EXISTS_TAC(``n:num``)
    ++ METIS_TAC[cloud_server_rv_list_def]) 
 ++ FULL_SIMP_TAC std_ss[GSYM cloud_server_rv_list_def]
 ++ FIRST_X_ASSUM (Q.SPECL_THEN [`m:num`] MP_TAC)
 ++ RW_TAC list_ss[]);
 (*---------------------*)
 val cloud_server_rv_list_not_null = store_thm("cloud_server_rv_list_not_null",
-  ``!p t a b c  n m. (!z.
-        MEM z (FLAT (FLAT (cloud_server_rv_list [c] m n))) ==> ~NULL z) ==> (!z.
+  ``!p t a b c n m.
+  (!z.
+        MEM z (FLAT (FLAT (cloud_server_rv_list [c] m n))) ==> ~NULL z) ==>
+  (!z.
         MEM z
          (FLAT
             (FLAT
                (four_dim_rel_event_list p
-                  (cloud_server_rv_list [a::b::c] m n) t))) ==> ~NULL z)  ``,
+                  (cloud_server_rv_list [a::b::c] m n) t))) ==> ~NULL z)``,
 GEN_TAC
 ++ GEN_TAC
 ++ GEN_TAC
@@ -1157,7 +1245,7 @@ GEN_TAC
    ++ FULL_SIMP_TAC std_ss[GSYM rel_event_list_def,GSYM two_dim_rel_event_list_def,GSYM three_dim_rel_event_list_def]
    ++ POP_ASSUM MP_TAC
    ++ MATCH_MP_TAC cloud_server_rv_list_not_null1
-   ++ EXISTS_TAC(--`n:num`--)
+   ++ EXISTS_TAC(``n:num``)
    ++ METIS_TAC[]) 
 ++ FULL_SIMP_TAC std_ss[GSYM cloud_server_rv_list_def]
 ++ FULL_SIMP_TAC std_ss[GSYM rel_event_list_def,GSYM two_dim_rel_event_list_def,GSYM three_dim_rel_event_list_def,GSYM four_dim_rel_event_list_def]
@@ -1178,9 +1266,11 @@ val in_events_cloud_server_rv_list1 = store_thm("in_events_cloud_server_rv_list1
                 (FLAT
                    (MAP (\a. three_dim_rel_event_list p a t)
                       (cloud_server_rv_list [c] m n))))) ==>
-        x' IN events p) ==> (!x'. MEM x'
-        (FLAT
-           (FLAT (three_dim_rel_event_list p (gen_list [a::b::c] m) t))) ==> x' IN events p)``,
+        x' IN events p) ==>
+     (!x'. MEM x'
+            (FLAT
+              (FLAT (three_dim_rel_event_list p (gen_list [a::b::c] m) t))) ==>
+	   x' IN events p)``,
 GEN_TAC
 ++ GEN_TAC
 ++ GEN_TAC
@@ -1211,21 +1301,23 @@ GEN_TAC
                     (MAP (\a. three_dim_rel_event_list p a t)
                        (cloud_server_rv_list [c] m n))))) ==>
          x' IN events p)` by RW_TAC std_ss[])
->> ( FULL_SIMP_TAC list_ss[three_dim_rel_event_list_def,two_dim_rel_event_list_def,rel_event_list_def])
+>> (FULL_SIMP_TAC list_ss[three_dim_rel_event_list_def,two_dim_rel_event_list_def,rel_event_list_def])
 >> (FULL_SIMP_TAC list_ss[cloud_server_rv_list_def,gen_list_suc,three_dim_rel_event_list_def,two_dim_rel_event_list_def,rel_event_list_def])
 ++ FULL_SIMP_TAC std_ss[GSYM four_dim_rel_event_list_def,GSYM three_dim_rel_event_list_def,GSYM two_dim_rel_event_list_def,GSYM rel_event_list_def]
 ++ METIS_TAC[]);
 
 (*----------------------*)
 val in_events_cloud_server_rv_list = store_thm("in_events_cloud_server_rv_list",
-  ``!p t a b c n m. rel_event p a t IN events p /\ rel_event p b t IN events p /\ (!x'.
+  ``!p t a b c n m. rel_event p a t IN events p /\ rel_event p b t IN events p /\
+  (!x'.
          MEM x'
            (FLAT
               (FLAT
                  (FLAT
                     (four_dim_rel_event_list p
                        (cloud_server_rv_list [c] m n) t)))) ==>
-         x' IN events p) ==> (!x'. MEM x'
+         x' IN events p) ==>
+   (!x'. MEM x'
          (FLAT
             (FLAT
                (FLAT
@@ -1244,7 +1336,7 @@ GEN_TAC
    ++ FULL_SIMP_TAC std_ss[GSYM rel_event_list_def,GSYM two_dim_rel_event_list_def,GSYM three_dim_rel_event_list_def]
    ++ POP_ASSUM MP_TAC
    ++ MATCH_MP_TAC in_events_cloud_server_rv_list1
-   ++ EXISTS_TAC(--`n:num`--)
+   ++ EXISTS_TAC(``n:num``)
    ++ METIS_TAC[])
 ++ FULL_SIMP_TAC std_ss[GSYM cloud_server_rv_list_def]
 ++ FULL_SIMP_TAC std_ss[GSYM rel_event_list_def,GSYM two_dim_rel_event_list_def,GSYM three_dim_rel_event_list_def,GSYM four_dim_rel_event_list_def]
@@ -1253,7 +1345,12 @@ GEN_TAC
 
 (*---------------------*)
 val rel_prod_series_rbd_exp_dist = store_thm("rel_prod_series_rbd_exp_dist",
-  ``!p t L C. (0 <= t) /\ prob_space p /\ exp_dist_list p L C /\ (LENGTH C = LENGTH L)/\ (!x. MEM x (rel_event_list p L t) ==>  x IN events p)==> (list_prod (list_prob p (rel_event_list p L t)) = list_prod (exp_func_list C t))  ``,
+  ``!p t L C.
+      (0 <= t) /\ prob_space p /\ exp_dist_list p L C /\
+      (LENGTH C = LENGTH L) /\
+      (!x. MEM x (rel_event_list p L t) ==> x IN events p) ==>
+      (list_prod (list_prob p (rel_event_list p L t)) =
+       list_prod (exp_func_list C t))``,
 GEN_TAC
 ++ GEN_TAC
 ++ Induct
@@ -1279,8 +1376,9 @@ GEN_TAC
 (*---------------------*)
 val len_cloud_server_fail_rate_eq_rv_list = store_thm(
   "len_cloud_server_fail_rate_eq_rv_list",
-  ``!a b c d e f n m. LENGTH (cloud_server_fail_rate_list [a::b::c] m n) =
-LENGTH (cloud_server_rv_list [d::e::f] m n) ``,
+  ``!a b c d e f n m.
+     LENGTH (cloud_server_fail_rate_list [a::b::c] m n) =
+     LENGTH (cloud_server_rv_list [d::e::f] m n)``,
 GEN_TAC
 ++ GEN_TAC
 ++ GEN_TAC
@@ -1295,8 +1393,9 @@ GEN_TAC
 (*---------------------*)
 val len_cloud_server_fail_rate_eq_rv_list1 = store_thm(
   "len_cloud_server_fail_rate_eq_rv_list1",
-  ``!a b c d e f m. (LENGTH (([a::b::c])) = LENGTH (([d::e::f]))) ==> ( LENGTH (gen_list ([a::b::c]) m) =
-LENGTH (gen_list ([d::e::f]) m))  ``,
+  ``!a b c d e f m.
+     (LENGTH (([a::b::c])) = LENGTH (([d::e::f]))) ==>
+     (LENGTH (gen_list ([a::b::c]) m) = LENGTH (gen_list ([d::e::f]) m))``,
 GEN_TAC
 ++ GEN_TAC
 ++ GEN_TAC
@@ -1309,8 +1408,13 @@ GEN_TAC
 (*---------------------*)
 val len_cloud_server_fail_rate_eq_rv_list2 = store_thm(
   "len_cloud_server_fail_rate_eq_rv_list2",
-  ``!a b c d e f n m n'. (LENGTH (([a::b::c])) = LENGTH ([d::e::f])) /\ (n' < LENGTH (cloud_server_rv_list ([a::b::c]) m n)) /\  (n' < LENGTH(cloud_server_fail_rate_list ([d::e::f]) m n)) /\ ~NULL (c) /\ ~NULL (f) ==> (LENGTH (EL n' (cloud_server_rv_list ([a::b::c]) m n)) =
-LENGTH (EL n' (cloud_server_fail_rate_list ([d::e::f]) m n)))  ``,
+  ``!a b c d e f n m n'.
+     (LENGTH [a::b::c] = LENGTH [d::e::f]) /\
+     (n' < LENGTH (cloud_server_rv_list ([a::b::c]) m n)) /\
+     (n' < LENGTH(cloud_server_fail_rate_list ([d::e::f]) m n)) /\
+     ~NULL c /\ ~NULL f ==>
+     (LENGTH (EL n' (cloud_server_rv_list ([a::b::c]) m n)) =
+      LENGTH (EL n' (cloud_server_fail_rate_list ([d::e::f]) m n)))``,
 GEN_TAC
 ++ GEN_TAC
 ++ GEN_TAC
@@ -1336,12 +1440,13 @@ GEN_TAC
 (*---------------------*)
 val len_cloud_server_fail_rate_eq_rv_list3 = store_thm(
   "len_cloud_server_fail_rate_eq_rv_list3",
-  ``!a b c d e f m n.  (LENGTH c = LENGTH f)
-  /\  ~NULL f
-  /\  ~NULL c
-  /\  (n < LENGTH (gen_list [a::b::c] m))
-  /\ ( n < LENGTH (gen_list [d::e::f] m)) ==> (LENGTH (EL n (gen_list [a::b::c] m)) =
-LENGTH (EL n (gen_list [d::e::f] m)))``,
+  ``!a b c d e f m n.
+      (LENGTH c = LENGTH f) /\
+      ~NULL f /\ ~NULL c /\
+      (n < LENGTH (gen_list [a::b::c] m)) /\
+      (n < LENGTH (gen_list [d::e::f] m)) ==>
+      (LENGTH (EL n (gen_list [a::b::c] m)) =
+       LENGTH (EL n (gen_list [d::e::f] m)))``,
 GEN_TAC
 ++ GEN_TAC
 ++ GEN_TAC
@@ -1395,12 +1500,11 @@ GEN_TAC
 (*-------------------------*)
 val len_cloud_server_fail_rate_eq_rv_list5 = store_thm(
   "len_cloud_server_fail_rate_eq_rv_list5",
-  ``!a b c d e f n.  (LENGTH c = LENGTH f)
-  /\  ~NULL f
-  /\  ~NULL c
-  /\  (n < LENGTH ([a::b::c]))
-  /\ ( n < LENGTH ([d::e::f] ))
-   ==> (LENGTH (EL n [a::b::c]) = LENGTH (EL n [d::e::f]))``,
+  ``!a b c d e f n.
+     (LENGTH c = LENGTH f) /\
+     ~NULL f /\ ~NULL c /\
+     (n < LENGTH [a::b::c]) /\ (n < LENGTH [d::e::f]) ==>
+     (LENGTH (EL n [a::b::c]) = LENGTH (EL n [d::e::f]))``,
 GEN_TAC
 ++ GEN_TAC
 ++ GEN_TAC
@@ -1414,14 +1518,16 @@ GEN_TAC
 (*-------------------------*)
 val len_cloud_server_fail_rate_eq_rv_list6 = store_thm(
   "len_cloud_server_fail_rate_eq_rv_list6",
-  ``!a b c d e f m n n'.  (LENGTH c = LENGTH f)
-  /\  ~NULL f
-  /\  ~NULL c
-  /\  (n' < LENGTH (gen_list [a::b::c] m))
-  /\ ( n' < LENGTH (gen_list [d::e::f] m))
-  /\ ( n < LENGTH (EL n' (gen_list [a::b::c] m)))
-  /\ ( n < LENGTH (EL n' (gen_list [d::e::f] m))) ==> (LENGTH (EL n (EL n' (gen_list [a::b::c] m))) =
-LENGTH (EL n (EL n' (gen_list [d::e::f] m))))``,
+  ``!a b c d e f m n n'.
+     (LENGTH c = LENGTH f) /\
+     ~NULL f /\
+     ~NULL c /\
+     (n' < LENGTH (gen_list [a::b::c] m)) /\
+     (n' < LENGTH (gen_list [d::e::f] m)) /\
+     (n < LENGTH (EL n' (gen_list [a::b::c] m))) /\
+     (n < LENGTH (EL n' (gen_list [d::e::f] m))) ==>
+     (LENGTH (EL n (EL n' (gen_list [a::b::c] m))) =
+      LENGTH (EL n (EL n' (gen_list [d::e::f] m))))``,
 GEN_TAC
 ++ GEN_TAC
 ++ GEN_TAC
@@ -1474,33 +1580,51 @@ NTAC 6 (GEN_TAC)
 ++ FULL_SIMP_TAC list_ss[cloud_server_fail_rate_list_def,cloud_server_rv_list_def]);
 (*----------------------*)
 val VDC_case_study_thm = store_thm("VDC_case_study_thm",
-  ``!X_VM X_VMM X_HW X_C C_VM C_VMM C_HW C m n p t.  (0 <=  t)/\ prob_space p /\ 
-~NULL (cloud_server_rv_list ([X_VM]) m n) /\  ~NULL (cloud_server_fail_rate_list ([C_VM]) m n) /\
-(!z. MEM z (FLAT (FLAT((cloud_server_rv_list ([X_VM]) m n) )))
-     	     ==>  ~NULL z) /\ (LENGTH C = LENGTH X_C) /\ ~NULL C_VM /\ ~NULL X_VM /\(LENGTH X_VM = LENGTH C_VM) /\ (exp_dist_list p X_C C)  /\ 
-~(NULL (rel_event_list p X_C t))/\ 
-  (!x'. MEM x'
-   (FLAT (FLAT (FLAT (four_dim_rel_event_list p (cloud_server_rv_list  ([X_VM]) m n) t)))) ==> (x' IN events p)) /\
-   ( rel_event p X_VMM t IN events p)  /\ 
-((rel_event p X_HW t) IN events p) 
-/\ (!z'.  MEM z' ((rel_event_list p X_C t)) ==> z' IN events p)
- /\ (LENGTH X_VM = LENGTH C_VM) /\
- (four_dim_exp_dist_list p  ((cloud_server_rv_list ([X_VMM::X_HW::X_VM]) m n)))
-((cloud_server_fail_rate_list ([C_VMM::C_HW:: C_VM]) m n)) /\
- (mutual_indep p
-    (rel_event_list p X_C t ++ FLAT (FLAT (FLAT(four_dim_rel_event_list p (cloud_server_rv_list  ([X_VMM::X_HW::X_VM]) m n) t))))) ==>
+  ``!X_VM X_VMM X_HW X_C C_VM C_VMM C_HW C m n p t.
+  (0 <=  t)/\ prob_space p /\ ~NULL (cloud_server_rv_list ([X_VM]) m n) /\
+  ~NULL (cloud_server_fail_rate_list ([C_VM]) m n) /\
+  (!z.
+    MEM z (FLAT (FLAT((cloud_server_rv_list ([X_VM]) m n)))) ==>
+    ~NULL z) /\ (LENGTH C = LENGTH X_C) /\ ~NULL C_VM /\
+  ~NULL X_VM /\ (LENGTH X_VM = LENGTH C_VM) /\
+  exp_dist_list p X_C C /\ ~NULL (rel_event_list p X_C t) /\ 
+  (!x'.
+    MEM x'
+     (FLAT
+       (FLAT
+         (FLAT
+	   (four_dim_rel_event_list p
+	     (cloud_server_rv_list  ([X_VM]) m n) t)))) ==>
+    x' IN events p) /\ (rel_event p X_VMM t IN events p) /\ 
+ (rel_event p X_HW t IN events p) /\
+ (!z'. MEM z' (rel_event_list p X_C t) ==> z' IN events p) /\
+ (LENGTH X_VM = LENGTH C_VM) /\
+ four_dim_exp_dist_list p
+   (cloud_server_rv_list [X_VMM::X_HW::X_VM] m n)
+   (cloud_server_fail_rate_list ([C_VMM::C_HW:: C_VM]) m n) /\
+ mutual_indep p
+    (rel_event_list p X_C t ++
+    FLAT
+     (FLAT
+       (FLAT
+          (four_dim_rel_event_list p
+	     (cloud_server_rv_list  ([X_VMM::X_HW::X_VM]) m n) t)))) ==>
 (prob p
-        (rbd_struct p  (series (rbd_list (rel_event_list p X_C t))) INTER rbd_struct p
-           ((series of parallel of series of
-             (\a. parallel (rbd_list (rel_event_list p a t))))  (cloud_server_rv_list  ([X_VMM::X_HW::X_VM]) m n))) =
-    (list_prod (exp_func_list C t)) *  (list_prod of (\a. 1 − list_prod (one_minus_list a)) of
-       (\a. list_prod a) of
-       (\a. 1 − list_prod (one_minus_list (exp_func_list a t)))) (cloud_server_fail_rate_list ([C_VMM::C_HW:: C_VM]) m n))``,
+   (rbd_struct p (series (rbd_list (rel_event_list p X_C t))) INTER
+    rbd_struct p
+       ((series of parallel of series of
+         (\a. parallel (rbd_list (rel_event_list p a t))))
+	  (cloud_server_rv_list  ([X_VMM::X_HW::X_VM]) m n))) =
+ (list_prod (exp_func_list C t)) *
+  (list_prod of (\a. 1 − list_prod (one_minus_list a)) of
+   (\a. list_prod a) of
+   (\a. 1 − list_prod (one_minus_list (exp_func_list a t))))
+    (cloud_server_fail_rate_list ([C_VMM::C_HW:: C_VM]) m n))``,
 RW_TAC std_ss[]
 ++ DEP_REWRITE_TAC[GSYM nested_series_parallel_rbd_alt_form]
 ++ RW_TAC std_ss[]
 ++ RW_TAC std_ss[of_DEF]
-++ DEP_REWRITE_TAC[series_rbd_indep_series_parallel_of_series_parallel]
+++ DEP_REWRITE_TAC[(REWRITE_RULE[of_DEF]series_rbd_indep_series_parallel_of_series_parallel)]
 ++ RW_TAC std_ss[]
 >> (FULL_SIMP_TAC list_ss[]
    ++ POP_ASSUM MP_TAC
@@ -1509,16 +1633,16 @@ RW_TAC std_ss[]
 >> (FULL_SIMP_TAC list_ss[]
    ++ POP_ASSUM MP_TAC
    ++ MATCH_MP_TAC in_events_cloud_server_rv_list
-   ++  METIS_TAC[])
+   ++ METIS_TAC[])
 ++ DEP_REWRITE_TAC[series_struct_thm]
 ++ RW_TAC std_ss[]
 >> (MATCH_MP_TAC mutual_indep_front_append
-   ++ EXISTS_TAC(--`FLAT
+   ++ EXISTS_TAC(``FLAT
             (FLAT
                (FLAT
                   (four_dim_rel_event_list p
                      (cloud_server_rv_list [X_VMM::X_HW::X_VM] m n)
-                     t)))`--)
+                     t)))``)
    ++ MATCH_MP_TAC mutual_indep_append_sym
    ++ RW_TAC std_ss[])
 ++ DEP_REWRITE_TAC[rel_prod_series_rbd_exp_dist]
@@ -1540,7 +1664,7 @@ RW_TAC std_ss[]
        (\a. parallel (rbd_list (rel_event_list p a t))))
         (cloud_server_rv_list [X_VMM::X_HW::X_VM] m n))) = (list_prod of (\a. 1 − list_prod (one_minus_list a)) of
        (\a. list_prod a) of
-       (\a. 1 − list_prod (one_minus_list (exp_func_list a t)))) (cloud_server_fail_rate_list [C_VMM::C_HW::C_VM] m n)` by MATCH_MP_TAC nested_series_parallel_exp_dist)
+       (\a. 1 − list_prod (one_minus_list (exp_func_list a t)))) (cloud_server_fail_rate_list [C_VMM::C_HW::C_VM] m n)` by (MATCH_MP_TAC nested_series_parallel_exp_dist))
 >> (RW_TAC std_ss[]
    >> (POP_ASSUM MP_TAC
       ++ MATCH_MP_TAC cloud_server_rv_list_not_null3
@@ -1556,7 +1680,7 @@ RW_TAC std_ss[]
    >> (MATCH_MP_TAC len_cloud_server_fail_rate_eq_rv_list7
       ++ RW_TAC list_ss[])
    ++ MATCH_MP_TAC mutual_indep_front_append
-   ++ EXISTS_TAC(--`rel_event_list p X_C t`--)
+   ++ EXISTS_TAC(``rel_event_list p X_C t``)
    ++ RW_TAC list_ss[])
 ++ POP_ORW
 ++ RW_TAC list_ss[of_DEF,o_DEF]);
@@ -1564,17 +1688,18 @@ RW_TAC std_ss[]
 (*------------parallel_series_exp_fail_rate-------------------------*)
 val parallel_series_exp_fail_rate = store_thm("parallel_series_exp_fail_rate",
   ``∀p t L C.
-     (∀z. MEM z L ⇒ ¬NULL z) ∧ 0 ≤ t ∧ prob_space p ∧
+     (∀z. MEM z L ==> ~NULL z) ∧ 0 <= t ∧ prob_space p ∧
      (∀x'.
         MEM x' (FLAT (two_dim_rel_event_list p L t)) ⇒ x' ∈ events p) ∧
      (LENGTH C = LENGTH L) ∧
      (∀n.
-        n < LENGTH L ∧ n < LENGTH C ⇒
+        n < LENGTH L ∧ n < LENGTH C ==>
         (LENGTH (EL n L) = LENGTH (EL n C))) ∧
      two_dim_exp_dist_list p L C ⇒
      (1 - (list_prod o (one_minus_list) of
-	(\a. list_prod (list_prob p a))) (two_dim_rel_event_list p L t) = 1 - (list_prod o (one_minus_list) of
-	(\a. list_prod (exp_func_list a t))) C) ``,
+	(\a. list_prod (list_prob p a))) (two_dim_rel_event_list p L t) =
+     1 - (list_prod o (one_minus_list) of
+	(\a. list_prod (exp_func_list a t))) C)``,
 GEN_TAC ++ GEN_TAC
 ++ Induct
    >> (RW_TAC list_ss[of_DEF,o_DEF,two_dim_rel_event_list_def,list_prod_def,list_prob_def,LENGTH_NIL])
@@ -1616,11 +1741,13 @@ val rel_parallel_series_exp_fail_rate = store_thm(
         n < LENGTH L ∧ n < LENGTH C ⇒
         (LENGTH (EL n L) = LENGTH (EL n C))) ∧
      two_dim_exp_dist_list p L C ⇒
-(prob p
-        (rbd_struct p ((parallel of (λa. series (rbd_list a))) (two_dim_rel_event_list p L t))) =
-      1 - (list_prod o (one_minus_list) of
+     (prob p
+        (rbd_struct p
+	   ((parallel of (λa. series (rbd_list a)))
+	      (two_dim_rel_event_list p L t))) =
+      1 -
+      (list_prod o (one_minus_list) of
 	(\a. list_prod (exp_func_list a t))) C)``,
-
 REPEAT GEN_TAC ++ REPEAT STRIP_TAC
 ++ DEP_REWRITE_TAC[parallel_series_struct_rbd_v2]
 ++ DEP_REWRITE_TAC[parallel_series_exp_fail_rate]
