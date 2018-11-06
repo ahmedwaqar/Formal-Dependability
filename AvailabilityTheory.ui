@@ -1,6 +1,0 @@
-$(HOLDIR)/sigobj/Overlay
-$(HOLDIR)/sigobj/Thm
-$(HOLDIR)/sigobj/term_grammar
-$(HOLDIR)/sigobj/type_grammar
-/home/waqar/12phdwahmad@seecs.edu.pk/Dropbox/WaqarP_data/Docs_for_Thesis_Compilation/HOL-Code-thesis/Formal_Depend_k12/Formal-Dependability/AvailabilityTheory
-/home/waqar/12phdwahmad@seecs.edu.pk/Dropbox/WaqarP_data/Docs_for_Thesis_Compilation/HOL-Code-thesis/Formal_Depend_k12/Formal-Dependability/AvailabilityTheory.sig
