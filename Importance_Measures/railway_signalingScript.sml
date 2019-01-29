@@ -6,10 +6,12 @@
 (*                                                                           *)
 (*                HOL4-Kananaskis 12 		 			     *)
 (*									     *)
-(*		Author :  Waqar Ahmad             		     	     *)
-(*                                              			     *)
-(* 	    Electrical and Computer Engineering                              *)
-(*	    Concordia Univeristy, Montreal, QC, Canada                       *)
+(*		Authors :  Shahid Murtaza (1)     		     	     *)
+(*                         Waqar Ahmad (2)               	             *)
+(*		(1) National School of Scinces and Technology	             *)
+(*		    Islamabad, Pakistan	       	   			     *)
+(* 	        (2) Electrical and Computer Engineering                      *)
+(*	            Concordia Univeristy, Montreal, QC, Canada               *)
 (*                                          		               	     *)
 (*                                                                           *)
 (* ========================================================================= *)
@@ -20,9 +22,9 @@
 (*loadPath := "/home/shahid/Downloads/Formal-Dependability-master" :: !loadPath;*)
 (*loadPath := "/home/savelab/Downloads/Formal-Dependability" :: !loadPath;
 
-app load ["FT_deepTheory","arithmeticTheory","probabilityTheory","listTheory","VDCTheory","RBDTheory","railwayTheory","util_probTheory","transcTheory","ASN_gatewayTheory","pred_setTheory","dep_rewrite","sortingTheory","combinTheory","seqTheory","realTheory","realLib","pred_setTheory","transform_FT_RBDTheory"];*)
+app load ["FT_deepTheory","arithmeticTheory","probabilityTheory","listTheory","VDCTheory","RBDTheory","railwayTheory","util_probTheory","transcTheory","ASN_gatewayTheory","pred_setTheory","dep_rewrite","sortingTheory","combinTheory","seqTheory","realTheory","realLib","pred_setTheory","transform_FT_RBDTheory","FTImp_deepTheory"];*)
 
-open FT_deepTheory probabilityTheory listTheory VDCTheory RBDTheory railwayTheory util_probTheory transcTheory ASN_gatewayTheory combinTheory pred_setTheory sortingTheory dep_rewrite seqTheory pred_setTheory arithmeticTheory realTheory realLib transform_FT_RBDTheory;
+open FT_deepTheory probabilityTheory listTheory VDCTheory RBDTheory railwayTheory util_probTheory transcTheory ASN_gatewayTheory combinTheory pred_setTheory sortingTheory dep_rewrite seqTheory pred_setTheory arithmeticTheory realTheory realLib transform_FT_RBDTheory FTImp_deepTheory;
 
    
 open HolKernel boolLib bossLib Parse;
@@ -77,6 +79,8 @@ val birnhaum_IMP_Vehicle_def = Define
 `birnhaum_IMP_Vehicle p e1 e2 e3 e4 e5 e6 e7 e8 e9 e10 e11 e12 e13 e14 e15 e16 e1'=
  prob p (PHI_STRUCT_RW p e1  e2 e3 e4 e5 e6 e7 e8 e9 e10 e11 e12 e13 e14 e15 e16) - 
  prob p (PHI_STRUCT_RW p e1' e2 e3 e4 e5 e6 e7 e8 e9 e10 e11 e12 e13 e14 e15 e16)`;
+
+
 (*********************************************************************)
 (** Definition : Birnbaum Reliability Importance Measure (Vehicle)  **)
 (*********************************************************************)
@@ -492,6 +496,35 @@ RW_TAC std_ss[EVENT2LIST]
 ++ FULL_SIMP_TAC list_ss[exp_dist_list_def,VDCTheory.exp_dist_def,CDF_def,distribution_def,fail_event_def]
 ++ RW_TAC real_ss[REAL_MUL_ASSOC]);
 
+(*-------------------------*)
+val CDF_SPACE = store_thm("CDF_SPACE",
+  ``!p x t. prob_space p /\ (fail_event p x t = p_space p) ==> (CDF p x t =  1)``,
+rw[CDF_def,VDCTheory.exp_dist_def,distribution_def,fail_event_def,PROB_UNIV]);
+
+
+(*--------------------------
+
+val BImp_measure_rail_alt = store_thm("BImp_measure_rail_alt",
+  ``!p x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11 x12 x13 x14 x15 x16 t.
+  prob_space p /\ (fail_event p x1 t = p_space p) ==>
+(BImp_measure p 0
+    (\b. (FTree p (OR [OR (gate_list ([fail_event p x3 t; fail_event p x4 t]));
+		       OR (gate_list ([fail_event p x5 t; fail_event p x6 t]));
+		       AND [OR (gate_list ([fail_event p x9 t; fail_event p x10 t]));
+		            OR (gate_list ([fail_event p x13 t; fail_event p x14 t]));
+			    OR (gate_list ([fail_event p x15 t; fail_event p x16 t]));
+			    OR (gate_list ([fail_event p x11 t; fail_event p x12 t]))];
+		       OR (gate_list ([ fail_event p x7 t; fail_event p x8 t]));
+		       OR (gate_list b)])))
+    ([fail_event p x1 t; fail_event p x2 t]) =
+birnhaum_Rel_IMP_Vehicle p x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11 x12
+   x13 x14 x15 x16 t)``,
+rw[BImp_measure_def,birnhaum_Rel_IMP_Vehicle_def,birnhaum_IMP_Vehicle_def,coherent_struct_update_def,s_comp_def,LUPDATE_def,f_comp_def,PHI_STRUCT_RW_def,coherent_struct_def]);
+
+
+
+
+
 (************************************************************)
 (************* THEOREM :  fail_prob_railway_FT0 *************)
 (************************************************************)
@@ -627,6 +660,50 @@ RW_TAC std_ss[birnhaum_Rel_IMP_Vehicle_def, birnhaum_IMP_Vehicle_def,PHI_STRUCT_
    ++ metis_tac[])
 ++ REAL_ARITH_TAC);
 
+(*------------------------------*)
+val Birnbaum_imp_rail_vehicle_fail = store_thm("Birnbaum_imp_rail_vehicle_fail",
+`` !p x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11 x12 x13 x14 x15 x16
+      c2 c3 c4 c5 c6 c7 c8 c9 c10 c11 c12 c13 c14 c15 c16 t.
+(0 <= t) /\ prob_space p /\ (fail_event p x1 t = p_space p) /\
+exp_dist_list p
+  [x3; x4; x5; x6; x7; x8; x2; x9; x10; x13; x14; x15; x16; x11; x12]
+  [c3; c4; c5; c6; c7; c8; c2; c9; c10; c13; c14; c15; c16; c11; c12] /\
+mutual_indep p
+  ((fail_event_list p
+     [x3; x4; x5; x6; x7; x8; x1; x2; x9; x10; x13; x14; x15; x16;
+      x11; x12] t)) /\
+in_events p
+ ((fail_event_list p
+    [x3; x4; x5; x6; x7; x8; x1; x2; x9; x10; x13; x14; x15; x16;
+     x11; x12] t)) ==> 
+(BImp_measure p 0
+            (λb.
+                 FTree p
+                   (OR
+                      [OR (gate_list [ω p x3 t; ω p x4 t]);
+                       OR (gate_list [ω p x5 t; ω p x6 t]);
+                       AND
+                         [OR (gate_list [ω p x9 t; ω p x10 t]);
+                          OR (gate_list [ω p x13 t; ω p x14 t]);
+                          OR (gate_list [ω p x15 t; ω p x16 t]);
+                          OR (gate_list [ω p x11 t; ω p x12 t])];
+                       OR (gate_list [ω p x7 t; ω p x8 t]); OR (gate_list b)]))
+            [ω p x1 t; ω p x2 t] = 
+ exp (-(c3 * t)) * exp (-(c4 * t)) * exp (-(c5 * t)) * exp (-(c6 * t)) *
+ exp (-(c7 * t)) * exp (-(c8 * t)) * exp (-(c2 * t)) *
+ (1 -
+  (1 - exp (-(c9 * t)) * exp (-(c10 * t))) *
+  (1 - exp (-(c13 * t)) * exp (-(c14 * t))) *
+  (1 - exp (-(c15 * t)) * exp (-(c16 * t))) *
+  (1 - exp (-(c11 * t)) * exp (-(c12 * t)))))``,
+rpt gen_tac
+\\ rpt disch_tac
+\\ DEP_REWRITE_TAC[BImp_measure_rail_alt]
+\\ rw[]
+\\ DEP_REWRITE_TAC[birnhaum_Rel_IMP_Vehicle_THM]
+\\ rw[]
+\\ irule CDF_SPACE
+\\ rw[]);
 (*----------------------------------------------------------------------*)
 (***********************************************)
 (*** THEOREM : fail_prob_railway_FT9_1 *********)
@@ -844,6 +921,70 @@ RW_TAC std_ss[birnhaum_Rel_IMP_X9_def, birnhaum_IMP_X9_def,PHI_STRUCT_RW_def,f_c
       FLAT,MEM,in_events_def, CDF_def]
    ++ metis_tac[])
 ++ REAL_ARITH_TAC);
+
+(*-----------------------------*)
+val BImp_alarm_fail_alt = store_thm("BImp_alarm_fail_alt",
+  ``!p x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11 x12 x13 x14 x15 x16 t.
+prob_space p ∧ (ω p x9 t = p_space p) ⇒
+ (BImp_measure p 0
+            (λb.
+                 FTree p
+                   (OR
+                      [OR (gate_list [ω p x3 t; ω p x4 t]);
+                       OR (gate_list [ω p x5 t; ω p x6 t]);
+                       AND
+                         [OR (gate_list b);
+                          OR (gate_list [ω p x13 t; ω p x14 t]);
+                          OR (gate_list [ω p x15 t; ω p x16 t]);
+                          OR (gate_list [ω p x11 t; ω p x12 t])];
+                       OR (gate_list [ω p x7 t; ω p x8 t]);
+		       OR (gate_list ([ω p x1 t; ω p x2 t]))]))
+	     ([ω p x9 t; ω p x10 t]) =
+birnhaum_Rel_IMP_X9 p x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11 x12 x13
+    x14 x15 x16 t)``,
+rw[BImp_measure_def,birnhaum_Rel_IMP_X9_def,birnhaum_IMP_X9_def,coherent_struct_update_def,s_comp_def,LUPDATE_def,f_comp_def,PHI_STRUCT_RW_def,coherent_struct_def]);
+
+
+(*---------------------------*)
+val birnhaum_IMP_alarm_THM = store_thm("birnhaum_IMP_alarm_THM",
+  ``!p x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11 x12 x13 x14 x15 x16
+     c2 c3 c4 c5 c6 c7 c8 c1 c10 c11 c12 c13 c14 c15 c16 t.
+(0 <= t) /\ prob_space p /\ (ω p x9 t = p_space p) /\
+exp_dist_list p
+  [x3; x4; x5; x6; x7; x8; x2; x1; x10; x13; x14; x15; x16; x11; x12]
+  [c3; c4; c5; c6; c7; c8; c2; c1; c10; c13; c14; c15; c16; c11; c12] /\
+mutual_indep p
+  ((fail_event_list p
+     [x3; x4; x5; x6; x7; x8; x1; x2; x9; x10; x13; x14; x15; x16;
+      x11; x12] t)) /\
+in_events p
+ ((fail_event_list p
+    [x3; x4; x5; x6; x7; x8; x1; x2; x9; x10; x13; x14; x15; x16;
+     x11; x12] t)) ==> 
+(BImp_measure p 0
+            (λb.
+                 FTree p
+                   (OR
+                      [OR (gate_list [ω p x3 t; ω p x4 t]);
+                       OR (gate_list [ω p x5 t; ω p x6 t]);
+                       AND
+                         [OR (gate_list b);
+                          OR (gate_list [ω p x13 t; ω p x14 t]);
+                          OR (gate_list [ω p x15 t; ω p x16 t]);
+                          OR (gate_list [ω p x11 t; ω p x12 t])];
+                       OR (gate_list [ω p x7 t; ω p x8 t]);
+                       OR (gate_list [ω p x1 t; ω p x2 t])]))
+            [ω p x9 t; ω p x10 t]  = 
+ exp (-(c3 * t)) * exp (-(c4 * t)) * exp (-(c5 * t)) *
+ exp (-(c6 * t)) * exp (-(c7 * t)) * exp (-(c8 * t)) *
+ exp (-(c1 * t)) * exp (-(c2 * t)) * exp (-(c10 * t)) *
+ ((1 − exp (-(c13 * t)) * exp (-(c14 * t))) *
+  (1 − exp (-(c15 * t)) * exp (-(c16 * t))) *
+  (1 − exp (-(c11 * t)) * exp (-(c12 * t)))))``,
+rpt gen_tac
+\\ rpt disch_tac
+\\ DEP_REWRITE_TAC[BImp_alarm_fail_alt,birnhaum_Rel_IMP_X9_THM,CDF_SPACE]
+\\ rw[]);
 
 (*************************************************************) 
 (************** Definition: Reliability Achievement Worth*****) 
@@ -1073,6 +1214,9 @@ rw[RAW_fail_X9_def,RAW_X9_def]
    \\ metis_tac[])
 \\ fs[exp_dist_list_def]
 \\ metis_tac[]);
+(***************************************)
+
+(****************************************)
 
 
 

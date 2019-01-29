@@ -1,0 +1,24 @@
+To use the proof script, follow the steps below:
+
+1) Install latest version of HOL by downloading it from  https://hol-theorem-prover.org/ or
+	(Follow the steps mentioned in http://save.seecs.nust.edu.pk/Downloads/Installation%20of%20HOL%20&%20HOL-LIGHT%20in%20Linux.pdf) 
+ 
+2) Open Emacs and load the file "hol-mode.el" 
+	(ALT-x load-file \<PATH to HOL folder\>/tools/hol-mode.el)
+
+3) Enter ALT+H 3, windows split into two and the hol starts
+
+4) Clone or Download the Folders (1): Formal-Dependability; and (2) Importance Measures
+
+4) Run HOLmake in the folder "Importance Measures". At the top of Emacs window, click HOL tab. In the Process option, click Run Holmake
+
+5) Load directory path to HOL shell by using this command "loadPath := "\<PATH to HOL script files\>/Importance_Measures" :: !loadPath;" 
+
+7) Now, the build version of the theories can be loaded to hol-shell using following commands:
+   app load ["FTImp_deepTheory","railway_signalingTheory"];
+   open FTImp_deepTheory railway_signalingTheory;
+
+
+Note: For any queries about this project contact:
+
+Waqar Ahmed on email address waqar@encs.concordia.ca
