@@ -8,7 +8,7 @@
 (*									     *)
 (*		Authors :  Shahid Murtaza (1)     		     	     *)
 (*                         Waqar Ahmad (2)               	             *)
-(*		(1) National School of Scinces and Technology	             *)
+(*		(1) National University of Sciences and Technology           *)
 (*		    Islamabad, Pakistan	       	   			     *)
 (* 	        (2) Electrical and Computer Engineering                      *)
 (*	            Concordia Univeristy, Montreal, QC, Canada               *)
