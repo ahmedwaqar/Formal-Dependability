@@ -1,0 +1,22 @@
+To use the proof script, follow the steps below:
+
+1) Install HOL-k11 version by downloading it from  Github https://github.com/HOL-Theorem-Prover/HOL or
+	(Follow the steps mentioned in http://save.seecs.nust.edu.pk/Downloads/Installation%20of%20HOL%20&%20HOL-LIGHT%20in%20Linux.pdf) 
+ 
+2) Open Emacs and load the file "hol-mode.el" 
+	(ALT-x load-file \<PATH to HOL folder\>/tools/hol-mode.el)
+
+3) Enter ALT+H 3, windows split into two and the hol starts
+
+4) Run HOLmake in the folder HOL-script/Power_Generation_Sources. At the top of Emacs window, click HOL tab. In the Process option, click Run Holmake
+
+5) Open the auto_rel_ess_res.ml. 
+
+6) Load directory path to HOL shell. loadPath := "\<PATH to HOL script files\>/Power_Generation_Sources" :: !loadPath and loadPath := "\<PATH to HOL script files\>/Dependability_scripts" :: !loadPath; 
+
+7) Run the script in HOL shell
+
+
+Note: For any queries about this project contact:
+
+Waqar Ahmad on email address waqar.ahmad@seecs.nust.edu.pk 
