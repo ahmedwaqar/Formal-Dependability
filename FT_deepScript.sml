@@ -20,8 +20,9 @@
           "combinTheory","limTheory","sortingTheory", "realLib", "optionTheory","satTheory",
           "util_probTheory", "extrealTheory", "measureTheory", "lebesgueTheory","real_sigmaTheory", "RBDTheory"];
 *)
-open HolKernel Parse boolLib bossLib limTheory arithmeticTheory realTheory prim_recTheory probabilityTheory
-     seqTheory pred_setTheory res_quanTheory sortingTheory res_quanTools listTheory transcTheory
+open HolKernel Parse boolLib bossLib limTheory arithmeticTheory realTheory 
+    prim_recTheory probabilityTheory seqTheory pred_setTheory res_quanTheory 
+    sortingTheory res_quanTools listTheory transcTheory
      rich_listTheory pairTheory combinTheory realLib  optionTheory dep_rewrite
       util_probTheory extrealTheory measureTheory lebesgueTheory real_sigmaTheory satTheory numTheory RBDTheory;
       
