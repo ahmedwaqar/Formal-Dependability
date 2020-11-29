@@ -4,7 +4,7 @@
 (* Description: Formal Reliability Analysis of Oil and Gas Pipelines         *)
 (*               using Theorem Proving    				     *)
 (*                                                                           *)
-(*                HOL4-Kananaskis 10 		 			     *)
+(*                HOL4-Kananaskis 12 		 			     *)
 (*									     *)
 (*		Author :  Waqar Ahmad             		     	     *)
 (*                                              			     *)
@@ -15,11 +15,11 @@
 (* ========================================================================= *)
 
 
-app load ["arithmeticTheory", "realTheory", "prim_recTheory", "seqTheory",
+(*app load ["arithmeticTheory", "realTheory", "prim_recTheory", "seqTheory",
     	  "pred_setTheory","res_quanTheory", "res_quanTools", "listTheory", "probabilityTheory", "numTheory",
 	  "transcTheory", "rich_listTheory", "pairTheory",
 	  "combinTheory","limTheory","sortingTheory", "realLib", "optionTheory","satTheory",
-	  "util_probTheory", "extrealTheory", "measureTheory", "lebesgueTheory","real_sigmaTheory","dep_rewrite","RBDTheory","FT_deepTheory","VDCTheory","ASN_gatewayTheory"];
+	  "util_probTheory", "extrealTheory", "measureTheory", "lebesgueTheory","real_sigmaTheory","dep_rewrite","RBDTheory","FT_deepTheory","VDCTheory","ASN_gatewayTheory"];*)
 open HolKernel Parse boolLib bossLib limTheory arithmeticTheory realTheory prim_recTheory probabilityTheory 
      seqTheory pred_setTheory res_quanTheory sortingTheory res_quanTools listTheory transcTheory
      rich_listTheory pairTheory combinTheory realLib  optionTheory
@@ -51,7 +51,7 @@ val op<< = op THENL;
 val op|| = op ORELSE;
 val op>> = op THEN1;
 val std_ss' = simpLib.++ (std_ss, boolSimps.ETA_ss);
-
+val op by = BasicProvers.byA;
 (*---------------------------*)
 fun SET_TAC L =
     POP_ASSUM_LIST(K ALL_TAC) THEN REPEAT COND_CASES_TAC THEN
@@ -275,7 +275,7 @@ val rel_pipeline_z3_lemma4 = store_thm("rel_pipeline_z3_lemma4",
       prob p (rbd_struct p ((series of (\a. parallel (rbd_list a))) L2)))``,
 RW_TAC std_ss[]
 ++ MP_TAC(ISPECL [``p:('a -> bool) # (('a -> bool) -> bool) # (('a -> bool) -> real)``, ``L1:'a event list list`` ,``[[L2:'a event list list]]``] series_parallel_rbd_indep_series_parallel_of_series_parallel)
-++ RW_TAC list_ss[rbd_struct_def,rbd_list_def,UNION_EMPTY]
+++ RW_TAC list_ss[of_DEF,o_DEF,rbd_struct_def,rbd_list_def,UNION_EMPTY]
 ++ FULL_SIMP_TAC std_ss[GSYM FLAT_APPEND]
 ++ RW_TAC std_ss[of_DEF,o_THM]
 ++ (`((rbd_struct p (series (MAP (\a. parallel (rbd_list a)) L2)) INTER
@@ -329,7 +329,7 @@ RW_TAC std_ss[]
 ++ RW_TAC list_ss[]
 ++ FULL_SIMP_TAC list_ss[two_dim_rel_event_list_def]
 ++ (`mutual_indep p (FLAT (MAP (\a. rel_event_list p a t) L1))` by MATCH_MP_TAC mutual_indep_front_append)
->> (EXISTS_TAC (--`(FLAT (MAP (\a. rel_event_list p a t) L2))`--)
+>> (EXISTS_TAC (``(FLAT (MAP (\a. rel_event_list p a t) L2))``)
    ++ MATCH_MP_TAC mutual_indep_append_sym
    ++ RW_TAC std_ss[])
 ++ FULL_SIMP_TAC list_ss[]
@@ -341,7 +341,7 @@ RW_TAC std_ss[]
 ++ RW_TAC list_ss[]
 ++ FULL_SIMP_TAC list_ss[two_dim_rel_event_list_def]
 ++ (`mutual_indep p (FLAT (MAP (\a. rel_event_list p a t) L2))` by MATCH_MP_TAC mutual_indep_front_append)
->> (EXISTS_TAC (--`(FLAT (MAP (\a. rel_event_list p a t) L1))`--)
+>> (EXISTS_TAC (``(FLAT (MAP (\a. rel_event_list p a t) L1))``)
    ++ RW_TAC std_ss[])
 ++ FULL_SIMP_TAC list_ss[]
 ++ RW_TAC std_ss[]);
@@ -371,7 +371,7 @@ val rel_pipeline_z4_lemma2 = store_thm("rel_pipeline_z4_lemma2",
 	      rbd_struct p ((series of (\a. parallel (rbd_list a))) L3)))``,
 RW_TAC std_ss[]
 ++ MP_TAC(ISPECL [``p:('a -> bool) # (('a -> bool) -> bool) # (('a -> bool) -> real)``, ``L1:'a event list list`` ,``[[L2:'a event list list];[L3]]``] series_parallel_rbd_indep_series_parallel_of_series_parallel)
-++ RW_TAC real_ss[rbd_struct_def,rbd_list_def]
+++ RW_TAC real_ss[of_DEF,o_DEF,rbd_struct_def,rbd_list_def]
 ++ FULL_SIMP_TAC list_ss[rbd_struct_def,rbd_list_def,o_THM,UNION_EMPTY]
 ++ (`((rbd_struct p (series (MAP (\a. parallel (rbd_list a)) L3)) INTER
            p_space p) = (rbd_struct p (series (MAP (\a. parallel (rbd_list a)) L3)))) ` by ONCE_REWRITE_TAC[INTER_COMM])
@@ -440,7 +440,7 @@ RW_TAC std_ss[]
 >> (FULL_SIMP_TAC list_ss[])
 >> (FULL_SIMP_TAC list_ss[]
    ++ MATCH_MP_TAC mutual_indep_front_append
-   ++ EXISTS_TAC(--`FLAT (MAP (\a. rel_event_list p a t) L1)`--)
+   ++ EXISTS_TAC(``FLAT (MAP (\a. rel_event_list p a t) L1)``)
    ++ RW_TAC list_ss[])
 ++ MP_TAC(Q.ISPECL[`p:('a -> bool) # (('a -> bool) -> bool) # (('a -> bool) -> real)`,
    	           `t:real`,`L1:('a->extreal)list list`,`C1:real list list`] rel_series_parallel_RBD_exp_dist_fail_rate)
@@ -448,8 +448,8 @@ RW_TAC std_ss[]
 ++ FULL_SIMP_TAC list_ss[two_dim_rel_event_list_def]
 ++ (`mutual_indep p (FLAT (MAP (\a. rel_event_list p a t) L1))` by 
    MATCH_MP_TAC mutual_indep_front_append)
->> (EXISTS_TAC(--`FLAT (MAP (\a. rel_event_list p a t) L2) ++
-         FLAT (MAP (\a. rel_event_list p a t) L3)`--)
+>> (EXISTS_TAC(``FLAT (MAP (\a. rel_event_list p a t) L2) ++
+         FLAT (MAP (\a. rel_event_list p a t) L3)``)
     ++ MATCH_MP_TAC mutual_indep_append_sym
     ++ RW_TAC list_ss[])
 ++ FULL_SIMP_TAC std_ss[]
@@ -459,10 +459,10 @@ RW_TAC std_ss[]
 ++ FULL_SIMP_TAC list_ss[two_dim_rel_event_list_def]
 ++ (`mutual_indep p (FLAT (MAP (\a. rel_event_list p a t) L2))` by 
    MATCH_MP_TAC mutual_indep_front_append)
->> (EXISTS_TAC(--`FLAT (MAP (\a. rel_event_list p a t) L3)`--)
+>> (EXISTS_TAC(``FLAT (MAP (\a. rel_event_list p a t) L3)``)
     ++ MATCH_MP_TAC mutual_indep_append_sym
     ++ MATCH_MP_TAC mutual_indep_front_append
-    ++ EXISTS_TAC(--`FLAT (MAP (\a. rel_event_list p a t) L1)`--)
+    ++ EXISTS_TAC(``FLAT (MAP (\a. rel_event_list p a t) L1)``)
     ++ RW_TAC list_ss[])
 ++ FULL_SIMP_TAC std_ss[]
 ++ MP_TAC(Q.ISPECL[`p:('a -> bool) # (('a -> bool) -> bool) # (('a -> bool) -> real)`,
@@ -471,8 +471,8 @@ RW_TAC std_ss[]
 ++ FULL_SIMP_TAC list_ss[two_dim_rel_event_list_def]
 ++ (`mutual_indep p (FLAT (MAP (\a. rel_event_list p a t) L3))` by 
    MATCH_MP_TAC mutual_indep_front_append)
->> (EXISTS_TAC(--`FLAT (MAP (\a. rel_event_list p a t) L1) ++
-   		  FLAT (MAP (\a. rel_event_list p a t) L2)`--)
+>> (EXISTS_TAC(``FLAT (MAP (\a. rel_event_list p a t) L1) ++
+   		  FLAT (MAP (\a. rel_event_list p a t) L2)``)
     ++ RW_TAC list_ss[])
 ++ FULL_SIMP_TAC std_ss[]
 ++ REAL_ARITH_TAC);

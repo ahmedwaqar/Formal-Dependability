@@ -1,15 +1,31 @@
-app load ["arithmeticTheory", "realTheory", "prim_recTheory", "seqTheory",
+(* ========================================================================= *)
+(* File Name: FTdeepScript.sml		                                     *)
+(*---------------------------------------------------------------------------*)
+(* Description: Formalization of Fault Trees in		                     *)
+(*                   Higher-order Logic                                      *)
+(*                                                                           *)
+(*                HOL4-Kananaskis 12 		 			     *)
+(*									     *)
+(*		Author :  Waqar Ahmed             		     	     *)
+(*                                              			     *)
+(* 	    School of Electrical Engineering and Computer Sciences (SEECS)   *)
+(*	    National University of Sciences and Technology (NUST), PAKISTAN  *)
+(*                                          		               	     *)
+(*                                                                           *)
+(* ========================================================================= *)
+
+(*app load ["arithmeticTheory", "realTheory", "prim_recTheory", "seqTheory",
           "pred_setTheory","res_quanTheory", "res_quanTools", "listTheory", "probabilityTheory", "numTheory", "dep_rewrite", 
           "transcTheory", "rich_listTheory", "pairTheory",
           "combinTheory","limTheory","sortingTheory", "realLib", "optionTheory","satTheory",
-          "util_probTheory", "extrealTheory", "measureTheory", "lebesgueTheory","real_sigmaTheory"];
-
-open HolKernel Parse boolLib bossLib limTheory arithmeticTheory realTheory prim_recTheory probabilityTheory
-     seqTheory pred_setTheory res_quanTheory sortingTheory res_quanTools listTheory transcTheory
+          "util_probTheory", "extrealTheory", "measureTheory", "lebesgueTheory","real_sigmaTheory", "RBDTheory"];
+*)
+open HolKernel Parse boolLib bossLib limTheory arithmeticTheory realTheory 
+    prim_recTheory probabilityTheory seqTheory pred_setTheory res_quanTheory 
+    sortingTheory res_quanTools listTheory transcTheory
      rich_listTheory pairTheory combinTheory realLib  optionTheory dep_rewrite
-      util_probTheory extrealTheory measureTheory lebesgueTheory real_sigmaTheory satTheory numTheory;
-load "RBDTheory";
-open RBDTheory
+      util_probTheory extrealTheory measureTheory lebesgueTheory real_sigmaTheory satTheory numTheory RBDTheory;
+      
 open HolKernel boolLib bossLib Parse;
 val _ = new_theory "FT_deep";
 (*------new tactics for set simplification----*)
@@ -32,7 +48,7 @@ val op<< = op THENL;
 val op|| = op ORELSE;
 val op>> = op THEN1;
 val std_ss' = simpLib.++ (std_ss, boolSimps.ETA_ss);
-
+val op by = BasicProvers.byA;
 (*---------------------------*)
 fun SET_TAC L =
     POP_ASSUM_LIST(K ALL_TAC) THEN REPEAT COND_CASES_TAC THEN
@@ -93,17 +109,17 @@ REPEAT (POP_ASSUM MP_TAC)
 
 
 
-
-
 (*--------------------*)
 (*------------------------------*)
 (*      Fault Tree Gates datatypes           *)
 (*------------------------------*)
 val _ = type_abbrev( "event" , ``:'a ->bool``);
 
-(*val _ = Hol_datatype` gate = AND of gate list | OR of gate list | atomic of 'a  event `; *)
 
-val _ = Hol_datatype` gate = AND of gate list | OR of gate list  | NOT of gate | atomic of 'a  event `;
+val _ = Hol_datatype` gate = AND of gate list
+      		      	    | OR of gate list
+			    | NOT of gate
+			    | atomic of 'a  event `;
 
 
 (*----------------------------------------------*)
@@ -120,16 +136,7 @@ val FTree_def = Define `
                  FTree p (x:'a gate) UNION FTree p (OR (xs)))`;
 
 
-(* val FTree_def = Define `
-    (FTree p ( atomic a)  = a) /\
-    (FTree p (AND []) = p_space p) /\
-    (FTree p (AND (x::xs)) =
-                FTree p (x:'a gate) INTER FTree p (AND (xs))) /\
-     (FTree p (OR []) = {} ) /\
-     (FTree p (OR (x::xs)) =
-                 FTree p (x:'a gate) UNION FTree p (OR (xs)))`;
-*)
-(*---rbd list from atomic events---*)
+(*---gate list from atomic events---*)
 
 val gate_list_def = Define `
     (gate_list [] = []) /\
@@ -165,7 +172,7 @@ val AND_gate_thm = store_thm("AND_gate_thm",
 	   (prob p (FTree p (AND (gate_list L))) =
 	    list_prod (list_prob p L))``,
 RW_TAC std_ss[] THEN
-(`(FTree p (AND (gate_list L))) = big_inter p L ` by Induct_on `L`) THEN1
+(`(FTree p (AND (gate_list L))) = big_inter p L ` by (Induct_on `L`)) THEN1
 RW_TAC std_ss[gate_list_def,FTree_def,big_inter_def] THENL[
 RW_TAC std_ss[big_inter_def] THEN
 FULL_SIMP_TAC std_ss[NULL] THEN
@@ -174,11 +181,11 @@ Cases_on `L` THEN1
 RW_TAC std_ss[gate_list_def,FTree_def,big_inter_def] THEN
 FULL_SIMP_TAC std_ss[NULL] THEN
 (`(!x'. MEM x' ((h'::t):'a  event list) ==> x' IN events p) /\
-          mutual_indep p (h'::t)` by RW_TAC std_ss[]) 
+          mutual_indep p (h'::t)` by (RW_TAC std_ss[])) 
 THENL[
 FULL_SIMP_TAC list_ss[],
 MATCH_MP_TAC mutual_indep_cons THEN
-EXISTS_TAC(--`h:'a ->bool`--) THEN
+EXISTS_TAC(``h:'a ->bool``) THEN
 RW_TAC std_ss[],
 FULL_SIMP_TAC std_ss[] THEN
 FULL_SIMP_TAC std_ss[gate_list_def,FTree_def,big_inter_def]],
@@ -201,7 +208,7 @@ FULL_SIMP_TAC std_ss[TAKE_LENGTH_ID]]]);
 (*------------------------------------*)
 
 (*------------------------------------*)
-(*      Lemmma's             *)
+(*      Lemmma's	              *)
 (*------------------------------------*)
 
 val OR_gate_lem1 = store_thm("OR_gate_lem1",
@@ -225,14 +232,12 @@ RW_TAC list_ss[LENGTH_APPEND]);
 val OR_gate_lem3 = store_thm("OR_gate_lem3",
   ``!A B C D. A INTER B INTER C INTER D = (B INTER C) INTER D INTER A ``,
 SRW_TAC[][IN_INTER,EXTENSION,GSPECIFICATION]
-THEN METIS_TAC[]
-);
+THEN METIS_TAC[]);
 (*--------------OR_gate_lem4---------*)
 val OR_gate_lem4 = store_thm("OR_gate_lem4",
   ``!p A C. A INTER (p_space p DIFF C) = (A INTER p_space p DIFF (A INTER C)) ``,
 SRW_TAC[][IN_INTER,EXTENSION,GSPECIFICATION]
-THEN METIS_TAC[]
-);
+THEN METIS_TAC[]);
 (*--------------OR_gate_lem5---------*)
 val  OR_gate_lem5 = store_thm("OR_gate_lem5",
   ``!m (L:('a ->bool)list) x. MEM x (TAKE m L) ==> MEM x L ``,
@@ -247,27 +252,29 @@ THEN NTAC 2 (POP_ASSUM MP_TAC)
 THEN POP_ASSUM (MP_TAC o Q.SPEC `L`)
 THEN RW_TAC std_ss[] );
 (*-------------OR_gate_lem6----------------*)
-val OR_gate_lem6 = store_thm("OR_gate_lem6",``!A C. A INTER (p_space p DIFF C) = (A INTER p_space p DIFF (A INTER C))``,
+val OR_gate_lem6 = store_thm("OR_gate_lem6",
+``!A C. A INTER (p_space p DIFF C) = (A INTER p_space p DIFF (A INTER C))``,
 SRW_TAC[][IN_INTER,EXTENSION,GSPECIFICATION]
 THEN METIS_TAC[]);
 (*-------------OR_gate_lem7----------------*)
-val OR_gate_lem7 =  store_thm("OR_gate_lem7",``!(L1:('a ->bool) list) p.
- prob_space p /\
- (!x. MEM x (L1) ==> x IN events p ) ==>
-((L1:('a ->bool) list) =  compl_list p (compl_list p L1)) ``,
+val OR_gate_lem7 =  store_thm("OR_gate_lem7",
+``!(L1:('a ->bool) list) p.
+   prob_space p /\
+   (!x. MEM x L1 ==> x IN events p) ==>
+   (L1 =  compl_list p (compl_list p L1)) ``,
 Induct
 >> (RW_TAC list_ss[compl_list_def,MAP])
 ++ RW_TAC std_ss[compl_list_def,MAP]
 >> (MATCH_MP_TAC EQ_SYM
    ++ MATCH_MP_TAC DIFF_DIFF_SUBSET
-   ++ (`h =  h INTER p_space p` by MATCH_MP_TAC EQ_SYM)
+   ++ (`h =  h INTER p_space p` by (MATCH_MP_TAC EQ_SYM))
       >> (ONCE_REWRITE_TAC[INTER_COMM]
          ++ MATCH_MP_TAC INTER_PSPACE
          ++ FULL_SIMP_TAC list_ss[])
    ++ POP_ORW
    ++ RW_TAC std_ss[INTER_SUBSET])
 ++ NTAC 2 (POP_ASSUM MP_TAC)
-++ POP_ASSUM (MP_TAC o Q.SPEC `p:(  'a    -> bool) # ((  'a    -> bool) -> bool) # ((  'a    -> bool) -> real)`)
+++ POP_ASSUM (MP_TAC o Q.SPEC `p:('a->bool) # (('a->bool)->bool) # (('a->bool)->real)`)
 ++ RW_TAC std_ss[]
 ++ FULL_SIMP_TAC std_ss[]
 ++ FULL_SIMP_TAC list_ss[compl_list_def]);
@@ -279,9 +286,9 @@ val prob_indep_big_inter2 = store_thm("prob_indep_big_inter2",
 	   (!x. MEM x (L1 ++ (L2)) ==> x IN events p ) /\
 	    1 <=  (LENGTH (L1 ++ (L2))) ==>
 	     (prob p (big_inter p (TAKE n (compl_list p L1)) INTER 
-	     	      big_inter p ((L2) )) =
+	     	      big_inter p L2) =
               list_prod (list_prob p (TAKE (n)(compl_list p L1) )) *
-	       list_prod (list_prob p (( L2) )))``,
+	       list_prod (list_prob p L2))``,
 Induct
 THEN1(RW_TAC real_ss[compl_list_def,MAP,TAKE_def,big_inter_def,list_prob_def,list_prod_def]
  THEN FULL_SIMP_TAC std_ss[mutual_indep_def]
@@ -315,7 +322,7 @@ THEN Induct_on `n`
      THEN (`mutual_indep p (L1 ++ L2) /\
       (!x. MEM x (L1 ++ L2) ==> x IN events p)` by STRIP_TAC)
       THEN1( MATCH_MP_TAC mutual_indep_cons
-       THEN EXISTS_TAC (--`h:'a  event`--)
+       THEN EXISTS_TAC (``h:'a  event``)
        THEN RW_TAC std_ss[])
       THEN1 (RW_TAC std_ss[]
       THEN FULL_SIMP_TAC list_ss[])
@@ -341,7 +348,7 @@ THEN1 (MATCH_MP_TAC EVENTS_INTER
 	    THEN1 (MATCH_MP_TAC in_events_big_inter
       	    	  THEN RW_TAC std_ss[]
 		  THEN (`MEM x (compl_list p (L1:'a  event list))` by MATCH_MP_TAC OR_gate_lem5)
-		  THEN1 (EXISTS_TAC(--`n:num`--)
+		  THEN1 (EXISTS_TAC(``n:num``)
        		  	THEN RW_TAC std_ss[])
 		  THEN FULL_SIMP_TAC std_ss[compl_list_def,MEM_MAP]
       		  THEN MATCH_MP_TAC EVENTS_COMPL
@@ -358,7 +365,7 @@ THEN1 (MATCH_MP_TAC EVENTS_INTER
 	    THEN1 (MATCH_MP_TAC in_events_big_inter
       	    	  THEN RW_TAC std_ss[]
 		  THEN (`MEM x (compl_list p (L1:'a  event list))` by MATCH_MP_TAC OR_gate_lem5)
-		  THEN1 (EXISTS_TAC(--`n:num`--)
+		  THEN1 (EXISTS_TAC(``n:num``)
        		  	THEN RW_TAC std_ss[])
 		  THEN FULL_SIMP_TAC std_ss[compl_list_def,MEM_MAP]
       		  THEN MATCH_MP_TAC EVENTS_COMPL
@@ -393,7 +400,7 @@ THEN FULL_SIMP_TAC std_ss[LE_SUC]
 THEN1 (DEP_ONCE_ASM_REWRITE_TAC[]
       THEN RW_TAC std_ss[]
       THEN1 (MATCH_MP_TAC mutual_indep_cons
-      	    THEN EXISTS_TAC (--`h:'a  event`--)
+      	    THEN EXISTS_TAC (``h:'a  event``)
       	    THEN FULL_SIMP_TAC list_ss[])
       THEN1 (RW_TAC std_ss[]
       	    THEN FULL_SIMP_TAC list_ss[])
@@ -644,7 +651,7 @@ RW_TAC std_ss[xor_gate_temp1]
                  `(A DIFF B UNION (B DIFF A)):'a->bool`]
        PROB_ADDITIVE )
 ++ FULL_SIMP_TAC std_ss[EVENTS_DIFF]
-++ KNOW_TAC(--`DISJOINT (A DIFF B) (B DIFF (A:'a->bool))`--)
+++ KNOW_TAC(``DISJOINT (A DIFF B) (B DIFF (A:'a->bool))``)
 >> (RW_TAC std_ss[DISJOINT_DIFF]
    ++ SRW_TAC[][DISJOINT_DEF,DIFF_DEF,INTER_DEF,EXTENSION,GSPECIFICATION]
    ++ METIS_TAC[])
@@ -757,7 +764,7 @@ RW_TAC std_ss[mutual_indep_def]
 ++ (`PERM ((L1 ++ L):'a  event list) (L1') /\
       n <= LENGTH ((L1 ++ L):'a  event list)` by STRIP_TAC)
 >> (MATCH_MP_TAC PERM_TRANS
-   ++ EXISTS_TAC(--`( L ++ L1):'a  event list`--)
+   ++ EXISTS_TAC(``( L ++ L1):'a  event list``)
    ++ RW_TAC std_ss[PERM_APPEND])
 >> (FULL_SIMP_TAC list_ss[])
 ++ FULL_SIMP_TAC std_ss[]);
@@ -790,7 +797,7 @@ RW_TAC std_ss[]
 >> (RW_TAC list_ss[])
 >> (RW_TAC list_ss[])
 >> (MATCH_MP_TAC mutual_indep_cons
-   ++ EXISTS_TAC(--`C:'a event`--)
+   ++ EXISTS_TAC(``C:'a event``)
    ++ RW_TAC std_ss[prove (``[C;A;B] = [C] ++ [A;B]``, RW_TAC list_ss[])]
    ++ MATCH_MP_TAC mutual_indep_append_sym
    ++ RW_TAC list_ss[])
@@ -832,12 +839,12 @@ RW_TAC std_ss[inhibit_FT_gate_def, FTree_def]
 ++ (`mutual_indep p [C;A] /\ 
    mutual_indep p [B;C]` by RW_TAC std_ss[])
 >> (MATCH_MP_TAC mutual_indep_cons
-   ++ EXISTS_TAC(--`B:'a->bool`--)
+   ++ EXISTS_TAC(``B:'a->bool``)
    ++ FULL_SIMP_TAC std_ss[prove(``!A B C. [B;C;A] = [B;C]++[A]``, RW_TAC list_ss[])]
    ++ MATCH_MP_TAC mutual_indep_append_sym
    ++ FULL_SIMP_TAC list_ss[])
 >> (MATCH_MP_TAC mutual_indep_cons
-   ++ EXISTS_TAC(--`A:'a->bool`--)
+   ++ EXISTS_TAC(``A:'a->bool``)
    ++ RW_TAC std_ss[])
 ++ DEP_REWRITE_TAC[indep_compl_event_nevents]
 ++ RW_TAC std_ss[]
@@ -1340,7 +1347,7 @@ RW_TAC std_ss[k_out_ntemp1]
      (n INSERT count n) INTER {x | k <= x}` by ALL_TAC
 >> (RW_TAC std_ss[GSYM COUNT_SUC]
    ++ RW_TAC std_ss[]);
-e (KNOW_TAC (--`{x | k <= x /\ x < n} = {x |  x < n /\ k <= x}`--));
+e (KNOW_TAC (``{x | k <= x /\ x < n} = {x |  x < n /\ k <= x}``));
 e (SRW_TAC[][EXTENSION,GSPECIFICATION,IN_INSERT]);
 e (METIS_TAC[]);
 e (RW_TAC std_ss[k_out_ntemp1]);
@@ -1379,14 +1386,14 @@ val k_out_n_temp5 = store_thm("k_out_n_temp5",
 RW_TAC std_ss []
 ++ ONCE_REWRITE_TAC[SUM_DIFF]
 ++ RW_TAC real_ss[]
-++ KNOW_TAC (--`(sum (0,SUC n) (prob p o (\x. PREIMAGE X {Normal (&x)} INTER p_space p)) = 
-prob p (BIGUNION (IMAGE (\x. PREIMAGE X {Normal &x} INTER p_space p) (count (SUC n)))))`--)
+++ KNOW_TAC (``(sum (0,SUC n) (prob p o (\x. PREIMAGE X {Normal (&x)} INTER p_space p)) = 
+prob p (BIGUNION (IMAGE (\x. PREIMAGE X {Normal &x} INTER p_space p) (count (SUC n)))))``)
 >> (MATCH_MP_TAC PROB_FINITELY_ADDITIVE 
    ++ RW_TAC std_ss []
    ++ MATCH_MP_TAC disj_thm
    ++ RW_TAC std_ss [])
 ++ DISCH_TAC ++ POP_ORW
-++ KNOW_TAC (--`(sum (0,k) (prob p o (\x. PREIMAGE X {Normal &x} INTER p_space p)) = prob p (BIGUNION (IMAGE (\x. PREIMAGE X {Normal &x} INTER p_space p) (count k))))`--)
+++ KNOW_TAC (``(sum (0,k) (prob p o (\x. PREIMAGE X {Normal &x} INTER p_space p)) = prob p (BIGUNION (IMAGE (\x. PREIMAGE X {Normal &x} INTER p_space p) (count k))))``)
 >> (MATCH_MP_TAC PROB_FINITELY_ADDITIVE 
    ++ RW_TAC std_ss []
    ++ FULL_SIMP_TAC real_ss [IN_FUNSET,IN_COUNT]
@@ -1401,8 +1408,8 @@ prob p (BIGUNION (IMAGE (\x. PREIMAGE X {Normal &x} INTER p_space p) (count (SUC
    >> (FULL_SIMP_TAC std_ss[SUBSET_DEF,IN_FUNSET,IN_COUNT,IN_IMAGE]
       ++ RW_TAC std_ss []
       ++ FULL_SIMP_TAC std_ss[EXTENSION,GSPECIFICATION])
-   ++ MATCH_MP_TAC COUNTABLE_IMAGE
-   ++ MATCH_MP_TAC FINITE_COUNTABLE
+   ++ MATCH_MP_TAC image_countable
+   ++ MATCH_MP_TAC finite_countable
    ++ RW_TAC std_ss[k_out_n_lemma2]
    ++ MATCH_MP_TAC FINITE_INTER
    ++ DISJ2_TAC
@@ -1412,12 +1419,12 @@ prob p (BIGUNION (IMAGE (\x. PREIMAGE X {Normal &x} INTER p_space p) (count (SUC
    ++ RW_TAC std_ss []
    >> (FULL_SIMP_TAC std_ss[SUBSET_DEF,IN_FUNSET,IN_COUNT,IN_IMAGE]
       ++ RW_TAC std_ss []
-      ++ KNOW_TAC (--`x' < SUC n`--)
+      ++ KNOW_TAC (``x' < SUC n``)
       >> (MATCH_MP_TAC LESS_TRANS
-      	 ++ EXISTS_TAC(--`k:num`--)
+      	 ++ EXISTS_TAC(``k:num``)
    	 ++ RW_TAC std_ss [])
       ++ RW_TAC std_ss [])
-   ++ MATCH_MP_TAC COUNTABLE_IMAGE
+   ++ MATCH_MP_TAC image_countable
    ++ RW_TAC std_ss [COUNTABLE_COUNT])
 >> (RW_TAC std_ss[ DISJOINT_BIGUNION]
    ++ FULL_SIMP_TAC std_ss[SUBSET_DEF,IN_FUNSET,IN_COUNT,IN_IMAGE]
@@ -1456,11 +1463,11 @@ val k_out_n_lemma6_new = store_thm("k_out_n_lemma6_new",
        (sum (k, (SUC n)-k) (\x. (&binomial (SUC n) x)* (pr pow x) * 
        	    ((1- pr) pow ((SUC n)-x) )) = prob p s) ``,
 RW_TAC std_ss[]
-++ KNOW_TAC (--`prob p
+++ KNOW_TAC (``prob p
   (BIGUNION
      (IMAGE (\x. PREIMAGE X {Normal (&x)} INTER p_space p)
         {x | k <= x /\ x < (SUC n)})) = sum (k,(SUC n) - k)
-        (prob p o (\x. PREIMAGE X {Normal (&x)} INTER p_space p))`--)
+        (prob p o (\x. PREIMAGE X {Normal (&x)} INTER p_space p))``)
 >> (MATCH_MP_TAC EQ_SYM
    ++ MATCH_MP_TAC  k_out_n_temp5
    ++ RW_TAC std_ss[])
@@ -1474,11 +1481,11 @@ val k_out_n_lemma6_new1 = store_thm("k_out_n_lemma6_new1",
        (s = BIGUNION (IMAGE (\x. PREIMAGE X {Normal (&x)} INTER p_space p) ({x|(k:num) <= x /\ x < (SUC n)}))) /\ (!x. (distribution p X {Normal (&x)} = ((& binomial (n) x)* (pr pow x) * ((1- pr) pow ((n)-x)))))==>
        (sum (k, (SUC n)-k) (\x. (& binomial (n) x)* (pr pow x) * ((1- pr) pow ((n)-x) )) = prob p s)``,
 RW_TAC std_ss []
-++ KNOW_TAC (--`prob p
+++ KNOW_TAC (``prob p
   (BIGUNION
      (IMAGE (\x. PREIMAGE X {Normal (&x)} INTER p_space p)
         {x | k ≤ x /\ x < (SUC n)})) = sum (k,(SUC n) − k)
-        (prob p o (\x. PREIMAGE X {Normal (&x)} INTER p_space p))`--)
+        (prob p o (\x. PREIMAGE X {Normal (&x)} INTER p_space p))``)
 >> (MATCH_MP_TAC EQ_SYM
    ++ MATCH_MP_TAC k_out_n_temp5
    ++ RW_TAC std_ss [])
@@ -1491,11 +1498,11 @@ val k_out_n_lemma6 = store_thm("k_out_n_lemma6",
        (s = BIGUNION (IMAGE (\x. PREIMAGE X {Normal (&x)} INTER p_space p) ({x|(k:num) <= x /\ x < n}))) /\ (!x. (distribution p X {Normal (&x)} = ((& binomial n x)* (pr pow x) * ((1- pr) pow (n-x)))))==>
        (sum (k, n-k) (\x. (& binomial n x)* (pr pow x) * ((1- pr) pow (n-x) )) = prob p s)``,
 RW_TAC std_ss []
-++ KNOW_TAC (--`prob p
+++ KNOW_TAC (``prob p
   (BIGUNION
      (IMAGE (\x. PREIMAGE X {Normal (&x)} INTER p_space p)
         {x | k ≤ x /\ x < n})) = sum (k,n − k)
-        (prob p o (\x. PREIMAGE X {Normal (&x)} INTER p_space p))`--)
+        (prob p o (\x. PREIMAGE X {Normal (&x)} INTER p_space p))``)
 >> (MATCH_MP_TAC EQ_SYM
    ++ MATCH_MP_TAC  k_out_n_lemma5
    ++ RW_TAC std_ss [])
@@ -1519,7 +1526,7 @@ val k_out_n_RBD = store_thm("k_out_n_RBD",
 RW_TAC std_ss []
 ++ MATCH_MP_TAC EQ_SYM
 ++ MATCH_MP_TAC  k_out_n_lemma6_new
-++ EXISTS_TAC (--`X: ('a -> extreal)`--)
+++ EXISTS_TAC (``X: ('a -> extreal)``)
 ++ RW_TAC std_ss []);
 
 (*----------------------------*)
@@ -1536,7 +1543,7 @@ val k_out_n_RBD_v1 = store_thm("k_out_n_RBD_v1",
 RW_TAC std_ss [K_out_N_struct_def]
 ++ MATCH_MP_TAC EQ_SYM
 ++ MATCH_MP_TAC  k_out_n_lemma6_new1
-++ EXISTS_TAC (--`X: ('a -> extreal)`--)
+++ EXISTS_TAC (``X: ('a -> extreal)``)
 ++ RW_TAC std_ss []);
 (*--------------------------------------------------------*)
 (*---------------------Case: When k = 1, Parallel Structure components with
@@ -1554,16 +1561,16 @@ val K_out_N_Parallel_Struct = store_thm("K_out_N_Parallel_Struct",
 	  	    ({x|(1:num) <= x /\ x < (SUC n)}))) = 
 	1 - (1 - pr) pow n )``,
 RW_TAC std_ss []
-++ KNOW_TAC (--`(prob p
+++ KNOW_TAC (``(prob p
    	    	     (BIGUNION
 			(IMAGE (\x. PREIMAGE X {Normal (&x)} INTER p_space p)
         		       {x | 1 ≤ x /\ x < SUC n})) =  
 		sum (1, (SUC n)-1) 
-		    (\x. (& binomial n x) * ((pr:real) pow x) * ((1- pr) pow (n -x) ))) `--)
+		    (\x. (& binomial n x) * ((pr:real) pow x) * ((1- pr) pow (n -x) ))) ``)
 >> (MATCH_MP_TAC EQ_SYM
    ++ MATCH_MP_TAC k_out_n_lemma6_new1
    ++ RW_TAC std_ss []
-   ++ EXISTS_TAC(--`X:'a->extreal`--)
+   ++ EXISTS_TAC(``X:'a->extreal``)
    ++ RW_TAC real_ss[])
 ++ DISCH_TAC ++ POP_ORW
 ++ RW_TAC arith_ss []
@@ -1574,8 +1581,8 @@ RW_TAC std_ss []
 ++ RW_TAC real_ss [binomial_def]
 ++ RW_TAC std_ss [REAL_SUM_IMAGE_EQ_sum]
 ++ RW_TAC std_ss [GSYM sum_set_def]
-++ KNOW_TAC (--` sum_set (count (SUC n))
-  (\x. &binomial n x * pr pow x * (1 − pr) pow (n − x)) = ((pr:real)+ (1 - pr)) pow n `--)
+++ KNOW_TAC (`` sum_set (count (SUC n))
+  (\x. &binomial n x * pr pow x * (1 − pr) pow (n − x)) = ((pr:real)+ (1 - pr)) pow n ``)
 >> (ONCE_REWRITE_TAC[GSYM REAL_MUL_ASSOC]
    ++  `!x. (pr pow x * (1 − pr) pow (n − x)) = ((1 − pr) pow (n − x)* pr pow x)` by RW_TAC arith_ss [REAL_MUL_COMM]
    ++ ONCE_ASM_REWRITE_TAC[]
@@ -1594,13 +1601,13 @@ val K_out_N_Series_Struct = store_thm("K_out_N_Series_Struct",
         (!x. (distribution p X {Normal (&x)} = ((& binomial ( n) x)* (pr pow x) * ((1- pr) pow ((n)-x)))))==>
        ( prob p (BIGUNION (IMAGE (\x. PREIMAGE X {Normal (&x)} INTER p_space p) ({x|(n:num) <= x /\ x < (SUC n)}))) = pr pow n )``,
 RW_TAC std_ss []
-++ KNOW_TAC (--`(prob p
+++ KNOW_TAC (``(prob p
   (BIGUNION
      (IMAGE (\x. PREIMAGE X {Normal (&x)} INTER p_space p)
-        {x | n ≤ x /\ x < SUC n}))=  sum (n, (SUC n)-n) (\x. (& binomial (n) x)* ((pr:real) pow x) * ((1- pr) pow ((n)-x) ))) `--)
+        {x | n ≤ x /\ x < SUC n}))=  sum (n, (SUC n)-n) (\x. (& binomial (n) x)* ((pr:real) pow x) * ((1- pr) pow ((n)-x) ))) ``)
 >> (MATCH_MP_TAC EQ_SYM
    ++ MATCH_MP_TAC k_out_n_lemma6_new1
-   ++ EXISTS_TAC(--`X:'a->extreal`--)
+   ++ EXISTS_TAC(``X:'a->extreal``)
    ++ RW_TAC std_ss [])
 ++ DISCH_TAC ++ POP_ORW
 ++ RW_TAC real_ss [ADD1]
@@ -1661,7 +1668,7 @@ RW_TAC std_ss[]
 ++ EQ_TAC
 >> ((MATCH_MP_TAC (PROVE [] (Term`((a /\ ~b ==> c) ==> (a ==> b \/ c))`)))
    ++ DISCH_TAC
-   ++ EXISTS_TAC (--`s DELETE (x)`--)
+   ++ EXISTS_TAC (``s DELETE (x)``)
    ++ SRW_TAC [][SUBSET_DEF,INSERT_DEF,EXTENSION,GSPECIFICATION]
    >> (METIS_TAC[])
    ++ METIS_TAC[])
@@ -1673,7 +1680,7 @@ val FINITE_SUBSETS_RESTRICT_NEW = store_thm("FINITE_SUBSETS_RESTRICT_NEW",
   ``!s:'a->bool p. FINITE s ==> FINITE {t | t SUBSET s /\ p t}``,
 REPEAT STRIP_TAC
 ++ MATCH_MP_TAC SUBSET_FINITE_I
-++ EXISTS_TAC (--`{t:'a->bool | t SUBSET s}`--)
+++ EXISTS_TAC (``{t:'a->bool | t SUBSET s}``)
 ++ REWRITE_TAC[GSYM POW_DEF]
 ++ RW_TAC std_ss[FINITE_POW]
 ++ SRW_TAC[][SUBSET_DEF,POW_DEF,EXTENSION,GSPECIFICATION]
@@ -1683,7 +1690,7 @@ val FINITE_SUBSETS_RESTRICT_NEW1 = store_thm("FINITE_SUBSETS_RESTRICT_NEW1",
   ``!s:'a->bool p. FINITE s ==> FINITE {t | t SUBSET s}``,
 REPEAT STRIP_TAC
 ++ MATCH_MP_TAC SUBSET_FINITE_I
-++ EXISTS_TAC (--`{t:'a->bool | t SUBSET s}`--)
+++ EXISTS_TAC (``{t:'a->bool | t SUBSET s}``)
 ++ REWRITE_TAC[GSYM POW_DEF]
 ++ RW_TAC std_ss[FINITE_POW]
 ++ SRW_TAC[][SUBSET_DEF,POW_DEF,EXTENSION,GSPECIFICATION]);
@@ -1704,14 +1711,14 @@ RW_TAC std_ss[has_size_def]);
 val temp3 = store_thm("temp3",
   ``!P. (!n. (!m. (m:num) < n ==> P m) ==> P n) ==> (!n. P n)``,
 GEN_TAC
-++ KNOW_TAC (--`((\n. !m. m < n ==> P m) 0 /\
+++ KNOW_TAC (``((\n. !m. m < n ==> P m) 0 /\
   (!n. (\n. !m. m < n ==> P m) n ==> (\n. !m. m < n ==> P m) (SUC n))
-  ==> (!n. (\n. !m. m < n ==> P m) n))`--)
+  ==> (!n. (\n. !m. m < n ==> P m) n))``)
 >> (DISCH_TAC
    ++ MATCH_MP_TAC INDUCTION
    ++ RW_TAC std_ss[])
 ++ RW_TAC std_ss[BETA_THM]
-++ KNOW_TAC (--`(!n. (!m. m < n ==> P m) ==> !m. m < SUC n ==> P m)`--)
+++ KNOW_TAC (``(!n. (!m. m < n ==> P m) ==> !m. m < SUC n ==> P m)``)
 >> (RW_TAC std_ss[]
    ++ FULL_SIMP_TAC std_ss[LT_SUC])
 ++ METIS_TAC[LT_SUC]);
@@ -1759,11 +1766,11 @@ RW_TAC std_ss[has_size_def]
       ++ RW_TAC std_ss[IN_DELETE]
       ++ POP_ASSUM (MP_TAC o Q.SPEC `a:'a`)
       ++ ASM_REWRITE_TAC[]
-      ++ KNOW_TAC(--`a INSERT (s DELETE a:'a) = s`--)
+      ++ KNOW_TAC(``a INSERT (s DELETE a:'a) = s``)
       >> (POP_ASSUM MP_TAC
       	 ++ RW_TAC std_ss[INSERT_DELETE])
       ++ RW_TAC std_ss[])
-   ++ KNOW_TAC(--`?a:'a. a IN s:'a->bool`--)
+   ++ KNOW_TAC(``?a:'a. a IN s:'a->bool``)
    >> (RW_TAC std_ss[MEMBER_NOT_EMPTY])
    ++ RW_TAC std_ss[]
    ++ FULL_SIMP_TAC std_ss[]
@@ -1772,7 +1779,7 @@ RW_TAC std_ss[has_size_def]
    ++ RW_TAC std_ss[IN_DELETE]
    ++ POP_ASSUM (MP_TAC o Q.SPEC `a:'a`)
    ++ ASM_REWRITE_TAC[]
-   ++ KNOW_TAC(--`a INSERT (s DELETE a:'a) = s`--)
+   ++ KNOW_TAC(``a INSERT (s DELETE a:'a) = s``)
    >> (POP_ASSUM MP_TAC
       ++ RW_TAC std_ss[INSERT_DELETE])
    ++ RW_TAC std_ss[])
@@ -1807,13 +1814,13 @@ REWRITE_TAC[temp4]
 ++ REPEAT STRIP_TAC ++ EQ_TAC
 >> (REWRITE_TAC[has_size_suc]
    ++ RW_TAC std_ss[]
-   ++ KNOW_TAC (--`?a:'a. a IN s:'a->bool`--)
+   ++ KNOW_TAC (``?a:'a. a IN s:'a->bool``)
    >> (RW_TAC std_ss[MEMBER_NOT_EMPTY])
    ++ RW_TAC std_ss[]
-   ++ EXISTS_TAC(--`a:'a`--)
-   ++ EXISTS_TAC(--` s:'a->bool DELETE a`--)
+   ++ EXISTS_TAC(``a:'a``)
+   ++ EXISTS_TAC(`` s:'a->bool DELETE a``)
    ++ RW_TAC std_ss[ IN_DELETE]
-   ++ KNOW_TAC (--` (s:'a->bool = a INSERT (s DELETE a)) `--)
+   ++ KNOW_TAC (`` (s:'a->bool = a INSERT (s DELETE a)) ``)
    >> (METIS_TAC[INSERT_DELETE])
    ++ RW_TAC std_ss[ IN_DELETE])
 ++ FULL_SIMP_TAC std_ss[GSYM LEFT_FORALL_IMP_THM]
@@ -1907,7 +1914,7 @@ Induction.recInduct SET_TO_LIST_IND
 ++ RW_TAC bool_ss []
 ++ RW_TAC std_ss [SET_TO_LIST_THM]
 ++ RW_TAC std_ss[BIGINTER_EMPTY,inter_list_def,INTER_UNIV]
-++ KNOW_TAC (--`BIGINTER (s:(('a -> bool) -> bool)) =  (BIGINTER (CHOICE s INSERT REST s) )`--)
+++ KNOW_TAC (``BIGINTER (s:(('a -> bool) -> bool)) =  (BIGINTER (CHOICE s INSERT REST s) )``)
 >> (RW_TAC std_ss[CHOICE_INSERT_REST])
 ++ DISCH_TAC ++ POP_ORW
 ++ RW_TAC std_ss[BIGINTER_INSERT,inter_list_def]
@@ -1964,7 +1971,7 @@ FULL_SIMP_TAC std_ss[AND_IMP, RIGHT_FORALL_IMP_THM]
 ++ POP_ASSUM MP_TAC
 ++ Q.SPEC_TAC (`x`, `x`) 
 ++ FULL_SIMP_TAC std_ss[AND_IMP,RIGHT_FORALL_IMP_THM]
-++ KNOW_TAC (--` 
+++ KNOW_TAC (`` 
  (!(x:'b->('a->bool)). (!a. a IN A ==> P (x a))==>
   (f (BIGUNION (IMAGE x (A:'b->bool))) =
    sum_set {B | B SUBSET A /\ ~(B = {})}
@@ -1972,7 +1979,7 @@ FULL_SIMP_TAC std_ss[AND_IMP, RIGHT_FORALL_IMP_THM]
   (!a. a IN A ==> P (x a)) ==>
   (f (BIGUNION (IMAGE x A)) =
    sum_set {B | B SUBSET A /\ ~(B={})}
-     (\B. -1 pow (CARD B + 1) * f (BIGINTER (IMAGE x B))))) A `--)
+     (\B. -1 pow (CARD B + 1) * f (BIGINTER (IMAGE x B))))) A ``)
 >> (RW_TAC std_ss[])
 ++ DISCH_TAC ++ POP_ORW 
 ++ Q.SPEC_TAC (`A`, `A`)
@@ -1980,7 +1987,7 @@ FULL_SIMP_TAC std_ss[AND_IMP, RIGHT_FORALL_IMP_THM]
 ++ REPEAT GEN_TAC
 ++ FULL_SIMP_TAC std_ss[]
 ++ Q.SPEC_TAC (`A`, `A`) 
-++ KNOW_TAC (--` 
+++ KNOW_TAC (`` 
   (!(A:'b->bool). has_size (A:('b->bool))  n ==>
 !(x:'b->('a->bool)).
  (!a. a IN (A:'b->bool) ==> P (x a)) ==>
@@ -1991,7 +1998,7 @@ FULL_SIMP_TAC std_ss[AND_IMP, RIGHT_FORALL_IMP_THM]
   (!a. a IN A ==> P (x a)) ==>
   (f (BIGUNION (IMAGE x A)) =
    sum_set {B | B SUBSET A /\ (B <> {}) }
-     (\B. -1 pow (CARD B + 1) * f (BIGINTER (IMAGE x B))))) n) `--)
+     (\B. -1 pow (CARD B + 1) * f (BIGINTER (IMAGE x B))))) n) ``)
 >> (RW_TAC std_ss[])
 ++ DISCH_TAC ++ POP_ORW
 ++ Q.SPEC_TAC (`n`, `n`) 
@@ -2024,16 +2031,16 @@ FULL_SIMP_TAC std_ss[AND_IMP, RIGHT_FORALL_IMP_THM]
 ++ STRIP_TAC
 ++ STRIP_TAC
 ++ MATCH_MP_TAC EQ_TRANS
-++ EXISTS_TAC(-- `(f(x a) + f(BIGUNION (IMAGE (x:'b->('a->bool)) t))) -
-              f(x a INTER BIGUNION (IMAGE x t)):real`--)
+++ EXISTS_TAC(``(f(x a) + f(BIGUNION (IMAGE (x:'b->('a->bool)) t))) -
+              f(x a INTER BIGUNION (IMAGE x t)):real``)
 ++ CONJ_TAC
->> (KNOW_TAC(--`P(x a) /\ P(BIGUNION(IMAGE (x:'b->('a->bool)) t))`--)
+>> (KNOW_TAC(``P(x a) /\ P(BIGUNION(IMAGE (x:'b->('a->bool)) t))``)
    >> (ASM_REWRITE_TAC[]
       ++ POP_ASSUM MP_TAC
-      ++ KNOW_TAC(--`FINITE (t:'b->bool)`--)
+      ++ KNOW_TAC(``FINITE (t:'b->bool)``)
       >> (FULL_SIMP_TAC std_ss[has_size_def])
-      ++ KNOW_TAC(--`(!a'. a' IN t ==> P (x a')) ==> P (BIGUNION (IMAGE (x:'b->('a->bool)) t)) =
- (\ (t:'b->bool). ((!a'. a' IN t ==> P (x a')) ==> P (BIGUNION (IMAGE x t))))t`--)
+      ++ KNOW_TAC(``(!a'. a' IN t ==> P (x a')) ==> P (BIGUNION (IMAGE (x:'b->('a->bool)) t)) =
+ (\ (t:'b->bool). ((!a'. a' IN t ==> P (x a')) ==> P (BIGUNION (IMAGE x t))))t``)
       >> (RW_TAC std_ss[])
       ++ DISCH_TAC ++ POP_ORW
       ++ Q.SPEC_TAC (`t`, `u`) 
@@ -2045,13 +2052,14 @@ FULL_SIMP_TAC std_ss[AND_IMP, RIGHT_FORALL_IMP_THM]
    ++ Q.SPEC_TAC(`BIGUNION (IMAGE x t)`,`t'`)
    ++ Q.SPEC_TAC(`x a`,`s'`)
    ++ RW_TAC std_ss[]
-   ++ KNOW_TAC (--`P (s' INTER t':'a->bool) /\ P (t' DIFF s':'a->bool) /\ DISJOINT (s' INTER t') (t' DIFF s':'a->bool) ==> (f (s' INTER t':'a->bool UNION (t' DIFF s':'a->bool)) = (f:('a->bool) -> real) (s' INTER t':'a->bool) + f (t' DIFF s':'a->bool))`--)
+   ++ KNOW_TAC (``P (s' INTER t':'a->bool) /\ P (t' DIFF s':'a->bool) /\ DISJOINT (s' INTER t') (t' DIFF s':'a->bool) ==> (f (s' INTER t':'a->bool UNION (t' DIFF s':'a->bool)) = (f:('a->bool) -> real) (s' INTER t':'a->bool) + f (t' DIFF s':'a->bool))``)
    >> (PAT_ASSUM (Term ` !s t. (P s /\ P t) /\ DISJOINT s t ==> (f (s UNION t) = f s + (f:('a->bool) -> real) t)`) (MP_TAC o Q.SPECL [`s' INTER t':'a->bool`, `t' DIFF s':'a->bool`])
       ++ RW_TAC std_ss[])
    ++ PAT_ASSUM (Term ` !s t. (P s /\ P t) /\ DISJOINT s t ==> (f (s UNION t) = f s + (f:('a->bool) -> real) t)`) MP_TAC
    ++ DISCH_THEN (MP_TAC o Q.SPECL [`s':'a->bool`, `t' DIFF s':'a->bool`])
-   ++ FULL_SIMP_TAC std_ss[temp5,temp6]
-   ++ KNOW_TAC (--`DISJOINT s' (t' DIFF s')`--)
+   ++ simp_tac std_ss[temp5,temp6]
+   ++ DISCH_TAC
+   ++ KNOW_TAC (``DISJOINT s' (t' DIFF s')``)
    >> (RW_TAC std_ss[DISJOINT_DEF]
       ++ SIMP_TAC (srw_ss()) [DISJOINT_DEF,DIFF_DEF,IN_INTER,EXTENSION,GSPECIFICATION,EXCLUDED_MIDDLE]
       ++ RW_TAC std_ss[DISJ_ASSOC]
@@ -2059,7 +2067,7 @@ FULL_SIMP_TAC std_ss[AND_IMP, RIGHT_FORALL_IMP_THM]
       ++ RW_TAC std_ss[DISJ_ASSOC])
    ++ RW_TAC std_ss[]
    ++ FULL_SIMP_TAC std_ss[]
-   ++ KNOW_TAC (--`DISJOINT (s' INTER t') (t' DIFF s')`--)
+   ++ KNOW_TAC (``DISJOINT (s' INTER t') (t' DIFF s')``)
    >> (RW_TAC std_ss[DISJOINT_DEF]
       ++ SIMP_TAC (srw_ss()) [DISJOINT_DEF,DIFF_DEF,IN_INTER,EXTENSION,GSPECIFICATION,EXCLUDED_MIDDLE]
       ++ ONCE_REWRITE_TAC[DISJ_SYM]
@@ -2076,11 +2084,11 @@ FULL_SIMP_TAC std_ss[AND_IMP, RIGHT_FORALL_IMP_THM]
 ++ REWRITE_TAC[LT_SUC]
 ++ DISCH_THEN(MP_TAC o Q.SPEC `t:'b->bool`) ++ ASM_REWRITE_TAC[]
 ++ DISCH_TAC
-++ KNOW_TAC (--`((!a'. a' IN t ==> P ((\s. (x:'b->('a->bool)) a INTER x s) a')) ==>
+++ KNOW_TAC (``((!a'. a' IN t ==> P ((\s. (x:'b->('a->bool)) a INTER x s) a')) ==>
  (f (BIGUNION (IMAGE (\s. x a INTER x s) t)) =
   sum_set {B | B SUBSET t /\ B <> EMPTY}
     (\B.
-       -1 pow (CARD B + 1) * f (BIGINTER (IMAGE (\s. x a INTER x s) B)))))`--)
+       -1 pow (CARD B + 1) * f (BIGINTER (IMAGE (\s. x a INTER x s) B)))))``)
 >> (PAT_ASSUM (Term ` !x.
         (!a. a IN t ==> P (x a)) ==>
         (f (BIGUNION (IMAGE x t)) =
@@ -2092,18 +2100,18 @@ FULL_SIMP_TAC std_ss[AND_IMP, RIGHT_FORALL_IMP_THM]
 ++ REPEAT(DISCH_THEN SUBST1_TAC)
 ++ FULL_SIMP_TAC std_ss[lemma_NEW]
 ++ DISCH_TAC
-++ KNOW_TAC (--`sum_set
+++ KNOW_TAC (``sum_set
   ({B | B SUBSET t:'b->bool /\ B <> EMPTY} UNION {a INSERT B | B | B SUBSET t /\ a INSERT B <> EMPTY})
   (\B. -1 pow (CARD B + 1) * f (BIGINTER (IMAGE (x:'b->('a->bool)) B))) = sum_set
   ({B | B SUBSET t /\ B <> EMPTY})(\B. -1 pow (CARD B + 1) * f (BIGINTER (IMAGE x B))) + sum_set ( {a INSERT B | B | B SUBSET t /\ a INSERT B <> EMPTY})
-  (\B. -1 pow (CARD B + 1) * f (BIGINTER (IMAGE x B)))`--)
+  (\B. -1 pow (CARD B + 1) * f (BIGINTER (IMAGE x B)))``)
 >> (RW_TAC std_ss[sum_set_def]
    ++ MATCH_MP_TAC  REAL_SUM_IMAGE_DISJOINT_UNION
-   ++ KNOW_TAC (--`FINITE {B | B SUBSET t /\ B <> EMPTY} /\
+   ++ KNOW_TAC (``FINITE {B | B SUBSET t /\ B <> EMPTY} /\
 FINITE {a INSERT B | B | B SUBSET t /\ a INSERT B <> EMPTY} /\
 DISJOINT {B | B SUBSET t:'b->bool /\ B <> EMPTY} {a INSERT B | B | B SUBSET t /\ a INSERT B <> EMPTY} = (FINITE( IMAGE (\B. B) {B | B SUBSET t /\ B <> EMPTY}) /\
 FINITE  (IMAGE (\B. a INSERT B){ B | B SUBSET t /\ a INSERT B <> EMPTY}) /\
-DISJOINT  (IMAGE (\B. B){B | B SUBSET t /\ B <> EMPTY}) ( IMAGE (\B. a INSERT B){ B | B SUBSET t /\ a INSERT B <> EMPTY}))`--)
+DISJOINT  (IMAGE (\B. B){B | B SUBSET t /\ B <> EMPTY}) ( IMAGE (\B. a INSERT B){ B | B SUBSET t /\ a INSERT B <> EMPTY}))``)
    >> (RW_TAC std_ss[GSYM simple_image_gen])
    ++ DISCH_TAC ++ PURE_ONCE_ASM_REWRITE_TAC [] ++ POP_ORW
    ++ FULL_SIMP_TAC std_ss[has_size_def]
@@ -2116,14 +2124,14 @@ DISJOINT_DEF,NOT_IN_EMPTY,EXTENSION,IN_INSERT,IN_INTER,IN_DIFF,IN_UNIV])
 ++ RW_TAC std_ss[NOT_INSERT_EMPTY]
 ++ RW_TAC std_ss[incl_excl_temp1]
 ++ MATCH_MP_TAC EQ_TRANS
-++ EXISTS_TAC(--`f((x:'b->('a->bool)) a) +
+++ EXISTS_TAC(``f((x:'b->('a->bool)) a) +
               sum_set {B | B SUBSET t /\ ~(B = {})}
                   (\B. -(&1) pow (CARD B) *
-                       f(BIGINTER(IMAGE x (a INSERT B))))`--)
+                       f(BIGINTER(IMAGE x (a INSERT B))))``)
 ++ CONJ_TAC
 >> (RW_TAC std_ss[incl_excl_temp2]
    ++ FULL_SIMP_TAC std_ss[has_size_def]
-   ++ KNOW_TAC(--`FINITE {B | B SUBSET t:'b->bool /\ B <> EMPTY}`--)
+   ++ KNOW_TAC(``FINITE {B | B SUBSET t:'b->bool /\ B <> EMPTY}``)
    >> (RW_TAC std_ss[FINITE_SUBSETS_RESTRICT_NEW])
    ++ REWRITE_TAC[sum_set_def]
    ++ RW_TAC std_ss[GSYM REAL_SUM_IMAGE_NEG]
@@ -2140,22 +2148,22 @@ DISJOINT_DEF,NOT_IN_EMPTY,EXTENSION,IN_INSERT,IN_INTER,IN_DIFF,IN_UNIV])
    ++ METIS_TAC [SUBSET_DEF,EXTENSION,IN_INSERT,IN_UNION,IN_DELETE,SUBSET_DEF,
 DISJOINT_DEF,NOT_IN_EMPTY,EXTENSION,IN_INSERT,IN_INTER,IN_DIFF,IN_UNIV])
 ++ RW_TAC std_ss[incl_excl_temp4]
-++ KNOW_TAC(--`EMPTY IN {B | B SUBSET t:'b->bool} `--)
+++ KNOW_TAC(``EMPTY IN {B | B SUBSET t:'b->bool} ``)
 >> (RW_TAC std_ss[incl_excl_temp6])
-++ KNOW_TAC(--`FINITE  {B | B SUBSET t:'b->bool}`--)
+++ KNOW_TAC(``FINITE  {B | B SUBSET t:'b->bool}``)
 >> (FULL_SIMP_TAC std_ss[has_size_def]
    ++ RW_TAC std_ss[FINITE_SUBSETS_RESTRICT_NEW1])
 ++ RW_TAC std_ss[incl_excl_temp9]
 ++ RW_TAC real_ss[CARD_EMPTY]
 ++ RW_TAC real_ss[IMAGE_SING,BIGINTER_SING]
-++ KNOW_TAC(--` {a INSERT B | B SUBSET t:'b->bool} = (IMAGE (\B. a INSERT B) {B | B SUBSET t:'b->bool })`--)
+++ KNOW_TAC(`` {a INSERT B | B SUBSET t:'b->bool} = (IMAGE (\B. a INSERT B) {B | B SUBSET t:'b->bool })``)
 >> (RW_TAC real_ss[GSYM simple_image_gen])
 ++ DISCH_TAC ++ PURE_ONCE_ASM_REWRITE_TAC [] ++ POP_ORW
-++ KNOW_TAC (--`sum_set (IMAGE (\B. a INSERT B) {B | B SUBSET (t:'b->bool)})
+++ KNOW_TAC (``sum_set (IMAGE (\B. a INSERT B) {B | B SUBSET (t:'b->bool)})
       (\B. - &1 pow (CARD B + 1) *  (f:('a->bool) -> real) (BIGINTER (IMAGE (x:'b->('a->bool)) B))) =
       sum_set {B | B SUBSET (t:'b->bool)}
       ((\B. - &1 pow (CARD B + 1) * f (BIGINTER (IMAGE x B))) o
-       (\B. a INSERT B))`--)
+       (\B. a INSERT B))``)
 >> (RW_TAC std_ss[sum_set_def]
    ++ MATCH_MP_TAC REAL_SUM_IMAGE_IMAGE1
    ++ ASM_SIMP_TAC(srw_ss())[INJ_DEF,INSERT_DEF,SUBSET_DEF,EXTENSION,GSPECIFICATION]
@@ -2166,9 +2174,9 @@ DISJOINT_DEF,NOT_IN_EMPTY,EXTENSION,IN_INSERT,IN_INTER,IN_DIFF,IN_UNIV])
 ++ MATCH_MP_TAC REAL_SUM_IMAGE_EQ
 ++ RW_TAC real_ss[GSPECIFICATION]
 ++ RW_TAC real_ss[REAL_POW_ADD,REAL_NEG_NEG]
-++ KNOW_TAC (--`FINITE (x':'b->bool)`--)
+++ KNOW_TAC (``FINITE (x':'b->bool)``)
 >> (MATCH_MP_TAC SUBSET_FINITE_I
-   ++ EXISTS_TAC(--`t:'b->bool`--)
+   ++ EXISTS_TAC(``t:'b->bool``)
    ++ RW_TAC real_ss[has_size_def]
    ++ FULL_SIMP_TAC std_ss[has_size_def])
 ++ RW_TAC real_ss[CARD_INSERT]

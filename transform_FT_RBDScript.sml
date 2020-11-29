@@ -1,8 +1,10 @@
-app load ["arithmeticTheory", "realTheory", "prim_recTheory", "seqTheory",
+
+
+(*app load ["arithmeticTheory", "realTheory", "prim_recTheory", "seqTheory",
           "pred_setTheory","res_quanTheory", "res_quanTools", "listTheory", "probabilityTheory", "numTheory", "dep_rewrite", 
           "transcTheory", "rich_listTheory", "pairTheory",
           "combinTheory","limTheory","sortingTheory", "realLib", "optionTheory","satTheory",
-          "util_probTheory", "extrealTheory", "measureTheory", "lebesgueTheory","real_sigmaTheory","RBDTheory","FT_deepTheory","VDCTheory","ASN_gatewayTheory"];
+          "util_probTheory", "extrealTheory", "measureTheory", "lebesgueTheory","real_sigmaTheory","RBDTheory","FT_deepTheory","VDCTheory","ASN_gatewayTheory"];*)
 
 open HolKernel Parse boolLib bossLib limTheory arithmeticTheory realTheory prim_recTheory probabilityTheory
      seqTheory pred_setTheory res_quanTheory sortingTheory res_quanTools listTheory transcTheory
@@ -31,7 +33,7 @@ val op<< = op THENL;
 val op|| = op ORELSE;
 val op>> = op THEN1;
 val std_ss' = simpLib.++ (std_ss, boolSimps.ETA_ss);
-
+val op by = BasicProvers.byA;
 (*---------------------------*)
 fun SET_TAC L =
     POP_ASSUM_LIST(K ALL_TAC) THEN REPEAT COND_CASES_TAC THEN
@@ -146,7 +148,7 @@ val Inhibit_gate_transform = store_thm("Inhibit_gate_transform",
   ``!p A B C. prob_space p /\ C IN events p ==> 
        	      (FTree p (AND [OR [atomic A; atomic B]; NOT (atomic C)]) =
        	      (rbd_struct p (parallel [atomic A; atomic B]) INTER 
-	      		    (p_space p DIFF rbd_struct p (atomic C)))) ``,
+	       (p_space p DIFF rbd_struct p (atomic C)))) ``,
 RW_TAC list_ss[FTree_def,rbd_struct_def, UNION_EMPTY]
 ++ SUBST_OCCS_TAC [([1], SPECL [``(p_space p DIFF C):('a->bool)``, ``p_space p:('a->bool)``] 
                                INTER_COMM)]

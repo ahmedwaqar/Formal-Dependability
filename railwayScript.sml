@@ -3,7 +3,7 @@
 (*---------------------------------------------------------------------------*)
 (* Description: Formal Fault Tree based Dependability Analysis of            *)
 (*                Railway Level Crossing using Theorem Proving               *)
-(*                HOL4-Kananaskis 10 		 			     *)
+(*                HOL4-Kananaskis 12 		 			     *)
 (*							          	     *)
 (*		Author :  Waqar Ahmad             		     	     *)
 (*                                              			     *)
@@ -15,11 +15,11 @@
 
 (*loadPath := "/home/waqar/Downloads/RBD" :: !loadPath;*)
 
-app load ["arithmeticTheory", "realTheory", "prim_recTheory", "seqTheory",
+(*app load ["arithmeticTheory", "realTheory", "prim_recTheory", "seqTheory",
     	  "pred_setTheory","res_quanTheory", "res_quanTools", "listTheory", "probabilityTheory", "numTheory",
 	  "transcTheory", "rich_listTheory", "pairTheory",
 	  "combinTheory","limTheory","sortingTheory", "realLib", "optionTheory","satTheory",
-	  "util_probTheory", "extrealTheory", "measureTheory", "lebesgueTheory","real_sigmaTheory","dep_rewrite","RBDTheory","FT_deepTheory","VDCTheory","smart_gridTheory","ASN_gatewayTheory"];
+	  "util_probTheory", "extrealTheory", "measureTheory", "lebesgueTheory","real_sigmaTheory","dep_rewrite","RBDTheory","FT_deepTheory","VDCTheory","smart_gridTheory","ASN_gatewayTheory"];*)
 open HolKernel Parse boolLib bossLib limTheory arithmeticTheory realTheory prim_recTheory probabilityTheory 
      seqTheory pred_setTheory res_quanTheory sortingTheory res_quanTools listTheory transcTheory
      rich_listTheory pairTheory combinTheory realLib  optionTheory
@@ -51,7 +51,7 @@ val op<< = op THENL;
 val op|| = op ORELSE;
 val op>> = op THEN1;
 val std_ss' = simpLib.++ (std_ss, boolSimps.ETA_ss);
-
+val op by = BasicProvers.byA;
 (*---------------------------*)
 fun SET_TAC L =
     POP_ASSUM_LIST(K ALL_TAC) THEN REPEAT COND_CASES_TAC THEN
@@ -197,7 +197,7 @@ RW_TAC std_ss[]
 ++ RW_TAC std_ss[in_events_def]
 >> (FULL_SIMP_TAC list_ss[three_dim_fail_event_list_def,in_events_def,two_dim_fail_event_list_def,fail_event_list_def])
 ++ RW_TAC std_ss[of_DEF]
-++ DEP_REWRITE_TAC[rel_parallel_of_series_parallel_rbd]
+++ DEP_REWRITE_TAC[REWRITE_RULE[of_DEF]rel_parallel_of_series_parallel_rbd]
 ++ RW_TAC std_ss[]
 >> (Q.EXISTS_TAC `[]`
    ++ RW_TAC list_ss[]

@@ -4,7 +4,7 @@
 (* Description: Formal Dependability Analysis of Smart Grids	             *)
 (*                 using Theorem Proving  			             *)
 (*                                                                           *)
-(*                HOL4-Kananaskis 10 		 			     *)
+(*                HOL4-Kananaskis 12 		 			     *)
 (*							          	     *)
 (*		Author :  Waqar Ahmad             		     	     *)
 (*                                              			     *)
@@ -15,11 +15,11 @@
 (* ========================================================================= *)
 (*loadPath := "/home/waqar/Downloads/HOL-Code-thesis/Formal-Dependability" :: !loadPath;*)
 
-app load ["arithmeticTheory", "realTheory", "prim_recTheory", "seqTheory",
+(*app load ["arithmeticTheory", "realTheory", "prim_recTheory", "seqTheory",
           "pred_setTheory","res_quanTheory", "res_quanTools", "listTheory", "probabilityTheory", "numTheory", "dep_rewrite", 
           "transcTheory", "rich_listTheory", "pairTheory",
           "combinTheory","limTheory","sortingTheory", "realLib", "optionTheory","satTheory",
-          "util_probTheory", "extrealTheory", "measureTheory", "lebesgueTheory","real_sigmaTheory","RBDTheory","FT_deepTheory","VDCTheory","ASN_gatewayTheory"];
+          "util_probTheory", "extrealTheory", "measureTheory", "lebesgueTheory","real_sigmaTheory","RBDTheory","FT_deepTheory","VDCTheory","ASN_gatewayTheory"];*)
 
 open HolKernel Parse boolLib bossLib limTheory arithmeticTheory realTheory prim_recTheory probabilityTheory
      seqTheory pred_setTheory res_quanTheory sortingTheory res_quanTools listTheory transcTheory
@@ -48,7 +48,7 @@ val op<< = op THENL;
 val op|| = op ORELSE;
 val op>> = op THEN1;
 val std_ss' = simpLib.++ (std_ss, boolSimps.ETA_ss);
-
+val op by = BasicProvers.byA;
 (*---------------------------*)
 fun SET_TAC L =
     POP_ASSUM_LIST(K ALL_TAC) THEN REPEAT COND_CASES_TAC THEN
@@ -330,8 +330,8 @@ RW_TAC list_ss[list_exp_def,exp_dist_def,distribution_def,CDF_def,list_fail_even
 ++ RW_TAC real_ss[]);
 (*---------------------------------*)
 val fail_prob_SABP_FT = store_thm("fail_prob_SABP_FT",
-  `` !p t SW1 SW2 L1_220 L2_220 L3_220 L4_220 T1_220 T2_220 BUS_220 SS_220 C_SW1 C_SW2 C_L1_220 C_L2_220 C_L3_220 C_L4_220 C_T1_220 C_T2_220 C_BUS_220 C_SS_220. 
-(0 <= t) /\  prob_space p  /\
+  ``!p t SW1 SW2 L1_220 L2_220 L3_220 L4_220 T1_220 T2_220 BUS_220 SS_220 C_SW1 C_SW2 C_L1_220 C_L2_220 C_L3_220 C_L4_220 C_T1_220 C_T2_220 C_BUS_220 C_SS_220. 
+(0 <= t) /\ prob_space p  /\
  (!x'.
     MEM x'
       (fail_event_list p 
@@ -346,17 +346,24 @@ val fail_prob_SABP_FT = store_thm("fail_prob_SABP_FT",
          [SW1; L1_220; L2_220; L3_220; L4_220; SW2; T1_220; T2_220;
           BUS_220; SS_220];
          [SW1; L1_220; L2_220; L3_220; L4_220; SW2; T1_220; T2_220;
-          BUS_220; SS_220]] t))
-       /\ (list_exp p ([C_SW1;C_SW2;C_L1_220;C_L2_220;C_L3_220;C_L4_220;C_T1_220;C_T2_220;C_BUS_220;C_SS_220]) 
-([SW1;SW2;L1_220;L2_220;L3_220;L4_220;T1_220;T2_220;BUS_220;SS_220])
-       ) ==> 
-(prob p (SABP_FT p t SW1 SW2 L1_220 L2_220 L3_220 L4_220 T1_220 T2_220 BUS_220 SS_220) =
+          BUS_220; SS_220]] t)) /\
+ (list_exp p
+    ([C_SW1;C_SW2;C_L1_220;C_L2_220;C_L3_220;C_L4_220;
+      C_T1_220;C_T2_220;C_BUS_220;C_SS_220]) 
+    ([SW1;SW2;L1_220;L2_220;L3_220;L4_220;T1_220;T2_220;
+      BUS_220;SS_220])) ==> 
+(prob p
+   (SABP_FT p t SW1 SW2 L1_220 L2_220 L3_220 L4_220 T1_220 T2_220 BUS_220 SS_220) =
 1 - list_prod
   (one_minus_exp_prod t
-	([[C_SW1;C_L1_220;C_L2_220;C_L3_220;C_L4_220;C_SW2;C_T1_220;C_T2_220;C_BUS_220;C_SS_220];
-		 [C_SW1;C_L1_220;C_L2_220;C_L3_220;C_L4_220;C_SW2;C_T1_220;C_T2_220;C_BUS_220;C_SS_220];
-		[C_SW1;C_L1_220;C_L2_220;C_L3_220;C_L4_220;C_SW2;C_T1_220;C_T2_220;C_BUS_220;C_SS_220];
-		[C_SW1;C_L1_220;C_L2_220;C_L3_220;C_L4_220;C_SW2;C_T1_220;C_T2_220;C_BUS_220;C_SS_220]])))``,
+     ([[C_SW1;C_L1_220;C_L2_220;C_L3_220;C_L4_220;C_SW2;
+        C_T1_220;C_T2_220;C_BUS_220;C_SS_220];
+       [C_SW1;C_L1_220;C_L2_220;C_L3_220;C_L4_220;C_SW2;
+        C_T1_220;C_T2_220;C_BUS_220;C_SS_220];
+       [C_SW1;C_L1_220;C_L2_220;C_L3_220;C_L4_220;C_SW2;
+        C_T1_220;C_T2_220;C_BUS_220;C_SS_220];
+       [C_SW1;C_L1_220;C_L2_220;C_L3_220;C_L4_220;C_SW2;
+        C_T1_220;C_T2_220;C_BUS_220;C_SS_220]])))``,
 RW_TAC std_ss[]
 ++ RW_TAC std_ss[SABP_FT_alt_form1]
 ++ DEP_REWRITE_TAC[rel_parallel_series_rbd]
@@ -447,8 +454,8 @@ RW_TAC std_ss []
     ++ ONCE_REWRITE_TAC[INTER_COMM]
     ++ DEP_REWRITE_TAC[INTER_PSPACE]
     ++ RW_TAC std_ss[])
-++ MATCH_MP_TAC COUNTABLE_IMAGE
-++ MATCH_MP_TAC FINITE_COUNTABLE
+++ MATCH_MP_TAC image_countable
+++ MATCH_MP_TAC finite_countable
 ++ RW_TAC std_ss[k_out_n_lemma2]
 ++ MATCH_MP_TAC FINITE_INTER
 ++ DISJ2_TAC
@@ -718,26 +725,42 @@ val series_parallel_rbd_indep_k_out_n_rbd_exp_dist = store_thm("series_parallel_
        0 <= t /\
        prob_space p /\
        mutual_indep p 
-         ((FLAT (K_out_N_struct_list p [ESWs;ESWs] 3 4::
-	 	(two_dim_rel_event_list p [[PIED];[ESW1;ESW2];[ESW3;ESW4];[CIED]] t)))) /\
-       in_events p (FLAT (two_dim_rel_event_list p [[PIED];[ESW1;ESW2];[ESW3;ESW4];[CIED]] t)) /\
-       (!x. (x < SUC 4) ==> in_events p (binomial_event_list [ESWs;ESWs] x)) /\
-       (!x. (distribution p ESWs {Normal (&x)} = 
-       ((& binomial 4 x)* (pr pow x) * ((1 - pr) pow (4 - x))))) /\
-        (two_dim_exp_dist_list p
+         ((FLAT
+	     (K_out_N_struct_list p [ESWs;ESWs] 3 4::
+	 	(two_dim_rel_event_list p
+		   [[PIED];[ESW1;ESW2];[ESW3;ESW4];[CIED]] t)))) /\
+       in_events p
+          (FLAT
+	    (two_dim_rel_event_list p
+	       [[PIED];[ESW1;ESW2];[ESW3;ESW4];[CIED]] t)) /\
+       (!x.
+          (x < SUC 4) ==>
+	  in_events p (binomial_event_list [ESWs;ESWs] x)) /\
+       (!x.
+          (distribution p ESWs {Normal (&x)} = 
+       	  ((& binomial 4 x)* (pr pow x) * ((1 - pr) pow (4 - x))))) /\
+       (two_dim_exp_dist_list p
         [[PIED]; [ESW1; ESW2]; [ESW3; ESW4]; [CIED]]
-        [[C_PIED]; [C_ESW1; C_ESW2]; [C_ESW3; C_ESW4]; [C_CIED]])
-  ==>
-        (prob p
-        (rbd_struct p (parallel (rbd_list (K_out_N_struct_list p [ESWs;ESWs] 3 4))) INTER
-         rbd_struct p (series (MAP (\a. parallel (rbd_list a)) (two_dim_rel_event_list p [[PIED];[ESW1;ESW2];[ESW3;ESW4];[CIED]] t)))) =
+        [[C_PIED]; [C_ESW1; C_ESW2]; [C_ESW3; C_ESW4]; [C_CIED]]) ==>
+       (prob p
+          (rbd_struct p
+	    (parallel
+	       (rbd_list (K_out_N_struct_list p [ESWs;ESWs] 3 4))) INTER
+           rbd_struct p
+	    (series
+	       (MAP (\a. parallel (rbd_list a))
+	          (two_dim_rel_event_list p
+		     [[PIED];[ESW1;ESW2];[ESW3;ESW4];[CIED]] t)))) =
+        (1 -
 	 (1 -
-	 (1 - sum (3,SUC 4 - 3)
-            (\x. &binomial 4 x * pr pow x * (1 - pr) pow (4 - x))) *
+	  sum (3,SUC 4 - 3)
+            (\x.
+	        &binomial 4 x * pr pow x * (1 - pr) pow (4 - x))) *
 	 (1 - sum (3,SUC 4 - 3)
             (\x. &binomial 4 x * pr pow x * (1 - pr) pow (4 - x))))  *
       (list_prod of
-       (\a. 1 - list_prod (one_minus_list (exp_func_list a t)))) [[C_PIED];[C_ESW1;C_ESW2];[C_ESW3;C_ESW4];[C_CIED]])``,
+       (\a. 1 - list_prod (one_minus_list (exp_func_list a t))))
+       	    [[C_PIED];[C_ESW1;C_ESW2];[C_ESW3;C_ESW4];[C_CIED]])``,
 RW_TAC std_ss[]
 ++ DEP_REWRITE_TAC[parallel_rbd_indep_k_out_n_rbd_v1]
 ++ RW_TAC std_ss[]
@@ -813,31 +836,52 @@ RW_TAC std_ss[]
 
 (*---------------------------------------------*)
 (*----------------------------------------------*)
-val series_parallel_rbd_indep_k_out_n_rbd_exp_dist = store_thm("series_parallel_rbd_indep_k_out_n_rbd_exp_dist",
+val series_parallel_rbd_indep_k_out_n_rbd_exp_dist_eval = store_thm("series_parallel_rbd_indep_k_out_n_rbd_exp_dist_eval",
 ``!p PIED ESW1 ESW2 ESW3 ESW4 ESWs CIED X_bino C_PIED C_ESW1 C_ESW2 C_ESW3 C_ESW4 C_ESWs C_CIED t.
        0 <= t /\
        prob_space p /\
        mutual_indep p 
-         ((FLAT (K_out_N_struct_list p [X_bino;X_bino] 3 4::
-	 	(two_dim_rel_event_list p [[PIED];[ESW1;ESW2];[ESW3;ESW4];[CIED]] t)))) /\
-       in_events p (FLAT (two_dim_rel_event_list p [[PIED];[ESW1;ESW2];[ESW3;ESW4];[CIED]] t)) /\
-       (!x. (x < SUC 4) ==> in_events p (binomial_event_list [X_bino;X_bino] x)) /\
-       (!x. (distribution p X_bino {Normal (&x)} = 
-       ((& binomial 4 x)* ((Reliability p ESWs t) pow x) * ((1 - (Reliability p ESWs t) ) pow (4 - x))))) /\ exp_dist p ESWs C_ESWs /\
-        (two_dim_exp_dist_list p
-        [[PIED]; [ESW1; ESW2]; [ESW3; ESW4]; [CIED]]
-        [[C_PIED]; [C_ESW1; C_ESW2]; [C_ESW3; C_ESW4]; [C_CIED]])
-  ==>
-        (prob p
-        (rbd_struct p (parallel (rbd_list (K_out_N_struct_list p [X_bino;X_bino] 3 4))) INTER
-         rbd_struct p (series (MAP (\a. parallel (rbd_list a)) (two_dim_rel_event_list p [[PIED];[ESW1;ESW2];[ESW3;ESW4];[CIED]] t)))) =
+         ((FLAT
+	    (K_out_N_struct_list p [X_bino;X_bino] 3 4::
+	 	(two_dim_rel_event_list p
+		  [[PIED];[ESW1;ESW2];[ESW3;ESW4];[CIED]] t)))) /\
+       in_events p
+         (FLAT
+	   (two_dim_rel_event_list p
+	      [[PIED];[ESW1;ESW2];[ESW3;ESW4];[CIED]] t)) /\
+       (!x.
+          (x < SUC 4) ==>
+	  in_events p (binomial_event_list [X_bino;X_bino] x)) /\
+       (!x.
+          (distribution p X_bino {Normal (&x)} = 
+       	  ((&binomial 4 x)* ((Reliability p ESWs t) pow x) *
+	  ((1 - (Reliability p ESWs t) ) pow (4 - x))))) /\
+       exp_dist p ESWs C_ESWs /\
+       (two_dim_exp_dist_list p [[PIED]; [ESW1; ESW2]; [ESW3; ESW4]; [CIED]]
+         [[C_PIED]; [C_ESW1; C_ESW2]; [C_ESW3; C_ESW4]; [C_CIED]]) ==>
+       (prob p
+        (rbd_struct p
+	   (parallel
+	     (rbd_list (K_out_N_struct_list p [X_bino;X_bino] 3 4))) INTER
+         rbd_struct p
+	   (series
+	     (MAP (\a. parallel (rbd_list a))
+	        (two_dim_rel_event_list p
+		   [[PIED];[ESW1;ESW2];[ESW3;ESW4];[CIED]] t)))) =
 	 (1 -
-	 (1 - sum (3,SUC 4 - 3)
-            (\x. &binomial 4 x * exp (-C_ESWs * t) pow x * (1 - exp (-C_ESWs * t)) pow (4 - x))) *
-	 (1 - sum (3,SUC 4 - 3)
-            (\x. &binomial 4 x * exp (-C_ESWs * t) pow x * (1 - exp (-C_ESWs * t)) pow (4 - x))))  *
-      (list_prod of
-       (\a. 1 - list_prod (one_minus_list (exp_func_list a t)))) [[C_PIED];[C_ESW1;C_ESW2];[C_ESW3;C_ESW4];[C_CIED]])``,
+	  (1 -
+	   sum (3,SUC 4 - 3)
+            (\x.
+	        &binomial 4 x * exp (-C_ESWs * t) pow x *
+		(1 - exp (-C_ESWs * t)) pow (4 - x))) *
+	  (1 -
+	   sum (3,SUC 4 - 3)
+            (\x.
+	        &binomial 4 x * exp (-C_ESWs * t) pow x *
+		(1 - exp (-C_ESWs * t)) pow (4 - x)))) *
+         (list_prod of
+          (\a. 1 - list_prod (one_minus_list (exp_func_list a t))))
+	    [[C_PIED];[C_ESW1;C_ESW2];[C_ESW3;C_ESW4];[C_CIED]])``,
 RW_TAC std_ss[]
 ++ DEP_REWRITE_TAC[parallel_rbd_indep_k_out_n_rbd_v1]
 ++ RW_TAC std_ss[]
