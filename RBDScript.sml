@@ -14,16 +14,15 @@
 (*                                          		               	     *)
 (*                                                                           *)
 (* ========================================================================= *)
-(*app load ["arithmeticTheory", "realTheory", "prim_recTheory", "seqTheory",
-          "pred_setTheory","res_quanTheory", "res_quanTools", "listTheory", "probabilityTheory", "numTheory", "dep_rewrite", 
+app load ["arithmeticTheory", "realTheory", "prim_recTheory", "seqTheory",
+          "pred_setTheory","res_quanTheory", "res_quanTools", "listTheory", "real_probabilityTheory", "numTheory", "dep_rewrite", 
           "transcTheory", "rich_listTheory", "pairTheory",
           "combinTheory","limTheory","sortingTheory", "realLib", "optionTheory","satTheory",
-          "util_probTheory", "extrealTheory", "measureTheory", "lebesgueTheory","real_sigmaTheory"];
-*)
-open HolKernel Parse boolLib bossLib limTheory arithmeticTheory realTheory prim_recTheory probabilityTheory
+          "util_probTheory", "extrealTheory", "real_measureTheory", "real_lebesgueTheory","real_sigmaTheory"];
+open HolKernel Parse boolLib bossLib limTheory arithmeticTheory realTheory prim_recTheory real_probabilityTheory
      seqTheory pred_setTheory res_quanTheory sortingTheory res_quanTools listTheory transcTheory
      rich_listTheory pairTheory combinTheory realLib  optionTheory dep_rewrite
-      util_probTheory extrealTheory measureTheory lebesgueTheory real_sigmaTheory satTheory numTheory;
+      util_probTheory extrealTheory real_measureTheory real_lebesgueTheory real_sigmaTheory satTheory numTheory;
 
 open HolKernel boolLib bossLib Parse;
 val _ = new_theory "RBD";
@@ -71,7 +70,7 @@ val UNIONL_def = Define `(UNIONL [] = {})
 
 val IN_UNIONL = store_thm
 ("IN_UNIONL",
-``!l (v:'a ). v IN UNIONL l = (?s. MEM s l /\ v IN s)``,
+``!l (v:'a ). (v IN UNIONL l) = (?s. MEM s l /\ v IN s)``,
 Induct >> RW_TAC std_ss [UNIONL_def, MEM, NOT_IN_EMPTY]
 ++ RW_TAC std_ss [UNIONL_def, MEM, NOT_IN_EMPTY, IN_UNION]
 ++ PROVE_TAC []);
@@ -85,16 +84,16 @@ IN_UNIONL, IN_DELETE, IN_PREIMAGE, IN_SING, IN_INSERT];
 
 
 fun rewr_ss ths =
-simpLib.++
-(std_ss,
-simpLib.SSFRAG
-{ac = [],
-name = NONE,
-convs = [],
-dprocs = [],
-filter = NONE,
-rewrs = set_rewrs @ elt_rewrs,
-congs = []});
+  simpLib.++
+  (std_ss,
+   simpLib.SSFRAG
+   {ac = [],
+    name = NONE,
+    convs = [],
+    dprocs = [],
+    filter = NONE,
+    rewrs = map (fn th => (NONE, th)) (set_rewrs @ elt_rewrs),
+    congs = []});
 val pset_set_ss = rewr_ss set_rewrs;
 val pset_elt_ss = rewr_ss elt_rewrs;
 val pset_ss = rewr_ss (set_rewrs @ elt_rewrs);
@@ -163,7 +162,7 @@ val list_prob_def = Define
 (*  Mutual Independence of Events          *)
 (* --------------------------------------- *)
 val mutual_indep_def = Define
-                    ` mutual_indep p (L) = !L1 n. (PERM L L1 /\
+                    `mutual_indep p (L) = !L1 n. (PERM L L1 /\
                        (1 <=  n /\ n <=  LENGTH L) ==>
  (prob p (big_inter p (TAKE n L1)) = list_prod (list_prob p (TAKE n L1 ))))`;
 (* ------------------------------------------------------------------------- *)
@@ -615,7 +614,7 @@ THEN1(RW_TAC real_ss[compl_list_def,MAP,TAKE_def,big_inter_def,list_prob_def,lis
  THEN RW_TAC std_ss[list_prob_def,list_prod_def])
 THEN Induct_on `n`
    THEN1(RW_TAC real_ss[compl_list_def,MAP,TAKE_def,big_inter_def,list_prob_def,list_prod_def]
-   THEN FULL_SIMP_TAC std_ss[APPEND,LENGTH,LE_SUC]
+   THEN FULL_SIMP_TAC std_ss[APPEND,LENGTH]
     THEN1 (NTAC 4 (POP_ASSUM MP_TAC)
      THEN POP_ASSUM (MP_TAC o Q.SPEC `L2:('a ->bool)list`)
      THEN RW_TAC std_ss[]
@@ -736,7 +735,6 @@ THEN1( NTAC 5(POP_ASSUM MP_TAC)
  THEN FULL_SIMP_TAC std_ss[]
  THEN POP_ASSUM (K ALL_TAC)
  THEN FULL_SIMP_TAC std_ss[LENGTH]
- THEN FULL_SIMP_TAC std_ss[LE_SUC]
  THEN FULL_SIMP_TAC list_ss[])
  THEN (`big_inter p (TAKE n (compl_list p L1)) INTER Q INTER big_inter p L2 INTER p_space p = big_inter p (TAKE n (compl_list p L1)) INTER big_inter p (Q::L2)` by (RW_TAC list_ss[big_inter_def]))
  THEN1( RW_TAC std_ss[GSYM INTER_ASSOC]
@@ -869,7 +867,7 @@ Induct
    ++ RW_TAC std_ss[])
 >> (RW_TAC list_ss[])
 ++ FULL_SIMP_TAC std_ss[]
-++ FULL_SIMP_TAC std_ss[LENGTH,LE_SUC]
+++ FULL_SIMP_TAC std_ss[LENGTH]
 >> (FULL_SIMP_TAC std_ss[]
    ++ (`(prob p (big_inter p (TAKE (n)(compl_list p L1) ) INTER  big_inter p ((h::[]) )) =
         list_prod (list_prob p (TAKE (n)(compl_list p L1) )) * list_prod (list_prob p ((( h::[]):('a ->bool) list) )))` by (MATCH_MP_TAC prob_indep_big_inter1))
@@ -883,7 +881,7 @@ Induct
 ++ FULL_SIMP_TAC std_ss[big_inter_def]
 ++ (`h INTER p_space p = h` by (ONCE_REWRITE_TAC[INTER_COMM]))
 >> (MATCH_MP_TAC INTER_PSPACE
-   ++ RW_TAC std_ss[]
+   ++ RW_TAC std_ss[]bbb
    ++ FULL_SIMP_TAC list_ss[])
 ++ FULL_SIMP_TAC std_ss[]
 ++ RW_TAC real_ss[list_prob_def,list_prod_def]
