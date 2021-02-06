@@ -19,10 +19,11 @@
 	  "transcTheory", "rich_listTheory", "pairTheory",
 	  "combinTheory","limTheory","sortingTheory", "realLib", "optionTheory","satTheory",
 	  "util_probTheory", "extrealTheory", "measureTheory", "lebesgueTheory","real_sigmaTheory","dep_rewrite","RBDTheory","FT_deepTheory","VDCTheory"];*)
-open HolKernel Parse boolLib bossLib limTheory arithmeticTheory realTheory prim_recTheory probabilityTheory 
+open HolKernel Parse boolLib bossLib limTheory arithmeticTheory realTheory 
+     prim_recTheory real_probabilityTheory 
      seqTheory pred_setTheory res_quanTheory sortingTheory res_quanTools listTheory transcTheory
      rich_listTheory pairTheory combinTheory realLib  optionTheory
-      util_probTheory extrealTheory measureTheory lebesgueTheory real_sigmaTheory satTheory numTheory dep_rewrite 
+      util_probTheory extrealTheory real_measureTheory real_lebesgueTheory real_sigmaTheory satTheory numTheory dep_rewrite 
       RBDTheory FT_deepTheory VDCTheory;
 
 fun K_TAC _ = ALL_TAC;
@@ -74,7 +75,7 @@ val UNIONL_def = Define `(UNIONL [] = {})
 
 val IN_UNIONL = store_thm
 ("IN_UNIONL",
-``!l (v:'a ). v IN UNIONL l = (?s. MEM s l /\ v IN s)``,
+``!l (v:'a ). (v IN UNIONL l) = (?s. MEM s l /\ v IN s)``,
 Induct >> RW_TAC std_ss [UNIONL_def, MEM, NOT_IN_EMPTY]
 ++ RW_TAC std_ss [UNIONL_def, MEM, NOT_IN_EMPTY, IN_UNION]
 ++ PROVE_TAC []);
@@ -88,16 +89,16 @@ IN_UNIONL, IN_DELETE, IN_PREIMAGE, IN_SING, IN_INSERT];
 
 
 fun rewr_ss ths =
-simpLib.++
-(std_ss,
-simpLib.SSFRAG
-{ac = [],
-name = NONE,
-convs = [],
-dprocs = [],
-filter = NONE,
-rewrs = set_rewrs @ elt_rewrs,
-congs = []});
+  simpLib.++
+  (std_ss,
+   simpLib.SSFRAG
+   {ac = [],
+    name = NONE,
+    convs = [],
+    dprocs = [],
+    filter = NONE,
+    rewrs = map (fn th => (NONE, th)) (set_rewrs @ elt_rewrs),
+    congs = []});
 val pset_set_ss = rewr_ss set_rewrs;
 val pset_elt_ss = rewr_ss elt_rewrs;
 val pset_ss = rewr_ss (set_rewrs @ elt_rewrs);
@@ -194,23 +195,23 @@ val inst_avail_exp3_def = Define
 (*-------------------------*)
 val inst_avail_exp_list_def = Define 
 `(inst_avail_exp_list p [] n M = T) /\ 
- (inst_avail_exp_list p (h::t) n M = inst_avail_exp p h n (HD M) /\ 
-  inst_avail_exp_list p t n (TL M) ) `;
+ (inst_avail_exp_list p (h::t) n M = (inst_avail_exp p h n (HD M) /\ 
+  inst_avail_exp_list p t n (TL M) )) `;
 (*-------------------------*)
 val inst_avail_exp_list1_def = Define 
 `(inst_avail_exp_list1 p [] M = T) /\ 
- (inst_avail_exp_list1 p (h::t) M = inst_avail_exp2 p h (HD M) /\ 
-  inst_avail_exp_list1 p t (TL M) ) `;
+ (inst_avail_exp_list1 p (h::t) M = (inst_avail_exp2 p h (HD M) /\ 
+  inst_avail_exp_list1 p t (TL M) )) `;
 (*-------------------------*)
 val inst_avail_exp_list2_def = Define 
 `(inst_avail_exp_list2 p [] M = T) /\ 
- (inst_avail_exp_list2 p (h::t) M = inst_avail_exp3 p h (HD M) /\ 
-  inst_avail_exp_list2 p t (TL M) ) `;
+ (inst_avail_exp_list2 p (h::t) M = (inst_avail_exp3 p h (HD M) /\ 
+  inst_avail_exp_list2 p t (TL M) )) `;
 (*-------------------------*)
 val two_dim_inst_avail_exp_def = Define 
 `(two_dim_inst_avail_exp p [] M = T) /\ 
- (two_dim_inst_avail_exp p (h::t) M = inst_avail_exp_list1 p h (HD M) /\ 
-  two_dim_inst_avail_exp p t (TL M) ) `;
+ (two_dim_inst_avail_exp p (h::t) M = (inst_avail_exp_list1 p h (HD M) /\ 
+  two_dim_inst_avail_exp p t (TL M) )) `;
 (*-------------------------*)
 val steady_state_avail_def = Define 
 `steady_state_avail m = (SND (m:real#real) / (SND m + FST m))`;
@@ -366,7 +367,7 @@ GEN_TAC
     ++ DISCH_TAC ++ PURE_ONCE_ASM_REWRITE_TAC [] ++ POP_ASSUM K_TAC
     ++ RW_TAC real_ss[EXP_LT_1])
 ++ RW_TAC std_ss[EXP_NEG]
-++ KNOW_TAC(``(-inv (exp c) < (1:real)) = (-1:real) < -(-inv (exp c)) ``)
+++ KNOW_TAC(``(-inv (exp c) < (1:real)) = ((-1:real) < -(-inv (exp c))) ``)
    >> (RW_TAC real_ss[REAL_LT_NEG])
 ++ RW_TAC real_ss[]
 ++ MATCH_MP_TAC REAL_LT_TRANS
