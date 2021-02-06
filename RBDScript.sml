@@ -15,15 +15,22 @@
 (*                                                                           *)
 (* ========================================================================= *)
 app load ["arithmeticTheory", "realTheory", "prim_recTheory", "seqTheory",
-          "pred_setTheory","res_quanTheory", "res_quanTools", "listTheory", "real_probabilityTheory", "numTheory", "dep_rewrite", 
-          "transcTheory", "rich_listTheory", "pairTheory",
+          "pred_setTheory","res_quanTheory", "res_quanTools", "listTheory",
+          "real_probabilityTheory",
+	  "numTheory", "dep_rewrite", "transcTheory", "rich_listTheory", "pairTheory",
           "combinTheory","limTheory","sortingTheory", "realLib", "optionTheory","satTheory",
-          "util_probTheory", "extrealTheory", "real_measureTheory", "real_lebesgueTheory","real_sigmaTheory"];
-open HolKernel Parse boolLib bossLib limTheory arithmeticTheory realTheory prim_recTheory real_probabilityTheory
-     seqTheory pred_setTheory res_quanTheory sortingTheory res_quanTools listTheory transcTheory
-     rich_listTheory pairTheory combinTheory realLib  optionTheory dep_rewrite
-      util_probTheory extrealTheory real_measureTheory real_lebesgueTheory real_sigmaTheory satTheory numTheory;
+          "util_probTheory", "extrealTheory", "real_measureTheory","real_sigmaTheory",
+	  "indexedListsTheory", "listLib", "bossLib", "metisLib", "realLib", "numLib",
+          "combinTheory", "arithmeticTheory","boolTheory", "listSyntax", "lebesgueTheory",
+	  "real_sigmaTheory", "cardinalTheory"];
 
+open HolKernel Parse boolLib bossLib limTheory arithmeticTheory realTheory prim_recTheory
+     real_probabilityTheory seqTheory pred_setTheory res_quanTheory sortingTheory res_quanTools
+     listTheory transcTheory rich_listTheory pairTheory combinTheory realLib  optionTheory
+     dep_rewrite util_probTheory extrealTheory real_measureTheory real_sigmaTheory
+     indexedListsTheory listLib satTheory numTheory bossLib metisLib realLib numLib
+     combinTheory arithmeticTheory boolTheory listSyntax lebesgueTheory real_sigmaTheory
+     cardinalTheory;
 open HolKernel boolLib bossLib Parse;
 val _ = new_theory "RBD";
 (*------new tactics for set simplification----*)
@@ -785,6 +792,15 @@ THEN1(FULL_SIMP_TAC list_ss[])
 THEN POP_ORW
 THEN REAL_ARITH_TAC);
 
+(*---LE_SUC---*)
+
+
+Theorem LE_SUC:
+  ∀a b. (a ≤ SUC b) = (a ≤ b ∨ (a = SUC b))
+Proof
+  decide_tac
+QED
+
 
 (*-------------prob_big_inter_compl_list--------------*)
 val prob_big_inter_compl_list = store_thm("prob_big_inter_compl_list",``!(L1:('a ->bool) list) n p . prob_space p  /\ mutual_indep p (L1) /\ (!x. MEM x (L1) ==> x IN events p ) /\ 1 <=  (LENGTH (L1)) ==> (prob p (big_inter p (TAKE (n)(compl_list p L1) )) =
@@ -803,20 +819,20 @@ Induct
   (big_inter p (TAKE n (compl_list p L1)) INTER  p_space p ) - prob p (big_inter p (TAKE n (compl_list p L1)) INTER  h)` by (MATCH_MP_TAC prob_compl_subset))
 >> (RW_TAC std_ss[]
    >> (MATCH_MP_TAC EVENTS_INTER
-   ++ RW_TAC std_ss[]
-   >> (MATCH_MP_TAC in_events_big_inter
-      ++ RW_TAC std_ss[]
-      ++(`MEM x (compl_list p (L1:'a  event list))` by (MATCH_MP_TAC parallel_rbd_lem5))
-      >> (EXISTS_TAC(``n:num``)
-         ++ RW_TAC std_ss[])
-      ++ FULL_SIMP_TAC std_ss[compl_list_def,MEM_MAP]
-      ++ MATCH_MP_TAC EVENTS_COMPL
-      ++ RW_TAC std_ss[]
-      ++ FULL_SIMP_TAC list_ss[])
-   ++ RW_TAC std_ss [EVENTS_SPACE])
-   >>(MATCH_MP_TAC EVENTS_INTER
-      ++ RW_TAC std_ss[]
-      >>(MATCH_MP_TAC in_events_big_inter
+       ++ RW_TAC std_ss[]
+       >> (MATCH_MP_TAC in_events_big_inter
+           ++ RW_TAC std_ss[]
+           ++(`MEM x (compl_list p (L1:'a  event list))` by (MATCH_MP_TAC parallel_rbd_lem5))
+           >> (EXISTS_TAC(``n:num``)
+               ++ RW_TAC std_ss[])
+           ++ FULL_SIMP_TAC std_ss[compl_list_def,MEM_MAP]
+           ++ MATCH_MP_TAC EVENTS_COMPL
+           ++ RW_TAC std_ss[]
+           ++ FULL_SIMP_TAC list_ss[])
+      ++ RW_TAC std_ss [EVENTS_SPACE])
+      >>(MATCH_MP_TAC EVENTS_INTER
+        ++ RW_TAC std_ss[]
+        >>(MATCH_MP_TAC in_events_big_inter
          ++ RW_TAC std_ss[]
          ++(`MEM x (compl_list p (L1:'a  event list))` by (MATCH_MP_TAC parallel_rbd_lem5))
          >> (EXISTS_TAC(``n:num``)
@@ -831,7 +847,7 @@ Induct
       ++ RW_TAC std_ss[]
       ++ MATCH_MP_TAC in_events_big_inter
       ++ RW_TAC std_ss[]
-      ++(`MEM x (compl_list p (L1:'a  event list))` by (MATCH_MP_TAC parallel_rbd_lem5))
+      ++ (`MEM x (compl_list p (L1:'a  event list))` by (MATCH_MP_TAC parallel_rbd_lem5))
       >> (EXISTS_TAC(``n:num``)
           ++ RW_TAC std_ss[])
           ++ FULL_SIMP_TAC std_ss[compl_list_def,MEM_MAP]
@@ -862,12 +878,12 @@ Induct
 ++ RW_TAC std_ss[]
 ++ FULL_SIMP_TAC std_ss[]
 ++ (`mutual_indep p L1 /\ (!x. MEM x L1 ==> x IN events p)` by (STRIP_TAC))
->>(MATCH_MP_TAC mutual_indep_cons
+>> (MATCH_MP_TAC mutual_indep_cons
    ++ EXISTS_TAC(``h:'a  event``)
    ++ RW_TAC std_ss[])
 >> (RW_TAC list_ss[])
 ++ FULL_SIMP_TAC std_ss[]
-++ FULL_SIMP_TAC std_ss[LENGTH]
+++ FULL_SIMP_TAC std_ss[LENGTH,LE_SUC]
 >> (FULL_SIMP_TAC std_ss[]
    ++ (`(prob p (big_inter p (TAKE (n)(compl_list p L1) ) INTER  big_inter p ((h::[]) )) =
         list_prod (list_prob p (TAKE (n)(compl_list p L1) )) * list_prod (list_prob p ((( h::[]):('a ->bool) list) )))` by (MATCH_MP_TAC prob_indep_big_inter1))
@@ -875,13 +891,11 @@ Induct
       >> (MATCH_MP_TAC mutual_indep_cons_swap
          ++ RW_TAC std_ss[])
       >> ( FULL_SIMP_TAC list_ss[])
-   ++ MATCH_MP_TAC LESS_EQ_TRANS
-   ++ EXISTS_TAC(``LENGTH (L1:'a  event list)``)
-   ++ RW_TAC list_ss[])
+   ++ fs[])
 ++ FULL_SIMP_TAC std_ss[big_inter_def]
 ++ (`h INTER p_space p = h` by (ONCE_REWRITE_TAC[INTER_COMM]))
 >> (MATCH_MP_TAC INTER_PSPACE
-   ++ RW_TAC std_ss[]bbb
+   ++ RW_TAC std_ss[]
    ++ FULL_SIMP_TAC list_ss[])
 ++ FULL_SIMP_TAC std_ss[]
 ++ RW_TAC real_ss[list_prob_def,list_prod_def]
