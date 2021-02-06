@@ -75,7 +75,7 @@ val UNIONL_def = Define `(UNIONL [] = {})
 
 val IN_UNIONL = store_thm
 ("IN_UNIONL",
-``!l (v:'a ). v IN UNIONL l = (?s. MEM s l /\ v IN s)``,
+``!l (v:'a ). (v IN UNIONL l) = (?s. MEM s l /\ v IN s)``,
 Induct >> RW_TAC std_ss [UNIONL_def, MEM, NOT_IN_EMPTY]
 ++ RW_TAC std_ss [UNIONL_def, MEM, NOT_IN_EMPTY, IN_UNION]
 ++ PROVE_TAC []);
@@ -89,16 +89,16 @@ IN_UNIONL, IN_DELETE, IN_PREIMAGE, IN_SING, IN_INSERT];
 
 
 fun rewr_ss ths =
-simpLib.++
-(std_ss,
-simpLib.SSFRAG
-{ac = [],
-name = NONE,
-convs = [],
-dprocs = [],
-filter = NONE,
-rewrs = set_rewrs @ elt_rewrs,
-congs = []});
+  simpLib.++
+  (std_ss,
+   simpLib.SSFRAG
+   {ac = [],
+    name = NONE,
+    convs = [],
+    dprocs = [],
+    filter = NONE,
+    rewrs = map (fn th => (NONE, th)) (set_rewrs @ elt_rewrs),
+    congs = []});
 val pset_set_ss = rewr_ss set_rewrs;
 val pset_elt_ss = rewr_ss elt_rewrs;
 val pset_ss = rewr_ss (set_rewrs @ elt_rewrs);
@@ -1462,9 +1462,9 @@ val union_list_def =  Define
 
 (*------------SUBSET_INSERT_EXISTS_NEW------------------------------------------ *)
 val SUBSET_INSERT_EXISTS_NEW = store_thm("SUBSET_INSERT_EXISTS_NEW",
-  ``!s x t. (s SUBSET (x INSERT t) =
-            (s SUBSET t)) \/ 
-	       (?u. u SUBSET t /\ (s = x INSERT u))``,
+  ``!s x t. (s SUBSET (x INSERT t)) =
+            ((s SUBSET t) \/ 
+	       (?u. u SUBSET t /\ (s = x INSERT u)))``,
 RW_TAC std_ss[]
 ++ EQ_TAC
 >> ((MATCH_MP_TAC (PROVE [] (Term`((a /\ ~b ==> c) ==> (a ==> b \/ c))`)))
@@ -1521,7 +1521,7 @@ GEN_TAC
 ++ RW_TAC std_ss[BETA_THM]
 ++ KNOW_TAC (``(!n. (!m. m < n ==> P m) ==> !m. m < SUC n ==> P m)``)
 >> (RW_TAC std_ss[]
-   ++ FULL_SIMP_TAC std_ss[LT_SUC])
+   ++ FULL_SIMP_TAC std_ss[LESS_THM])
 ++ METIS_TAC[LT_SUC]);
 (*-----------------------temp2---------------------------*)
 val temp2 = store_thm("temp2",
@@ -1845,7 +1845,7 @@ FULL_SIMP_TAC std_ss[AND_IMP, RIGHT_FORALL_IMP_THM]
       >> (RW_TAC std_ss[])
       ++ DISCH_TAC ++ POP_ORW
       ++ Q.SPEC_TAC (`t`, `u`) 
-      ++ MATCH_MP_TAC FINITE_INDUCT
+      ++ HO_MATCH_MP_TAC FINITE_INDUCT
       ++ FULL_SIMP_TAC std_ss[IMAGE_EMPTY,IMAGE_INSERT,BIGUNION_EMPTY,BIGUNION_INSERT]
       ++ FULL_SIMP_TAC std_ss[FORALL_INSERT])
    ++ FULL_SIMP_TAC std_ss[ PULL_FORALL,AND_IMP_INTRO]
@@ -1882,7 +1882,7 @@ FULL_SIMP_TAC std_ss[AND_IMP, RIGHT_FORALL_IMP_THM]
 ++ FULL_SIMP_TAC std_ss[GSYM IMAGE_DEF]
 ++ FULL_SIMP_TAC std_ss[GSYM IMAGE_COMPOSE,o_DEF]
 ++ FIRST_X_ASSUM(MP_TAC o Q.SPEC `n:num`) 
-++ REWRITE_TAC[LT_SUC]
+++ REWRITE_TAC[LESS_THM]
 ++ DISCH_THEN(MP_TAC o Q.SPEC `t:'b->bool`) ++ ASM_REWRITE_TAC[]
 ++ DISCH_TAC
 ++ KNOW_TAC (``((!a'. a' IN t ==> P ((\s. (x:'b->('a->bool)) a INTER x s) a')) ==>
@@ -1908,12 +1908,13 @@ FULL_SIMP_TAC std_ss[AND_IMP, RIGHT_FORALL_IMP_THM]
   (\B. -1 pow (CARD B + 1) * f (BIGINTER (IMAGE x B)))``)
 >> (RW_TAC std_ss[sum_set_def]
    ++ MATCH_MP_TAC  REAL_SUM_IMAGE_DISJOINT_UNION
-   ++ KNOW_TAC (``FINITE {B | B SUBSET t /\ B <> EMPTY} /\
+   ++ KNOW_TAC (``(FINITE {B | B SUBSET t /\ B <> EMPTY} /\
 FINITE {a INSERT B | B | B SUBSET t /\ a INSERT B <> EMPTY} /\
-DISJOINT {B | B SUBSET t:'b->bool /\ B <> EMPTY} {a INSERT B | B | B SUBSET t /\ a INSERT B <> EMPTY} = (FINITE( IMAGE (\B. B) {B | B SUBSET t /\ B <> EMPTY}) /\
+DISJOINT {B | B SUBSET t:'b->bool /\ B <> EMPTY} {a INSERT B | B | B SUBSET t /\ a INSERT B <> EMPTY}) = 
+(FINITE( IMAGE (\B. B) {B | B SUBSET t /\ B <> EMPTY}) /\
 FINITE  (IMAGE (\B. a INSERT B){ B | B SUBSET t /\ a INSERT B <> EMPTY}) /\
 DISJOINT  (IMAGE (\B. B){B | B SUBSET t /\ B <> EMPTY}) ( IMAGE (\B. a INSERT B){ B | B SUBSET t /\ a INSERT B <> EMPTY}))``)
-   >> (RW_TAC std_ss[GSYM simple_image_gen])
+   >> (simp[GSYM simple_image_gen])
    ++ DISCH_TAC ++ PURE_ONCE_ASM_REWRITE_TAC [] ++ POP_ORW
    ++ FULL_SIMP_TAC std_ss[has_size_def]
    ++ FULL_SIMP_TAC std_ss[FINITE_SUBSETS_RESTRICT_NEW,IMAGE_FINITE]
