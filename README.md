@@ -10,12 +10,15 @@ Theories | Description
 --------- | ----------
  RBDScript.sml|				               Contains the formalization of RBD configurations
  FT_deepScript.sml|			            Contains the formalization of FT gates and PIE principle
+ AvailabilityScript.sml|			            Contains the formalization of instantenous and steady availability theory based on FT and RBD 
  VDCScript.sml|				               Formalization about the reliability analysis of virutal data center
  transform_FT_RBDscipt.sml|	      Lemmas about either way transformation of RBD and FT models
  smart_gridScript.sml	|	          Formalization describing the dependability analysis of smart grid substation
  auto_smart_grid.ml	|		           SML functions for automatic simplification and computation of dependability properties
  WSNScript.sml	|		Contains the formalization related to reliability analysis of WSN data transport protocol 
  frogpScript.sml|			Contains the formalization related to reliability analysis of oil and gas pipelines
+ ASN_gatewayScript.sml|		 Formalization of communication gateway software for the next generation air traffic management system	
+ railwayScript.sml|		 Formal realiability analysis of railway traction system 
 
 To use the proof script, follow the steps below:
 
