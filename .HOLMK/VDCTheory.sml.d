@@ -1,0 +1,1 @@
+VDCTheory.uo: VDCTheory.ui /Users/waqarahmed/HOL/sigobj/Globals.uo /Users/waqarahmed/HOL/sigobj/Parse.uo RBDTheory.uo /Users/waqarahmed/HOL/sigobj/Redblackmap.uo /Users/waqarahmed/HOL/sigobj/Term.uo /Users/waqarahmed/HOL/sigobj/Theory.uo /Users/waqarahmed/HOL/sigobj/TheoryReader.uo /Users/waqarahmed/HOL/sigobj/Thm.uo /Users/waqarahmed/HOL/sigobj/Type.uo 

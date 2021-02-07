@@ -23,11 +23,12 @@ app load ["arithmeticTheory", "realTheory", "prim_recTheory", "seqTheory",
           "combinTheory","limTheory","sortingTheory", "realLib", "optionTheory","satTheory",
           "util_probTheory", "extrealTheory", "measureTheory", "lebesgueTheory","real_sigmaTheory","RBDTheory"];*)
 
-open HolKernel Parse boolLib bossLib limTheory arithmeticTheory realTheory prim_recTheory probabilityTheory
-     seqTheory pred_setTheory res_quanTheory sortingTheory res_quanTools listTheory transcTheory
-     rich_listTheory pairTheory combinTheory realLib  optionTheory dep_rewrite
-      util_probTheory extrealTheory measureTheory lebesgueTheory real_sigmaTheory satTheory numTheory RBDTheory;
-term_grammar();
+open HolKernel Parse boolLib bossLib limTheory arithmeticTheory realTheory 
+    prim_recTheory real_probabilityTheory seqTheory pred_setTheory 
+    res_quanTheory sortingTheory res_quanTools listTheory
+    transcTheory rich_listTheory pairTheory combinTheory realLib  
+    optionTheory dep_rewrite util_probTheory extrealTheory real_measureTheory 
+    real_lebesgueTheory real_sigmaTheory satTheory numTheory RBDTheory;
 
 open HolKernel boolLib bossLib Parse;
 val _ = new_theory "VDC";
@@ -75,7 +76,7 @@ val UNIONL_def = Define `(UNIONL [] = {})
 
 val IN_UNIONL = store_thm
 ("IN_UNIONL",
-``!l (v:'a ). v IN UNIONL l = (?s. MEM s l /\ v IN s)``,
+``!l (v:'a ). (v IN UNIONL l) = (?s. MEM s l /\ v IN s)``,
 Induct >> RW_TAC std_ss [UNIONL_def, MEM, NOT_IN_EMPTY]
 ++ RW_TAC std_ss [UNIONL_def, MEM, NOT_IN_EMPTY, IN_UNION]
 ++ PROVE_TAC []);
@@ -89,16 +90,16 @@ IN_UNIONL, IN_DELETE, IN_PREIMAGE, IN_SING, IN_INSERT];
 
 
 fun rewr_ss ths =
-simpLib.++
-(std_ss,
-simpLib.SSFRAG
-{ac = [],
-name = NONE,
-convs = [],
-dprocs = [],
-filter = NONE,
-rewrs = set_rewrs @ elt_rewrs,
-congs = []});
+  simpLib.++
+  (std_ss,
+   simpLib.SSFRAG
+   {ac = [],
+    name = NONE,
+    convs = [],
+    dprocs = [],
+    filter = NONE,
+    rewrs = map (fn th => (NONE, th)) (set_rewrs @ elt_rewrs),
+    congs = []});
 val pset_set_ss = rewr_ss set_rewrs;
 val pset_elt_ss = rewr_ss elt_rewrs;
 val pset_ss = rewr_ss (set_rewrs @ elt_rewrs);
@@ -188,24 +189,24 @@ val exp_dist_def = Define
 !t:real. CDF p X (t) = (if (0 <=  t) then 1 - exp(-l * t) else 0) `;
 
 val exp_dist_list_def = Define
-`(exp_dist_list p [] L = T ) /\
-(exp_dist_list p (h::t) L =
-(exp_dist p h (HD L)) /\ exp_dist_list p t (TL L))`;
+`(exp_dist_list p [] L =  T) /\
+((exp_dist_list p (h::t) L) =
+((exp_dist p h (HD L)) /\ exp_dist_list p t (TL L)))`;
 
 val two_dim_exp_dist_list_def = Define
 `(two_dim_exp_dist_list p [] L = T) /\
  (two_dim_exp_dist_list p (h::t) L =
- (exp_dist_list p h (HD L)) /\ two_dim_exp_dist_list p t (TL L))`;
+ ((exp_dist_list p h (HD L)) /\ two_dim_exp_dist_list p t (TL L)))`;
 
 val three_dim_exp_dist_list_def = Define
 `(three_dim_exp_dist_list p [] L = T) /\
 (three_dim_exp_dist_list p (h::t) L =
-(two_dim_exp_dist_list p h (HD L)) /\ three_dim_exp_dist_list p t (TL L))`;
+((two_dim_exp_dist_list p h (HD L)) /\ three_dim_exp_dist_list p t (TL L)))`;
 
 val four_dim_exp_dist_list_def = Define
 `(four_dim_exp_dist_list p [] L = T) /\
  (four_dim_exp_dist_list p (h::t) L =
- (three_dim_exp_dist_list p h (HD L)) /\ four_dim_exp_dist_list p t (TL L))`;
+ ((three_dim_exp_dist_list p h (HD L)) /\ four_dim_exp_dist_list p t (TL L)))`;
 
 val gen_rv_list_def = Define
 `gen_rv_list (X:'a->extreal) n = gen_list X n`;
@@ -505,14 +506,17 @@ RW_TAC std_ss[]
 ++ DEP_ASM_REWRITE_TAC[mult_ratr]);
 (*-------------------------*)
 val bound_log_inequal = store_thm("bound_log_inequal",
-  ``! (a:real) (b:real) (c:real) (e:real)  n. (0<=e) /\ (e < 1) /\ (a < b) /\ (0 < n)/\  (0 <  b) /\ (a =  e * b *(1 - (1- c) pow n)) /\  (0< c /\ c <  1) ==> (&n > (log_base 10 (1 - a / b) / log_base 10 (1 - c)))  ``,
+  ``! (a:real) (b:real) (c:real) (e:real)  n. 
+    (0 <= e) /\ (e < 1) /\ (a < b) /\ (0 < n) /\  (0 <  b) /\ 
+    (a =  e * b * (1 - (1 - c) pow n)) /\  (0 < c /\ c <  1) ==> (&n > (log_base 10 (1 - a / b) / log_base 10 (1 - c)))  ``,
 REPEAT GEN_TAC
 ++ DISCH_TAC
 ++ ONCE_REWRITE_TAC [real_gt]
-++ (`((log_base 10 (1 - a / b) / log_base 10 (1 - c)) < &n) = ((&n * log_base 10 (1 - (c:real))) < log_base 10 (1 - a / b))  ` by ALL_TAC)
+++ (`((log_base 10 (1 - a / b) / log_base 10 (1 - c)) < &n) = 
+    ((&n * log_base 10 (1 - (c:real))) < log_base 10 (1 - a / b))  ` by ALL_TAC)
 >> (DEP_REWRITE_TAC[REAL_LT_RDIV_EQ_NEG]
    ++ RW_TAC std_ss[log_base_def]
-   ++ (`ln (1 - c) / ln 10 < 0 = ln(1 - c) < 0 * ln 10` by DEP_REWRITE_TAC[REAL_LT_LDIV_EQ])
+   ++ (`(ln (1 - c) / ln 10 < 0) = (ln(1 - c) < 0 * ln 10)` by DEP_REWRITE_TAC[REAL_LT_LDIV_EQ])
    >> (RW_TAC std_ss[GSYM LN_1]
       ++ DEP_REWRITE_TAC[LN_MONO_LT]
       ++ RW_TAC real_ss[])
@@ -557,7 +561,7 @@ REPEAT GEN_TAC
       	++ DEP_REWRITE_TAC[REAL_LT_IMP_LE]
 	++ RW_TAC real_ss[POW_ONE])
       ++ RW_TAC real_ss[GSYM real_sub,POW_ONE]
-      ++ (`1 - c < 1 = (1 - (c:real)) < (1 - (0:real))` by RW_TAC real_ss[])
+      ++ (`((1 - c) < 1) = ((1 - (c:real)) < (1 - (0:real)))` by RW_TAC real_ss[])
       ++ POP_ORW
       ++ ONCE_REWRITE_TAC[real_sub]
       ++ RW_TAC real_ss[REAL_LT_LADD]
@@ -590,7 +594,7 @@ REPEAT GEN_TAC
    ++ DEP_REWRITE_TAC[REAL_LT_IMP_LE]
    ++ RW_TAC real_ss[POW_ONE])
 ++ RW_TAC real_ss[POW_ONE]
-++ (`(1 + -c < 1) = ((1:real) + -c) < (1 + (-0:real))` by RW_TAC real_ss[])
+++ (`(1 + -c < 1) = (((1:real) + -c) < (1 + (-0:real)))` by RW_TAC real_ss[])
 ++ POP_ORW
 ++ DEP_REWRITE_TAC[REAL_LT_LADD]
 ++ ONCE_REWRITE_TAC[GSYM REAL_NEG_0]

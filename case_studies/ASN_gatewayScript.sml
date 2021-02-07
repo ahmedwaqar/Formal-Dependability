@@ -12,10 +12,12 @@
 	  "transcTheory", "rich_listTheory", "pairTheory",
 	  "combinTheory","limTheory","sortingTheory", "realLib", "optionTheory","satTheory",
 	  "util_probTheory", "extrealTheory", "measureTheory", "lebesgueTheory","real_sigmaTheory","dep_rewrite","RBDTheory","FT_deepTheory","VDCTheory"];*)
-open HolKernel Parse boolLib bossLib limTheory arithmeticTheory realTheory prim_recTheory probabilityTheory 
-     seqTheory pred_setTheory res_quanTheory sortingTheory res_quanTools listTheory transcTheory
-     rich_listTheory pairTheory combinTheory realLib  optionTheory
-      util_probTheory extrealTheory measureTheory lebesgueTheory real_sigmaTheory satTheory numTheory dep_rewrite RBDTheory FT_deepTheory VDCTheory;
+open HolKernel Parse boolLib bossLib limTheory arithmeticTheory realTheory 
+    prim_recTheory real_probabilityTheory seqTheory pred_setTheory res_quanTheory 
+    sortingTheory res_quanTools listTheory transcTheory
+    rich_listTheory pairTheory combinTheory realLib  optionTheory
+    util_probTheory extrealTheory real_measureTheory real_lebesgueTheory 
+    real_sigmaTheory satTheory numTheory dep_rewrite RBDTheory FT_deepTheory VDCTheory;
 
 fun K_TAC _ = ALL_TAC;  
 open HolKernel boolLib bossLib Parse;
@@ -64,7 +66,7 @@ val UNIONL_def = Define `(UNIONL [] = {})
 
 val IN_UNIONL = store_thm
 ("IN_UNIONL",
-``!l (v:'a ). v IN UNIONL l = (?s. MEM s l /\ v IN s)``,
+``!l (v:'a ). (v IN UNIONL l) = (?s. MEM s l /\ v IN s)``,
 Induct >> RW_TAC std_ss [UNIONL_def, MEM, NOT_IN_EMPTY]
 ++ RW_TAC std_ss [UNIONL_def, MEM, NOT_IN_EMPTY, IN_UNION]
 ++ PROVE_TAC []);
@@ -78,16 +80,16 @@ IN_UNIONL, IN_DELETE, IN_PREIMAGE, IN_SING, IN_INSERT];
 
 
 fun rewr_ss ths =
-simpLib.++
-(std_ss,
-simpLib.SSFRAG
-{ac = [],
-name = NONE,
-convs = [],
-dprocs = [],
-filter = NONE,
-rewrs = set_rewrs @ elt_rewrs,
-congs = []});
+  simpLib.++
+  (std_ss,
+   simpLib.SSFRAG
+   {ac = [],
+    name = NONE,
+    convs = [],
+    dprocs = [],
+    filter = NONE,
+    rewrs = map (fn th => (NONE, th)) (set_rewrs @ elt_rewrs),
+    congs = []});
 val pset_set_ss = rewr_ss set_rewrs;
 val pset_elt_ss = rewr_ss elt_rewrs;
 val pset_ss = rewr_ss (set_rewrs @ elt_rewrs);
@@ -149,7 +151,7 @@ val exp_distribution_def = Define
 (* ------------------------------------------------------------*)
 val list_exp_def =  Define
 `(list_exp p [] L = T ) /\
-(list_exp p (h::t) L = (exp_dist p (HD(L)) (h)) /\ (list_exp p (t) (TL L)))`; 
+(list_exp p (h::t) L = ((exp_dist p (HD(L)) (h)) /\ (list_exp p (t) (TL L))))`; 
 
 (*=================probability of B1=====================================*)
 val B1_FT_def = Define
