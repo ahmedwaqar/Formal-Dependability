@@ -14,17 +14,18 @@
 (*                                                                           *)
 (* ========================================================================= *)
 
-(*app load ["arithmeticTheory", "realTheory", "prim_recTheory", "seqTheory",
+(*app load ["arithmeticTheory", "realTheory", "prim_recTheory", 
     	  "pred_setTheory","res_quanTheory", "res_quanTools", "listTheory", "probabilityTheory", "numTheory",
 	  "transcTheory", "rich_listTheory", "pairTheory",
 	  "combinTheory","limTheory","sortingTheory", "realLib", "optionTheory","satTheory",
-	  "util_probTheory", "extrealTheory", "measureTheory", "lebesgueTheory","real_sigmaTheory","dep_rewrite","RBDTheory","FT_deepTheory","VDCTheory"];*)
+	  "util_probTheory", "extrealTheory", "measureTheory", "lebesgueTheory","real_sigmaTheory","dep_rewrite","RBDTheory","FT_deepTheory","VDCTheory", "seqTheory"];*)
+
 open HolKernel Parse boolLib bossLib limTheory arithmeticTheory realTheory 
      prim_recTheory real_probabilityTheory 
-     seqTheory pred_setTheory res_quanTheory sortingTheory res_quanTools listTheory transcTheory
+      pred_setTheory res_quanTheory sortingTheory res_quanTools listTheory transcTheory
      rich_listTheory pairTheory combinTheory realLib  optionTheory
       util_probTheory extrealTheory real_measureTheory real_lebesgueTheory real_sigmaTheory satTheory numTheory dep_rewrite 
-      RBDTheory FT_deepTheory VDCTheory;
+      RBDTheory FT_deepTheory VDCTheory seqTheory;
 
 fun K_TAC _ = ALL_TAC;
 
@@ -402,10 +403,10 @@ RW_TAC std_ss[]
    ++ DEP_REWRITE_TAC[SEQ_ADD]
    ++ RW_TAC std_ss[]
    >> (RW_TAC std_ss[SEQ_CONST])
-   >> ((`((\t. FST m / (SND m + FST m) * exp (-(SND m + FST m) * &t)) --> 0) = 
-      	 ((\t. 
+   >> ((`(seq$--> (\t. (FST (m:real#real) / (SND m + FST m)) * exp (-(SND m + FST m) * &t)) 0) = 
+      	 (seq$--> (\t. 
 	     (\t. FST m / (SND m + FST m)) t * 
-	     (\t. exp (-(SND m + FST m) * &t)) t) --> 
+	     (\t. exp (-(SND m + FST m) * &t)) t) 
 	 ((FST m / (SND m + FST m)) *0))` by (RW_TAC real_ss[]))
       ++ POP_ORW
       ++ MATCH_MP_TAC SEQ_MUL
@@ -423,7 +424,9 @@ RW_TAC std_ss[]
   ++ POP_ORW
   ++ MATCH_MP_TAC SEQ_ADD
   ++ RW_TAC std_ss[SEQ_CONST]
-  ++ (`((\t. FST m / (SND m + FST m) * exp (-(SND m + FST m) * &t)) --> 0) = ((\t. (\t. FST m / (SND m + FST m))t * (\t. exp (-(SND m + FST m) * &t))t) --> ((FST m / (SND m + FST m)) *0))` by RW_TAC real_ss[])
+  ++ (`(seq$--> (\t. FST m / (SND m + FST m) * exp (-(SND m + FST m) * &t)) 0) = 
+      (seq$--> (\t. (\t. FST m / (SND m + FST m))t * (\t. exp (-(SND m + FST m) * &t))t) ((FST m / (SND m + FST m)) *0))` 
+       by RW_TAC real_ss[])
   ++ POP_ORW
   ++ MATCH_MP_TAC SEQ_MUL
   ++ RW_TAC real_ss[SEQ_CONST]
@@ -434,16 +437,19 @@ RW_TAC std_ss[]
   ++ RW_TAC std_ss[steady_avail_temp])
 ++ RW_TAC std_ss [expec_avail_def]
 ++ FULL_SIMP_TAC std_ss[inst_avail_exp_def,expec_def]
-++ (`((\t.
+++ (`(seq$--> (\t.
      SND m / (SND m + FST m) +
-     FST m / (SND m + FST m) * exp (-(SND m + FST m) * &t)) --> (SND m / (SND m + FST m))) = ((\t.
+     FST m / (SND m + FST m) * exp (-(SND m + FST m) * &t)) (SND m / (SND m + FST m))) = 
+    (seq$--> (\t.
      (\t. SND m / (SND m + FST m)) t +
-     (\t. FST m / (SND m + FST m) * exp (-(SND m + FST m) * &t))t) --> ((SND m / (SND m + FST m)) + 0))` by RW_TAC real_ss[])
+     (\t. FST m / (SND m + FST m) * exp (-(SND m + FST m) * &t))t) ((SND m / (SND m + FST m)) + 0))` by RW_TAC real_ss[])
 ++ POP_ORW
 ++ MATCH_MP_TAC SEQ_ADD
 ++ RW_TAC std_ss[]
 >> (RW_TAC std_ss[SEQ_CONST])
-++ (`((\t. FST m / (SND m + FST m) * exp (-(SND m + FST m) * &t)) --> 0) = ((\t. (\t. FST m / (SND m + FST m))t * (\t. exp (-(SND m + FST m) * &t))t) --> ((FST m / (SND m + FST m)) *0))` by RW_TAC real_ss[])
+++ (`(seq$--> (\t. FST m / (SND m + FST m) * exp (-(SND m + FST m) * &t)) 0) = 
+    (seq$--> (\t. (\t. FST m / (SND m + FST m))t * (\t. exp (-(SND m + FST m) * &t))t) ((FST m / (SND m + FST m)) *0))` 
+      by RW_TAC real_ss[])
 ++ POP_ORW
 ++ MATCH_MP_TAC SEQ_MUL
 ++ RW_TAC real_ss[SEQ_CONST]
@@ -483,7 +489,7 @@ RW_TAC std_ss[]
 (*                 EXT_LE_LT               *)
 (* ------------------------------------------------------------------------- *)
 val EXT_LE_LT = store_thm("EXT_LE_LT",
-  ``!x y: extreal. (x <=  y) \/ y < x = (x = y) \/ x < y \/ y < x``,
+  ``!x y: extreal. ((x <=  y) \/ y < x) = ((x = y) \/ x < y \/ y < x)``,
 RW_TAC std_ss []
 ++ RW_TAC std_ss [le_lt]
 ++ KNOW_TAC (``(x < y \/ (x = y)) = ( (x = y) \/ x < y)``)
@@ -545,16 +551,21 @@ GEN_TAC
 ++ RW_TAC std_ss[]
 >> (FULL_SIMP_TAC list_ss[inst_avail_exp_list1_def,inst_avail_exp2_def]
    ++ REWRITE_TAC[steady_state_avail_def]
-   ++ (`((\t.
+   ++ (`(seq$--> (\t.
      SND (h':real#real) / (SND h' + FST h') +
-     FST h' / (SND h' + FST h') * exp (-(SND h' + FST h') * &t))--> (SND h' / (SND h' + FST h'))) = ((\t.
+     FST h' / (SND h' + FST h') * exp (-(SND h' + FST h') * &t)) 
+         (SND h' / (SND h' + FST h'))) = 
+     (seq$--> (\t.
      (\t. SND h' / (SND  h'+ FST h')) t +
-     (\t. FST h' / (SND h' + FST h') * exp (-(SND h' + FST h') * &t))t)--> (SND h' / (SND h' + FST h') + 0))` by RW_TAC real_ss[])
+     (\t. FST h' / (SND h' + FST h') * exp (-(SND h' + FST h') * &t))t) 
+     (SND h' / (SND h' + FST h') + 0))` by RW_TAC real_ss[])
    ++ POP_ORW
    ++ MATCH_MP_TAC SEQ_ADD
    ++ RW_TAC std_ss[]
    >> (RW_TAC std_ss[SEQ_CONST])
-   >> ((`((\t. FST  h'/ (SND h' + FST h') * exp (-(SND h'  + FST h') * &t)) --> 0) = ((\t. (\t. FST h' / (SND h' + FST h'))t * (\t. exp (-(SND h' + FST h') * &t))t) --> ((FST h' / (SND h' + FST h')) *0))` by RW_TAC real_ss[])
+   >> ((`(seq$--> (\t. FST  h'/ (SND h' + FST h') * exp (-(SND h'  + FST h') * &t)) 0) = 
+      (seq$--> (\t. (\t. FST h' / (SND h' + FST h'))t * (\t. exp (-(SND h' + FST h') * &t))t)
+       ((FST h' / (SND h' + FST h')) *0))` by RW_TAC real_ss[])
       ++ POP_ORW
       ++ MATCH_MP_TAC SEQ_MUL
       ++ RW_TAC real_ss[SEQ_CONST]
@@ -639,16 +650,20 @@ GEN_TAC
    ++ RW_TAC std_ss[SEQ_CONST]
    ++ FULL_SIMP_TAC list_ss[inst_avail_exp_list1_def,inst_avail_exp2_def]
    ++ REWRITE_TAC[steady_state_avail_def]
-   ++ (`((\t.
+   ++ (`(seq$--> (\t.
      SND (h':real#real) / (SND h' + FST h') +
-     FST h' / (SND h' + FST h') * exp (-(SND h' + FST h') * &t))--> (SND h' / (SND h' + FST h'))) = ((\t.
+     FST h' / (SND h' + FST h') * exp (-(SND h' + FST h') * &t)) (SND h' / (SND h' + FST h'))) = 
+     (seq$--> (\t.
      (\t. SND h' / (SND  h'+ FST h')) t +
-     (\t. FST h' / (SND h' + FST h') * exp (-(SND h' + FST h') * &t))t)--> (SND h' / (SND h' + FST h') + 0))` by RW_TAC real_ss[])
+     (\t. FST h' / (SND h' + FST h') * exp (-(SND h' + FST h') * &t))t) (SND h' / (SND h' + FST h') + 0))` 
+     by RW_TAC real_ss[])
    ++ POP_ORW
    ++ MATCH_MP_TAC SEQ_ADD
    ++ RW_TAC std_ss[]
    >> (RW_TAC std_ss[SEQ_CONST])
-   >> ((`((\t. FST  h'/ (SND h' + FST h') * exp (-(SND h'  + FST h') * &t)) --> 0) = ((\t. (\t. FST h' / (SND h' + FST h'))t * (\t. exp (-(SND h' + FST h') * &t))t) --> ((FST h' / (SND h' + FST h')) *0))` by RW_TAC real_ss[])
+   >> ((`(seq$--> (\t. FST  h'/ (SND h' + FST h') * exp (-(SND h'  + FST h') * &t)) 0) = 
+        (seq$--> (\t. (\t. FST h' / (SND h' + FST h'))t * (\t. exp (-(SND h' + FST h') * &t))t) ((FST h' / (SND h' + FST h')) *0))` 
+        by RW_TAC real_ss[])
       ++ POP_ORW
       ++ MATCH_MP_TAC SEQ_MUL
       ++ RW_TAC real_ss[SEQ_CONST]
@@ -1018,12 +1033,15 @@ val inst_unavail_exp_def = Define
        (FST (m) / (SND m + FST m)) - 
        (FST m /(SND m + FST m)) * exp (-((SND m + FST m))* &t)) `;
 (*-------------------------*)
-val inst_unavail_exp_list_def = Define `(inst_unavail_exp_list p [] M = T) /\ (inst_unavail_exp_list p (h::t) M = inst_unavail_exp p h (HD M) /\ inst_unavail_exp_list p t (TL M) ) `;
+val inst_unavail_exp_list_def = Define 
+`(inst_unavail_exp_list p [] M = T) /\ 
+(inst_unavail_exp_list p (h::t) M = 
+(inst_unavail_exp p h (HD M) /\ inst_unavail_exp_list p t (TL M) ))`;
 (*-------------------------*)
 val two_dim_inst_unavail_exp_def = Define 
 `(two_dim_inst_unavail_exp p [] M = T) /\ 
  (two_dim_inst_unavail_exp p (h::t) M = 
-  inst_unavail_exp_list p h (HD M) /\ two_dim_inst_unavail_exp p t (TL M) ) `;
+  (inst_unavail_exp_list p h (HD M) /\ two_dim_inst_unavail_exp p t (TL M) )) `;
 
 (* ------------------------------------------------------------------------- *)
 (*--- Definition.  Unavailability FT gates     ----  *)
@@ -1094,16 +1112,20 @@ GEN_TAC
 ++ RW_TAC std_ss[]
 >> (FULL_SIMP_TAC list_ss[inst_unavail_exp_list_def,inst_unavail_exp_def]
    ++ REWRITE_TAC[steady_state_unavail_def]
-   ++ (`((\t.
+   ++ (`(seq$--> (\t.
      FST (h':real#real) / (SND h' + FST h') -
-     FST h' / (SND h' + FST h') * exp (-(SND h' + FST h') * &t))--> (FST h' / (SND h' + FST h'))) = ((\t.
+     FST h' / (SND h' + FST h') * exp (-(SND h' + FST h') * &t)) (FST h' / (SND h' + FST h'))) = 
+     (seq$--> (\t.
      (\t. FST (h':real#real) / (SND  h'+ FST h')) t -
-     (\t. FST h' / (SND h' + FST h') * exp (-(SND h' + FST h') * &t))t)--> (FST h' / (SND h' + FST h') - 0))` by RW_TAC real_ss[])
+     (\t. FST h' / (SND h' + FST h') * exp (-(SND h' + FST h') * &t))t) (FST h' / (SND h' + FST h') - 0))` 
+      by RW_TAC real_ss[])
    ++ POP_ORW
    ++ MATCH_MP_TAC SEQ_SUB
    ++ RW_TAC std_ss[]
    >> (RW_TAC std_ss[SEQ_CONST])
-   >> ((`((\t. FST  h'/ (SND h' + FST h') * exp (-(SND h'  + FST h') * &t)) --> 0) = ((\t. (\t. FST h' / (SND h' + FST h'))t * (\t. exp (-(SND h' + FST h') * &t))t) --> ((FST h' / (SND h' + FST h')) *0))` by RW_TAC real_ss[])
+   >> ((`(seq$--> (\t. FST  h'/ (SND h' + FST h') * exp (-(SND h'  + FST h') * &t)) 0) = 
+        (seq$--> (\t. (\t. FST h' / (SND h' + FST h'))t * (\t. exp (-(SND h' + FST h') * &t))t) ((FST h' / (SND h' + FST h')) *0))`
+          by RW_TAC real_ss[])
       ++ POP_ORW
       ++ MATCH_MP_TAC SEQ_MUL
       ++ RW_TAC real_ss[SEQ_CONST]
@@ -1187,16 +1209,20 @@ GEN_TAC
    ++ RW_TAC std_ss[SEQ_CONST]
    ++ FULL_SIMP_TAC list_ss[inst_unavail_exp_list_def,inst_unavail_exp_def]
    ++ REWRITE_TAC[steady_state_unavail_def]
-   ++ (`((\t.
+   ++ (`(seq$--> (\t.
      FST (h':real#real) / (SND h' + FST h') -
-     FST h' / (SND h' + FST h') * exp (-(SND h' + FST h') * &t))--> (FST h' / (SND h' + FST h'))) = ((\t.
+     FST h' / (SND h' + FST h') * exp (-(SND h' + FST h') * &t)) (FST h' / (SND h' + FST h'))) =
+     (seq$--> (\t.
      (\t. FST h' / (SND  h'+ FST h')) t -
-     (\t. FST h' / (SND h' + FST h') * exp (-(SND h' + FST h') * &t))t)--> (FST h' / (SND h' + FST h') - 0))` by RW_TAC real_ss[])
+     (\t. FST h' / (SND h' + FST h') * exp (-(SND h' + FST h') * &t))t) (FST h' / (SND h' + FST h') - 0))` 
+         by RW_TAC real_ss[])
    ++ POP_ORW
    ++ MATCH_MP_TAC SEQ_SUB
    ++ RW_TAC std_ss[]
    >> (RW_TAC std_ss[SEQ_CONST])
-   >> ((`((\t. FST  h'/ (SND h' + FST h') * exp (-(SND h'  + FST h') * &t)) --> 0) = ((\t. (\t. FST h' / (SND h' + FST h'))t * (\t. exp (-(SND h' + FST h') * &t))t) --> ((FST h' / (SND h' + FST h')) *0))` by RW_TAC real_ss[])
+   >> ((`(seq$--> (\t. FST  h'/ (SND h' + FST h') * exp (-(SND h'  + FST h') * &t)) 0) =
+        (seq$--> (\t. (\t. FST h' / (SND h' + FST h'))t * (\t. exp (-(SND h' + FST h') * &t))t) ((FST h' / (SND h' + FST h')) *0))`
+                 by RW_TAC real_ss[])
       ++ POP_ORW
       ++ MATCH_MP_TAC SEQ_MUL
       ++ RW_TAC real_ss[SEQ_CONST]
@@ -1363,16 +1389,20 @@ GEN_TAC
       ++ POP_ORW
       ++ FULL_SIMP_TAC list_ss[inst_avail_exp_list2_def,inst_avail_exp3_def]
       ++ RW_TAC std_ss[steady_state_avail_def]
-      ++ (`((\t.
+      ++ (`(seq$--> (\t.
      SND (h':real#real) / (SND h' + FST h') +
-     FST h' / (SND h' + FST h') * exp (-(SND h' + FST h') * &t))--> (SND h' / (SND h' + FST h'))) = ((\t.
+     FST h' / (SND h' + FST h') * exp (-(SND h' + FST h') * &t)) (SND h' / (SND h' + FST h'))) =
+     (seq$--> (\t.
      (\t. SND h' / (SND  h'+ FST h')) t +
-     (\t. FST h' / (SND h' + FST h') * exp (-(SND h' + FST h') * &t))t)--> (SND h' / (SND h' + FST h') + 0))` by RW_TAC real_ss[])
+     (\t. FST h' / (SND h' + FST h') * exp (-(SND h' + FST h') * &t))t) (SND h' / (SND h' + FST h') + 0))` 
+            by RW_TAC real_ss[])
    ++ POP_ORW
    ++ MATCH_MP_TAC SEQ_ADD
    ++ RW_TAC std_ss[]
    >> (RW_TAC std_ss[SEQ_CONST])
-   >> ((`((\t. FST  h'/ (SND h' + FST h') * exp (-(SND h'  + FST h') * &t)) --> 0) = ((\t. (\t. FST h' / (SND h' + FST h'))t * (\t. exp (-(SND h' + FST h') * &t))t) --> ((FST h' / (SND h' + FST h')) *0))` by RW_TAC real_ss[])
+   >> ((`(seq$--> (\t. FST  h'/ (SND h' + FST h') * exp (-(SND h'  + FST h') * &t)) 0) =
+        (seq$--> (\t. (\t. FST h' / (SND h' + FST h'))t * (\t. exp (-(SND h' + FST h') * &t))t) ((FST h' / (SND h' + FST h')) *0))` 
+          by RW_TAC real_ss[])
       ++ POP_ORW
       ++ MATCH_MP_TAC SEQ_MUL
       ++ RW_TAC real_ss[SEQ_CONST]
@@ -1473,16 +1503,20 @@ val inst_XOR_tends_steady = store_thm("inst_XOR_tends_steadty",
 RW_TAC std_ss[]
 ++ FULL_SIMP_TAC std_ss[inst_unavail_exp_def]
      ++ RW_TAC std_ss[steady_state_unavail_def]
-     ++ (`((\t.
+     ++ (`(seq$--> (\t.
      FST (m1:real#real) / (SND m1 + FST m1) -
-     FST m1 / (SND m1 + FST m1) * exp (-(SND m1 + FST m1) * &t))--> (FST m1 / (SND m1 + FST m1))) = ((\t.
+     FST m1 / (SND m1 + FST m1) * exp (-(SND m1 + FST m1) * &t)) (FST m1 / (SND m1 + FST m1))) =
+    (seq$--> (\t.
      (\t. FST m1 / (SND  m1+ FST m1)) t -
-     (\t. FST m1 / (SND m1 + FST m1) * exp (-(SND m1 + FST m1) * &t))t)--> (FST m1 / (SND m1 + FST m1) - 0))` by RW_TAC real_ss[])
+     (\t. FST m1 / (SND m1 + FST m1) * exp (-(SND m1 + FST m1) * &t))t) (FST m1 / (SND m1 + FST m1) - 0))` 
+           by RW_TAC real_ss[])
    ++ POP_ORW
    ++ MATCH_MP_TAC SEQ_SUB
    ++ RW_TAC std_ss[]
    >> (RW_TAC std_ss[SEQ_CONST])
-   ++ (`((\t. FST  (m1:real#real) / (SND m1 + FST m1) * exp (-(SND m1  + FST m1) * &t)) --> 0) = ((\t. (\t. FST m1 / (SND m1 + FST m1))t * (\t. exp (-(SND m1 + FST m1) * &t))t) --> ((FST m1 / (SND m1 + FST m1)) *0))` by RW_TAC real_ss[])
+   ++ (`(seq$--> (\t. FST  (m1:real#real) / (SND m1 + FST m1) * exp (-(SND m1  + FST m1) * &t)) 0) = 
+       (seq$--> (\t. (\t. FST m1 / (SND m1 + FST m1))t * (\t. exp (-(SND m1 + FST m1) * &t))t) ((FST m1 / (SND m1 + FST m1)) *0))` 
+         by RW_TAC real_ss[])
       ++ POP_ORW
       ++ MATCH_MP_TAC SEQ_MUL
       ++ RW_TAC real_ss[SEQ_CONST]
@@ -1617,4 +1651,5 @@ RW_TAC std_ss[]
   ++ RW_TAC std_ss[SEQ_CONST]
   ++ MATCH_MP_TAC inst_XOR_tends_steady
   ++ METIS_TAC[]);
+
 val _ = export_theory();

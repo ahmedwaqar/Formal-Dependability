@@ -16,15 +16,15 @@
 (*loadPath := "/home/waqar/Downloads/HOL-Code-thesis/Formal-Dependability" :: !loadPath;*)
 
 (*app load ["arithmeticTheory", "realTheory", "prim_recTheory", "seqTheory",
-          "pred_setTheory","res_quanTheory", "res_quanTools", "listTheory", "probabilityTheory", "numTheory", "dep_rewrite", 
+          "pred_setTheory","res_quanTheory", "res_quanTools", "listTheory", "real_probabilityTheory", "numTheory", "dep_rewrite", 
           "transcTheory", "rich_listTheory", "pairTheory",
           "combinTheory","limTheory","sortingTheory", "realLib", "optionTheory","satTheory",
-          "util_probTheory", "extrealTheory", "measureTheory", "lebesgueTheory","real_sigmaTheory","RBDTheory","FT_deepTheory","VDCTheory","ASN_gatewayTheory"];*)
+          "util_probTheory", "extrealTheory", "real_measureTheory", "real_lebesgueTheory","real_sigmaTheory","RBDTheory","FT_deepTheory","VDCTheory","ASN_gatewayTheory"];*)
 
-open HolKernel Parse boolLib bossLib limTheory arithmeticTheory realTheory prim_recTheory probabilityTheory
+open HolKernel Parse boolLib bossLib limTheory arithmeticTheory realTheory prim_recTheory real_probabilityTheory
      seqTheory pred_setTheory res_quanTheory sortingTheory res_quanTools listTheory transcTheory
      rich_listTheory pairTheory combinTheory realLib  optionTheory dep_rewrite
-      util_probTheory extrealTheory measureTheory lebesgueTheory real_sigmaTheory satTheory numTheory
+      util_probTheory extrealTheory real_measureTheory real_lebesgueTheory real_sigmaTheory satTheory numTheory
       RBDTheory FT_deepTheory VDCTheory ASN_gatewayTheory;
 open HolKernel boolLib bossLib Parse;
 val _ = new_theory "smart_grid";
@@ -72,7 +72,7 @@ val UNIONL_def = Define `(UNIONL [] = {})
 
 val IN_UNIONL = store_thm
 ("IN_UNIONL",
-``!l (v:'a ). v IN UNIONL l = (?s. MEM s l /\ v IN s)``,
+``!l (v:'a ). (v IN UNIONL l) = (?s. MEM s l /\ v IN s)``,
 Induct >> RW_TAC std_ss [UNIONL_def, MEM, NOT_IN_EMPTY]
 ++ RW_TAC std_ss [UNIONL_def, MEM, NOT_IN_EMPTY, IN_UNION]
 ++ PROVE_TAC []);
@@ -86,16 +86,16 @@ IN_UNIONL, IN_DELETE, IN_PREIMAGE, IN_SING, IN_INSERT];
 
 
 fun rewr_ss ths =
-simpLib.++
-(std_ss,
-simpLib.SSFRAG
-{ac = [],
-name = NONE,
-convs = [],
-dprocs = [],
-filter = NONE,
-rewrs = set_rewrs @ elt_rewrs,
-congs = []});
+  simpLib.++
+  (std_ss,
+   simpLib.SSFRAG
+   {ac = [],
+    name = NONE,
+    convs = [],
+    dprocs = [],
+    filter = NONE,
+    rewrs = map (fn th => (NONE, th)) (set_rewrs @ elt_rewrs),
+    congs = []});
 val pset_set_ss = rewr_ss set_rewrs;
 val pset_elt_ss = rewr_ss elt_rewrs;
 val pset_ss = rewr_ss (set_rewrs @ elt_rewrs);
@@ -115,7 +115,7 @@ val not_null_def = Define
 `not_null L = (!x. MEM x L ==> ~NULL x)`;
 (*------------------------------------------------------*)
 val in_events_k_out_n_def = Define 
-`in_events_k_out_n p X n = (\x. PREIMAGE X {Normal(&x)}) IN ((count (SUC n)) -> events p)`;
+`in_events_k_out_n p X n = ((\x. PREIMAGE X {Normal(&x)}) IN ((count (SUC n)) -> events p))`;
 (*------------------------------------------------------*)
 val k_out_n_event_def = Define 
 `k_out_n_event p X k n = PREIMAGE X (BIGUNION {{Normal (&x)} | k <= x /\ x < SUC n}) `;
@@ -537,14 +537,14 @@ val binomial_event_list_def = Define
 (*----------------------------------------------*)
 val binomial_conds_def = Define 
 `binomial_conds p X X1 k n L t  = 
- (k < (SUC n)) /\ 
+ ((k < (SUC n)) /\ 
  (!x.
         x < SUC n ==>
         in_events p (binomial_event_list L x)) /\
 (!x.
         distribution p X {Normal (&x)} =
         &binomial n x * Reliability p X1 t pow x *
-        (1 - Reliability p X1 t) pow (n - x))`;
+        (1 - Reliability p X1 t) pow (n - x)))`;
 (*----------------------------------------------*)
 val K_out_N_struct_list_def = Define 
 `K_out_N_struct_list p L k n = MAP (\a. K_out_N_struct p a k n) L `;
@@ -552,9 +552,9 @@ val K_out_N_struct_list_def = Define
 (*----------------------------------------------*)
 val rbd_conds_def = Define 
 `rbd_conds p L = 
- prob_space p /\
+( prob_space p /\
  in_events p L /\
-  mutual_indep p L `;
+  mutual_indep p L )`;
 
 (*----------------------------------------------*)
 (*val parallel_rbd_indep_k_out_n_rbd = store_thm("parallel_rbd_indep_k_out_n_rbd",
