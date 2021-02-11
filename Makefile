@@ -1,2 +1,11 @@
+.PHONY: all clean
+
+HOLMAKE = /Users/waqarahmed/HOL/bin/Holmake 
+all:
+	$(HOLMAKE)
+
 clean:
-	find . ! -name '*Script.sml' ! -name 'Makefile' ! -name 'README.md' ! -name 'auto_smart_grid.ml' -maxdepth 1 -type f -delete
+	$(HOLMAKE) cleanAll
+	cd RBD/ && $(HOLMAKE) cleanAll && cd ..
+	cd FT/ && $(HOLMAKE)cleanAll && cd ..
+	cd case_studies/ && $(HOLMAKE) cleanAll && cd ..
