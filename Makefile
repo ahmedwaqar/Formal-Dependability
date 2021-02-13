@@ -1,9 +1,16 @@
-.PHONY: all clean
+.PHONY: all RBD FT case_studies clean
 
 HOLMAKE = /Users/waqarahmed/HOL/bin/Holmake 
-all:
+all:    case_studies
 	$(HOLMAKE)
+RBD:
+	cd RBD/ && $(HOLMAKE)
 
+FT:
+	cd FT/ && $(HOLMAKE)
+
+case_studies:
+	cd case_studies/ && $(HOLMAKE)
 clean:
 	$(HOLMAKE) cleanAll
 	cd RBD/ && $(HOLMAKE) cleanAll && cd ..
