@@ -6,9 +6,11 @@ app load
 
 open bossLib metisLib realLib numLib listLib;
 
-app load ["combinTheory","RBDTheory","FT_deepTheory","VDCTheory","smart_gridTheory","ASN_gatewayTheory","realTheory","arithmeticTheory","boolTheory","listTheory"];
+app load ["combinTheory","RBDTheory","FT_deepTheory","VDCTheory",
+"smart_gridTheory","ASN_gatewayTheory","realTheory","arithmeticTheory","boolTheory","listTheory"];
 
-open combinTheory RBDTheory FT_deepTheory VDCTheory smart_gridTheory ASN_gatewayTheory realTheory arithmeticTheory boolTheory listTheory; 
+open combinTheory RBDTheory FT_deepTheory VDCTheory 
+smart_gridTheory ASN_gatewayTheory realTheory arithmeticTheory boolTheory listTheory; 
 
 (*-------------------------------*)
 

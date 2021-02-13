@@ -1,16 +1,18 @@
 
-
+(*---------------------*)
 (*app load ["arithmeticTheory", "realTheory", "prim_recTheory", "seqTheory",
-          "pred_setTheory","res_quanTheory", "res_quanTools", "listTheory", "real_probabilityTheory", "numTheory", "dep_rewrite", 
-          "transcTheory", "rich_listTheory", "pairTheory",
-          "combinTheory","limTheory","sortingTheory", "realLib", "optionTheory","satTheory",
-          "util_probTheory", "extrealTheory", "real_measureTheory", "real_lebesgueTheory","real_sigmaTheory","RBDTheory","FT_deepTheory","VDCTheory","ASN_gatewayTheory"];*)
+          "pred_setTheory","res_quanTheory", "res_quanTools", "listTheory", 
+          "real_probabilityTheory", "numTheory", "dep_rewrite", "transcTheory", 
+          "rich_listTheory", "pairTheory", "combinTheory","limTheory","sortingTheory", 
+          "realLib", "optionTheory","satTheory", "util_probTheory", "extrealTheory", 
+          "real_measureTheory", "real_lebesgueTheory","real_sigmaTheory","RBDTheory",
+          "FT_deepTheory","VDCTheory","ASN_gatewayTheory","extra_pred_setTools"];*)
 
 open HolKernel Parse boolLib bossLib limTheory arithmeticTheory realTheory prim_recTheory real_probabilityTheory
      seqTheory pred_setTheory res_quanTheory sortingTheory res_quanTools listTheory transcTheory
      rich_listTheory pairTheory combinTheory realLib  optionTheory dep_rewrite
       util_probTheory extrealTheory real_measureTheory real_lebesgueTheory real_sigmaTheory satTheory numTheory
-      RBDTheory FT_deepTheory VDCTheory ASN_gatewayTheory;
+      RBDTheory FT_deepTheory VDCTheory ASN_gatewayTheory extra_pred_setTools;
 open HolKernel boolLib bossLib Parse;
 val _ = new_theory "transform_FT_RBD";
 (*------new tactics for set simplification----*)
@@ -35,63 +37,6 @@ val op>> = op THEN1;
 val std_ss' = simpLib.++ (std_ss, boolSimps.ETA_ss);
 val op by = BasicProvers.byA;
 (*---------------------------*)
-fun SET_TAC L =
-    POP_ASSUM_LIST(K ALL_TAC) THEN REPEAT COND_CASES_TAC THEN
-    REWRITE_TAC (append [EXTENSION, SUBSET_DEF, PSUBSET_DEF, DISJOINT_DEF,
-    SING_DEF] L) THEN SIMP_TAC std_ss [NOT_IN_EMPTY, IN_UNIV, IN_UNION,
-    IN_INTER, IN_DIFF, IN_INSERT, IN_DELETE, IN_BIGINTER, IN_BIGUNION,
-    IN_IMAGE, GSPECIFICATION, IN_DEF] THEN METIS_TAC [];
-
-fun SET_RULE tm = prove(tm,SET_TAC []);
-
-
-val set_rewrs
-= [INTER_EMPTY, INTER_UNIV, UNION_EMPTY, UNION_UNIV, DISJOINT_UNION,
-DISJOINT_INSERT, DISJOINT_EMPTY, GSYM DISJOINT_EMPTY_REFL,
-DISJOINT_BIGUNION, INTER_SUBSET, INTER_IDEMPOT, UNION_IDEMPOT,
-SUBSET_UNION];
-
-val UNIONL_def = Define `(UNIONL [] = {})
-/\ (UNIONL (s::ss) = (s:'a ->bool) UNION UNIONL ss)`;
-
-
-val IN_UNIONL = store_thm
-("IN_UNIONL",
-``!l (v:'a ). (v IN UNIONL l) = (?s. MEM s l /\ v IN s)``,
-Induct >> RW_TAC std_ss [UNIONL_def, MEM, NOT_IN_EMPTY]
-++ RW_TAC std_ss [UNIONL_def, MEM, NOT_IN_EMPTY, IN_UNION]
-++ PROVE_TAC []);
-
-
-val elt_rewrs
-= [SUBSET_DEF, IN_COMPL, IN_DIFF, IN_UNIV, NOT_IN_EMPTY, IN_UNION,
-IN_INTER, IN_IMAGE, IN_FUNSET, IN_DFUNSET, GSPECIFICATION,
-DISJOINT_DEF, IN_BIGUNION, IN_BIGINTER, IN_COUNT, IN_o,
-IN_UNIONL, IN_DELETE, IN_PREIMAGE, IN_SING, IN_INSERT];
-
-
-fun rewr_ss ths =
-  simpLib.++
-  (std_ss,
-   simpLib.SSFRAG
-   {ac = [],
-    name = NONE,
-    convs = [],
-    dprocs = [],
-    filter = NONE,
-    rewrs = map (fn th => (NONE, th)) (set_rewrs @ elt_rewrs),
-    congs = []});
-val pset_set_ss = rewr_ss set_rewrs;
-val pset_elt_ss = rewr_ss elt_rewrs;
-val pset_ss = rewr_ss (set_rewrs @ elt_rewrs);
-
-
-fun PSET_TAC ths =
-REPEAT (POP_ASSUM MP_TAC)
-++ RW_TAC pset_set_ss ths
-++ REPEAT (POP_ASSUM MP_TAC)
-++ RW_TAC pset_elt_ss ths;
-
 
 (*--------AND_to_series-------------------*)
 val AND_to_series = store_thm("AND_to_series",
