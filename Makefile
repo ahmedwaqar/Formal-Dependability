@@ -1,6 +1,10 @@
 .PHONY: all RBD FT case_studies clean
 
+# Change HOLMAKE path according to your hol installation
+# Don't forget to change the path for HOLMAKE variable (if defined) in the subdirectories.
+# You'll find Holmakefile in each RBD/ FT/ case_studies/ subdirectories.
 HOLMAKE = /Users/waqarahmed/HOL/bin/Holmake 
+
 all:    case_studies
 	$(HOLMAKE)
 RBD:
