@@ -75,7 +75,7 @@ rel_event p X t = PREIMAGE X {y| Normal t < y} INTER p_space p
 End
 
 
- Definition rel_event_list_def :
+Definition rel_event_list_def :
 rel_event_list p L t =
   MAP (\a. PREIMAGE a {y| Normal t < y} INTER p_space p) L
 End
