@@ -1,4 +1,3 @@
-
 (* ========================================================================= *)
 (* File Name: VDCScript.sml                                                  *)
 (*---------------------------------------------------------------------------*)
@@ -32,30 +31,7 @@ open HolKernel Parse boolLib bossLib limTheory arithmeticTheory realTheory
 
 open HolKernel boolLib bossLib Parse;
 val _ = new_theory "VDC";
-(*------new tactics for set simplification----*)
 (*--------------------*)
-(*infixr 0 ++ << || ORELSEC ## --> THENC;
-infix 1 >> |->;
-fun parse_with_goal t (asms, g) =
-  let
-    val ctxt = free_varsl (g::asms)
-  in
-    Parse.parse_in_context ctxt t
-  end;
-
-val PARSE_TAC = fn tac => fn q => W (tac o parse_with_goal q
-QED
-val Suff = PARSE_TAC SUFF_TAC;
-val POP_ORW = POP_ASSUM (fn thm => ONCE_REWRITE_TAC [thm]
-QED
-val !! = REPEAT;
-val op++ = op THEN;
-val op<< = op THENL;
-val op|| = op ORELSE;
-val op>> = op THEN1;
-val std_ss' = simpLib.++ (std_ss, boolSimps.ETA_ss
-QED
-*)
 val op by = BasicProvers.byA;
 val POP_ORW = POP_ASSUM (fn thm => ONCE_REWRITE_TAC [thm]);
 (*---------------------------*)
@@ -75,7 +51,7 @@ rel_event p X t = PREIMAGE X {y| Normal t < y} INTER p_space p
 End
 
 
- Definition rel_event_list_def :
+Definition rel_event_list_def :
 rel_event_list p L t =
   MAP (\a. PREIMAGE a {y| Normal t < y} INTER p_space p) L
 End
@@ -372,9 +348,10 @@ GEN_TAC
 QED
 (*-----------------------------*)
 Theorem rbd_virtual_cloud_server_alt_form :
-!p t L. prob_space p ==> ((rbd_struct p
-     ((series of (\a. parallel (rbd_list (rel_event_list p a t))))
-        L)) = (rbd_struct p ((series of (\a. parallel (rbd_list a))) (two_dim_rel_event_list p L t))))
+!p t L. prob_space p ==>
+  ((rbd_struct p
+     ((series of (\a. parallel (rbd_list (rel_event_list p a t)))) L)) =
+  (rbd_struct p ((series of (\a. parallel (rbd_list a))) (two_dim_rel_event_list p L t))))
 Proof
 GEN_TAC
 >> GEN_TAC
@@ -448,7 +425,8 @@ RW_TAC std_ss[]
       >> RW_TAC list_ss[gen_rv_list_def,gen_list_suc]
       >> RW_TAC list_ss[rel_event_list_def,list_prob_def,one_minus_list_def,list_prod_def]
       >> RW_TAC real_ss[Reliability_def,distribution_def,CDF_def]
-      >> (`(1 - prob p (PREIMAGE X {y | Normal t < y} INTER p_space p)) =  prob p (p_space p  DIFF (PREIMAGE X {y | Normal t < y} INTER p_space p))` by DEP_REWRITE_TAC[GSYM PROB_COMPL])
+      >> (`(1 - prob p (PREIMAGE X {y | Normal t < y} INTER p_space p)) =
+            prob p (p_space p  DIFF (PREIMAGE X {y | Normal t < y} INTER p_space p))` by DEP_REWRITE_TAC[GSYM PROB_COMPL])
       >- (RW_TAC std_ss[]
          >> FULL_SIMP_TAC std_ss[possibly_def]
          >> FULL_SIMP_TAC list_ss[rel_event_def])
@@ -471,7 +449,10 @@ RW_TAC std_ss[]
 QED
 (*--------rel_prod_tend_0----*)
 Theorem rel_prod_tend_0 :
-!(n:num) p X t . (0 <=  (t:real)) /\ possibly p ((rel_event p X t)) /\   prob_space p ==> (lim (\ (n:num). ( list_prod (one_minus_list (list_prob p (rel_event_list p (gen_rv_list (X:('a -> extreal)) n) t))))) =  (0:real))
+!(n:num) p X t. (0 <=  (t:real)) /\
+      possibly p ((rel_event p X t)) /\
+      prob_space p ==>
+      (lim (\ (n:num). ( list_prod (one_minus_list (list_prob p (rel_event_list p (gen_rv_list (X:('a -> extreal)) n) t))))) =  (0:real))
 Proof
 RW_TAC std_ss[]
 >> MATCH_MP_TAC SEQ_UNIQ
@@ -501,7 +482,8 @@ QED
 Theorem bound_log_inequal :
 ! (a:real) (b:real) (c:real) (e:real)  n.
     (0 <= e) /\ (e < 1) /\ (a < b) /\ (0 < n) /\  (0 <  b) /\
-    (a =  e * b * (1 - (1 - c) pow n)) /\  (0 < c /\ c <  1) ==> (&n > (log_base 10 (1 - a / b) / log_base 10 (1 - c)))
+    (a =  e * b * (1 - (1 - c) pow n)) /\  (0 < c /\ c <  1) ==>
+    (&n > (log_base 10 (1 - a / b) / log_base 10 (1 - c)))
 Proof
 REPEAT GEN_TAC
 >> DISCH_TAC

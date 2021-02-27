@@ -22,30 +22,7 @@ open HolKernel Parse boolLib bossLib limTheory arithmeticTheory realTheory
 fun K_TAC _ = ALL_TAC;
 open HolKernel boolLib bossLib Parse;
 val _ = new_theory "ASN_gateway";
-(*------new tactics for set simplification----*)
 (*--------------------*)
-(*infixr 0 ++ << || ORELSEC ## --> THENC;
-infix 1 >> |->;
-fun parse_with_goal t (asms, g) =
-  let
-    val ctxt = free_varsl (g::asms)
-  in
-    Parse.parse_in_context ctxt t
-  end;
-
-val PARSE_TAC = fn tac => fn q => W (tac o parse_with_goal q
-QED
-val Suff = PARSE_TAC SUFF_TAC;
-val POP_ORW = POP_ASSUM (fn thm => ONCE_REWRITE_TAC [thm]
-QED
-val !! = REPEAT;
-val op++ = op THEN;
-val op<< = op THENL;
-val op|| = op ORELSE;
-val op>> = op THEN1;
-val std_ss' = simpLib.++ (std_ss, boolSimps.ETA_ss
-QED
-*)
 val op by = BasicProvers.byA;
 val POP_ORW = POP_ASSUM (fn thm => ONCE_REWRITE_TAC [thm]);
 (*---------------------------*)
@@ -91,8 +68,8 @@ End
 
 Definition list_sum_def :
 (list_sum [] = 0) /\
-                         ( list_sum (h::t) =
-                         ((h:real) + list_sum(t)))
+( list_sum (h::t) =
+((h:real) + list_sum(t)))
 End
 
 (* ----------------------------------------------------*)
@@ -100,8 +77,7 @@ End
 (* ----------------------------------------------------*)
 Definition exp_distribution_def :
 exp_dist p X l =
-   !x:real. CDF p X (x) = (if (0 <=  x) then 1 -
-                              exp(-l * x) else 0)
+   !x:real. CDF p X (x) = (if (0 <=  x) then 1 - exp(-l * x) else 0)
 End
 (* ------------------------------------------------------------*)
 (* Definition : List of Exponential Distribution Functions     *)
@@ -163,12 +139,12 @@ End
 
 (*=================probability of ASN gateway =====================================*)
 Definition ASN_gateway_FT_def :
-ASN_gateway_FT p t FD AP FF1 D1 D4 D7 D10 E1 E2 E3 E4 E5 E6 E7 E8 E9 E10 E11 E12 E13 
-E14 E15 E16 E17 E18 E19 E20 E21 C5 C6 C7 C8 notshw AL SL PD Others time ED EQ1 EN1 
-EN2 EN3 EN4 human = 
+ASN_gateway_FT p t FD AP FF1 D1 D4 D7 D10 E1 E2 E3 E4 E5 E6 E7 E8 E9 E10 E11 E12 E13
+E14 E15 E16 E17 E18 E19 E20 E21 C5 C6 C7 C8 notshw AL SL PD Others time ED EQ1 EN1
+EN2 EN3 EN4 human =
 FTree p (OR
        [AND (gate_list(fail_event_list p [ED; EQ1] t));
-        OR [AND (gate_list(fail_event_list p [EN1; EN2; EN3; EN4] t)); 
+        OR [AND (gate_list(fail_event_list p [EN1; EN2; EN3; EN4] t));
             atomic (fail_event p human t) ];
         Internal_FT p t FD AP FF1 D1 D4 D7 D10 E1 E2 E3 E4 E5
           E6 E7 E8 E9 E10 E11 E12 E13 E14 E15 E16 E17 E18 E19 E20 E21 C5
@@ -313,7 +289,7 @@ Theorem B1_FT_lemma4 :
        (list_prod_rel p
           (list_fail_event_list p
              [[D1]; [D4]; [E3]; [E4]; [E5];
-               [E8]; [E9]; [E10]] t ))) = 
+               [E8]; [E9]; [E10]] t ))) =
 exp
   (-(t * list_sum [C_D1; C_D4; C_E3; C_E4; C_E5; C_E8; C_E9; C_E10])))
 Proof
@@ -343,17 +319,20 @@ Theorem A_FT_lemma1 :
             [E11; E21]; [E12; E21]; [E13]; [E14]; [E15]; [E16; E21];
             [E17; E21]; [E18]; [E19]; [E20]; [C5; C8]; [C6; C8];
             [C7; C8]; [notshw]; [AL; time]; [SL; time]; [PD; time];
-            [Others; time]] t))) = list_prod
+            [Others; time]] t))) =
+list_prod
   (one_minus_list
      (list_prod_rel p
         (list_fail_event_list p
            [[D1]; [D4]; [E1; E21]; [E2; E21]; [E3]; [E4]; [E5];
-            [E6; E21]; [E7; E21]; [E8]; [E9]; [E10]] t))) * list_prod
+            [E6; E21]; [E7; E21]; [E8]; [E9]; [E10]] t))) *
+list_prod
   (one_minus_list
      (list_prod_rel p
         (list_fail_event_list p [[D7]; [D10];
             [E11; E21]; [E12; E21]; [E13]; [E14]; [E15]; [E16; E21];
-            [E17; E21]; [E18]; [E19]; [E20]] t ))) * list_prod
+            [E17; E21]; [E18]; [E19]; [E20]] t ))) *
+list_prod
   (one_minus_list
      (list_prod_rel p
         (list_fail_event_list p [[C5; C8]; [C6; C8];
@@ -388,7 +367,8 @@ list_prod
   (one_minus_list
      (list_prod_rel p
         (list_fail_event_list p
-           [[FD; FF1]; [FF1; AP]] t))) * list_prod
+           [[FD; FF1]; [FF1; AP]] t))) *
+list_prod
   (one_minus_list
      (list_prod_rel p
         (list_fail_event_list p [[D1]; [D4]; [E1; E21]; [E2; E21];
@@ -398,7 +378,6 @@ list_prod
             [C6; C8]; [C7; C8]; [notshw]; [AL; time]; [SL; time];
             [PD; time]; [Others; time]] t)))
 Proof
-
 RW_TAC list_ss[list_fail_event_list_def,fail_event_list_def,fail_event_def,list_prod_rel_def,one_minus_list_def,list_prob_def,list_prod_def]
 >> RW_TAC real_ss[REAL_MUL_ASSOC]
 QED
@@ -432,7 +411,7 @@ Theorem ASN_gateway_lemma1 :
 !p t FD AP FF1 D1 D4 D7 D10 E1 E2 E3 E4 E5 E6 E7 E8 E9 E10 E11 E12
       E13 E14 E15 E16 E17 E18 E19 E20 E21 C5 C6 C7 C8 notshw AL SL PD
       Others time ED EQ1 EN1 EN2 EN3 EN4 human.
-      (list_prod
+(list_prod
   (one_minus_list
      (list_prod_rel p
         (list_fail_event_list p
@@ -442,11 +421,13 @@ Theorem ASN_gateway_lemma1 :
             [E11; E21]; [E12; E21]; [E13]; [E14]; [E15]; [E16; E21];
             [E17; E21]; [E18]; [E19]; [E20]; [C5; C8]; [C6; C8];
             [C7; C8]; [notshw]; [AL; time]; [SL; time]; [PD; time];
-            [Others; time]] t))) = list_prod
+            [Others; time]] t))) =
+list_prod
   (one_minus_list
      (list_prod_rel p
         (list_fail_event_list p
-           [[ED; EQ1]; [EN1; EN2; EN3; EN4]; [human]] t))) *  list_prod
+           [[ED; EQ1]; [EN1; EN2; EN3; EN4]; [human]] t))) *
+list_prod
   (one_minus_list
      (list_prod_rel p
         (list_fail_event_list p [[FD; FF1];
@@ -469,7 +450,8 @@ Theorem ASN_gateway_lemma2 :
        (FLAT
           [[C_ED;C_EQ1];[C_EN1;C_EN2;C_EN3;C_EN4];[C_human]])
        (FLAT
-          [[ED;EQ1];[EN1;EN2;EN3;EN4];[human]])) ==> (list_prod
+          [[ED;EQ1];[EN1;EN2;EN3;EN4];[human]])) ==>
+(list_prod
   (one_minus_list
      (list_prod_rel p
         (list_fail_event_list p
@@ -491,28 +473,31 @@ Theorem ASN_gateway_lem5 :
      (list_prod_rel p
         (list_fail_event_list p
            [[C5; C8]; [C6; C8]; [C7; C8]; [notshw]; [AL; time];
-            [SL; time]; [PD; time]; [Others; time]] t))) = list_prod
+            [SL; time]; [PD; time]; [Others; time]] t))) =
+list_prod
   (one_minus_list
      (list_prod_rel p
         (list_fail_event_list p
-           [[C5; C8]; [C6; C8]; [C7; C8]] t))) *  list_prod
+           [[C5; C8]; [C6; C8]; [C7; C8]] t))) *
+list_prod
   (one_minus_list
      (list_prod_rel p
         (list_fail_event_list p [[notshw]; [AL; time];
             [SL; time]; [PD; time]; [Others; time]] t))))
 Proof
-
 RW_TAC list_ss[list_fail_event_list_def,fail_event_list_def,fail_event_def,list_prod_rel_def,one_minus_list_def,list_prob_def,list_prod_def]
 >> RW_TAC real_ss[REAL_MUL_ASSOC]
 QED
 (*-----------------*)
 Theorem ASN_gateway_lem6 :
 ! p t C5 C6 C7 C8 C_C5 C_C6 C_C7 C_C8.
-(0<= t) /\ prob_space p /\ (list_exp p (FLAT [[C_C5;C_C8]; [C_C6;C_C8]; [C_C7;C_C8]]) (FLAT [[C5;C8]; [C6;C8]; [C7;C8]])) ==> (list_prod
+(0<= t) /\ prob_space p /\ (list_exp p (FLAT [[C_C5;C_C8]; [C_C6;C_C8]; [C_C7;C_C8]]) (FLAT [[C5;C8]; [C6;C8]; [C7;C8]])) ==>
+(list_prod
        (one_minus_list
           (list_prod_rel p
              (list_fail_event_list p [[C5; C8]; [C6; C8]; [C7; C8]]
-                t))) = list_prod
+                t))) =
+list_prod
        (one_minus_exp_prod t
           [[C_C5;C_C8]; [C_C6;C_C8]; [C_C7;C_C8]]))
 Proof
