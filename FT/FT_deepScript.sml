@@ -31,30 +31,7 @@ open HolKernel Parse boolLib bossLib limTheory arithmeticTheory realTheory
 
 open HolKernel boolLib bossLib Parse;
 val _ = new_theory "FT_deep";
-(*------new tactics for set simplification----*)
 (*--------------------*)
-(*infixr 0 ++ << || ORELSEC ## --> THENC;
-infix 1 >> |->;
-fun parse_with_goal t (asms, g) =
-  let
-    val ctxt = free_varsl (g::asms)
-  in
-    Parse.parse_in_context ctxt t
-  end;
-
-val PARSE_TAC = fn tac => fn q => W (tac o parse_with_goal q
-QED
-val Suff = PARSE_TAC SUFF_TAC;
-val POP_ORW = POP_ASSUM (fn thm => ONCE_REWRITE_TAC [thm]
-QED
-val !! = REPEAT;
-val op++ = op THEN;
-val op<< = op THENL;
-val op|| = op ORELSE;
-val op>> = op THEN1;
-val std_ss' = simpLib.++ (std_ss, boolSimps.ETA_ss
-QED
-*)
 val op by = BasicProvers.byA;
 val POP_ORW = POP_ASSUM (fn thm => ONCE_REWRITE_TAC [thm]);
 (*---------------------------*)
@@ -456,8 +433,9 @@ QED
 (*----------------OR_lem4----------------------*)
 Theorem OR_lem4 :
 !p L. (!x. MEM x L ==> x IN events p) /\
-prob_space p /\
-  ((FTree p (OR (gate_list L))) IN events p) ==> ((FTree p (OR (gate_list L))) SUBSET p_space p )
+      prob_space p /\
+      ((FTree p (OR (gate_list L))) IN events p) ==>
+      ((FTree p (OR (gate_list L))) SUBSET p_space p )
 Proof
 GEN_TAC
 >> Induct
@@ -488,15 +466,17 @@ QED
 (*-----------------OR_lem6---------------------*)
 
 Theorem OR_lem6 :
-!p x L.  prob_space p /\ (!x'. MEM x' L ==> x' IN events p)                                ==>
-(prob p (FTree p (OR (gate_list L))) = 1 - prob p (FTree p (AND (gate_list (compl_list p ( L))))))
+!p x L.  prob_space p /\ (!x'. MEM x' L ==> x' IN events p) ==>
+        (prob p (FTree p (OR (gate_list L))) =
+        1 - prob p (FTree p (AND (gate_list (compl_list p ( L))))))
 Proof
 RW_TAC std_ss[]
 >> (`FTree p (OR (gate_list L)) SUBSET p_space p` by MATCH_MP_TAC  OR_lem4)
 >- (RW_TAC std_ss[]
    >> MATCH_MP_TAC OR_lem3
    >> RW_TAC std_ss[])
->>  (`(1 - prob p (FTree p (AND (gate_list (compl_list p L)))))  = (prob p (p_space p DIFF (FTree p (AND (gate_list (compl_list p L))))))` by MATCH_MP_TAC EQ_SYM)
+>>  (`(1 - prob p (FTree p (AND (gate_list (compl_list p L)))))  =
+      (prob p (p_space p DIFF (FTree p (AND (gate_list (compl_list p L))))))` by MATCH_MP_TAC EQ_SYM)
 >- (MATCH_MP_TAC PROB_COMPL
    >>  RW_TAC std_ss[]
    >>  RW_TAC std_ss[OR_lem5]
@@ -511,7 +491,8 @@ RW_TAC std_ss[]
 QED
 (*--------------OR_lem7----------------------*)
 Theorem OR_lem7 :
-!p (L). prob_space p /\ (!x'. MEM x' L ==> x'  IN  events p )   ==> (one_minus_list (list_prob p L) = list_prob p ( compl_list p L))
+!p (L). prob_space p /\ (!x'. MEM x' L ==> x'  IN  events p ) ==>
+        (one_minus_list (list_prob p L) = list_prob p ( compl_list p L))
 Proof
 RW_TAC std_ss[]
 >> Induct_on `L`
@@ -535,11 +516,13 @@ QED
 (*-----------OR_gate_thm------*)
 (*------------------------------------*)
 Theorem OR_gate_thm :
-!p L . ~NULL L /\ (!x'. MEM x' L ==> x' IN events p) /\ prob_space p  /\ mutual_indep p L  ==> (prob p (FTree p (OR (gate_list L))) =
+!p L . ~NULL L /\ (!x'. MEM x' L ==> x' IN events p) /\ prob_space p  /\ mutual_indep p L  ==>
+      (prob p (FTree p (OR (gate_list L))) =
        1 -  list_prod (one_minus_list (list_prob p L)))
 Proof
 RW_TAC real_ss[OR_lem6,real_sub,REAL_EQ_LADD,REAL_EQ_NEG]
->> (`prob p (FTree p (AND (gate_list (compl_list p L)))) = list_prod (list_prob p (compl_list p L))` by MATCH_MP_TAC AND_gate_thm)
+>> (`prob p (FTree p (AND (gate_list (compl_list p L)))) =
+      list_prod (list_prob p (compl_list p L))` by MATCH_MP_TAC AND_gate_thm)
 >- (RW_TAC std_ss[]
    >- (RW_TAC std_ss[GSYM LENGTH_NOT_NULL]
        >> RW_TAC std_ss[compl_list_def,LENGTH_MAP]
@@ -627,7 +610,8 @@ End
 
 (*-------------------*)
 Theorem NOR_gate_thm :
-!p L . ~NULL L /\ (!x'. MEM x' L ==> x' IN events p) /\ prob_space p  /\ mutual_indep p L  ==> (prob p (NOR_FT_gate p L) =
+!p L . ~NULL L /\ (!x'. MEM x' L ==> x' IN events p) /\ prob_space p  /\ mutual_indep p L  ==>
+       (prob p (NOR_FT_gate p L) =
        list_prod (one_minus_list (list_prob p L)))
 Proof
 RW_TAC std_ss[NOR_FT_gate_def]
@@ -656,14 +640,15 @@ SRW_TAC[][COMPL_DEF,EXTENSION,GSPECIFICATION]
 QED
 (*----------------------PROB_COMPL_SUBSET----------------------------------*)
 Theorem PROB_COMPL_SUBSET :
-!p s t. prob_space p /\ s IN events p /\ t IN events p /\ t SUBSET s ==> (prob p (s DIFF t) = prob p s - prob p t)
+!p s t. prob_space p /\ s IN events p /\ t IN events p /\ t SUBSET s ==>
+        (prob p (s DIFF t) = prob p s - prob p t)
 Proof
 METIS_TAC [MEASURE_COMPL_SUBSET,prob_space_def,events_def,prob_def,p_space_def]
 QED
 (*--------------------PROB_XOR_GATE------------------------------------*)
 Theorem PROB_XOR_GATE :
 !A B p .  prob_space p /\ A IN events p /\ B IN events p ==>
-(prob p  ((COMPL A INTER B) UNION (COMPL B INTER A)) = prob p A + prob p B - 2 *prob p (A INTER B))
+          (prob p  ((COMPL A INTER B) UNION (COMPL B INTER A)) = prob p A + prob p B - 2 *prob p (A INTER B))
 Proof
 RW_TAC std_ss[xor_gate_temp1]
 >> MP_TAC(Q.ISPECL [`p:('a -> bool) # (('a -> bool) -> bool) # (('a -> bool) -> real)`, `A DIFF B:'a->bool`,`(B DIFF A):'a->bool`,

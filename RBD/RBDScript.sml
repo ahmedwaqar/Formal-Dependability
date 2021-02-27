@@ -1,4 +1,3 @@
-
 (* ========================================================================= *)
 (* File Name: RBDScript.sml                                                  *)
 (*---------------------------------------------------------------------------*)
@@ -33,30 +32,7 @@ open HolKernel Parse boolLib bossLib limTheory arithmeticTheory realTheory prim_
      cardinalTheory extra_pred_setTools;
 open HolKernel boolLib bossLib Parse;
 val _ = new_theory "RBD";
-(*------new tactics for set simplification----*)
 (*--------------------*)
-(*infixr 0 ++ << || ORELSEC ## --> THENC;
-infix 1 >> |->;
-fun parse_with_goal t (asms, g) =
-  let
-    val ctxt = free_varsl (g::asms)
-  in
-    Parse.parse_in_context ctxt t
-  end;
-
-val PARSE_TAC = fn tac => fn q => W (tac o parse_with_goal q
-QED
-val Suff = PARSE_TAC SUFF_TAC;
-val POP_ORW = POP_ASSUM (fn thm => ONCE_REWRITE_TAC [thm]
-QED
-val !! = REPEAT;
-val op++ = op THEN;
-val op<< = op THENL;
-val op|| = op ORELSE;
-val op>> = op THEN1;
-val std_ss' = simpLib.++ (std_ss, boolSimps.ETA_ss
-QED
-*)
 val op by = BasicProvers.byA;
 val POP_ORW = POP_ASSUM (fn thm => ONCE_REWRITE_TAC [thm]);
 (*---------------------------*)
@@ -74,7 +50,6 @@ val _ = Hol_datatype` rbd = series of rbd list| parallel of rbd list | atomic of
 (*----------------------------------------------*)
 
 Definition rbd_struct_def :
-
     (rbd_struct p ( atomic a)  = a) /\
     (rbd_struct p (series []) = p_space p) /\
     (rbd_struct p (series (x::xs)) =
@@ -82,13 +57,11 @@ Definition rbd_struct_def :
      (rbd_struct p (parallel []) = {} ) /\
      (rbd_struct p (parallel (x::xs)) =
       rbd_struct p (x:'a  rbd) UNION rbd_struct p (parallel (xs)))
-
 End
 
 (*---rbd list from atomic events---*)
 
 Definition rbd_list_def :
-
     (rbd_list [] = []) /\
     (rbd_list (h::t) =  atomic h::rbd_list t)
 End
@@ -102,7 +75,7 @@ val of_DEF = Q.new_infixr_definition("of_DEF", `$of g f = (g o (\a. MAP f a))`, 
 
 Definition big_inter_def :
  (big_inter p []= p_space p) /\
-          ( big_inter p (h ::t)  = ( h  INTER big_inter p t ))
+  ( big_inter p (h ::t)  = ( h  INTER big_inter p t ))
 End
 (* --------------------- *)
 (*      list_prod        *)
@@ -110,7 +83,7 @@ End
 
 Definition list_prod_def :
 (list_prod ([]) =  1:real ) /\
-                   ( list_prod (h :: t)  =   (h:real) * (list_prod t ))
+ ( list_prod (h :: t)  =   (h:real) * (list_prod t ))
 End
 
 (* --------------------------- *)
@@ -118,7 +91,7 @@ End
 (* --------------------------- *)
 Definition list_prob_def :
  (list_prob p [] = []) /\
-                 (list_prob p (h::t) =  prob p (h) :: list_prob p t )
+ (list_prob p (h::t) =  prob p (h) :: list_prob p t )
 End
 
 (* --------------------------------------- *)
@@ -141,7 +114,7 @@ End
 (* --------------------------------------------- *)
 Definition one_minus_list_def :
 (one_minus_list [] = []) /\
-                    ( one_minus_list (h::t) = (1 - (h:real)):: one_minus_list t)
+( one_minus_list (h::t) = (1 - (h:real)):: one_minus_list t)
 End
 
 (* ----------------------------------------- *)
@@ -374,7 +347,9 @@ QED
 
 (*--------prob_B-------------------*)
 Theorem prob_B :
-!p a b . prob_space p /\  (a IN events p /\  b IN events p)  ==> ( prob p b = prob p ( a   INTER b) + prob p (compl_pspace p a  INTER b ))
+!p a b.
+  prob_space p /\  (a IN events p /\  b IN events p)  ==>
+  ( prob p b = prob p ( a   INTER b) + prob p (compl_pspace p a  INTER b ))
 Proof
 RW_TAC std_ss[] THEN
 (`(a INTER b)  UNION ((compl_pspace p a) INTER (b )) = b` by (ALL_TAC)) THENL[
@@ -391,7 +366,8 @@ RW_TAC std_ss[] THEN
          ONCE_REWRITE_TAC[INTER_COMM] THEN
          MATCH_MP_TAC INTER_PSPACE THEN
          RW_TAC std_ss[]],
-(` prob p (a INTER b) + prob p (compl_pspace p a INTER b) = prob p ( a INTER b UNION (compl_pspace p a INTER b))` by (MATCH_MP_TAC EQ_SYM)) THENL[
+(` prob p (a INTER b) + prob p (compl_pspace p a INTER b) =
+  prob p ( a INTER b UNION (compl_pspace p a INTER b))` by (MATCH_MP_TAC EQ_SYM)) THENL[
    MATCH_MP_TAC PROB_ADDITIVE THEN
    RW_TAC std_ss[] THENL[
          MATCH_MP_TAC EVENTS_INTER THEN
@@ -403,7 +379,8 @@ RW_TAC std_ss[] THEN
          RW_TAC std_ss[DISJOINT_DEF] THEN
          RW_TAC std_ss[INTER_COMM] THEN
          RW_TAC std_ss[INTER_ASSOC] THEN
-         (`(a INTER b INTER b INTER compl_pspace p a) = (a INTER compl_pspace p a) INTER b` by (SRW_TAC[][INTER_DEF,EXTENSION,GSPECIFICATION])) THENL[
+         (`(a INTER b INTER b INTER compl_pspace p a) =
+            (a INTER compl_pspace p a) INTER b` by (SRW_TAC[][INTER_DEF,EXTENSION,GSPECIFICATION])) THENL[
               EQ_TAC THENL[
                  RW_TAC std_ss[],
                  RW_TAC std_ss[]],
@@ -423,11 +400,13 @@ QED
 
 (*-------Prob_Incl_excl--------------------*)
 Theorem Prob_Incl_excl :
-!p a b. prob_space p /\ a IN events p /\ b IN events p ==> ( prob p ((a ) UNION (b )) = prob p (a) + prob p (b) - prob p ((a) INTER (b)))
+!p a b. prob_space p /\ a IN events p /\ b IN events p ==>
+        ( prob p ((a ) UNION (b )) = prob p (a) + prob p (b) - prob p ((a) INTER (b)))
 Proof
 REPEAT GEN_TAC THEN
 RW_TAC std_ss[] THEN
-(` prob p (a UNION (compl_pspace p a  INTER b)) = prob p (a ) + prob p (compl_pspace p a INTER b)` by  (MATCH_MP_TAC PROB_ADDITIVE)) THENL[
+(` prob p (a UNION (compl_pspace p a  INTER b)) =
+   prob p (a ) + prob p (compl_pspace p a INTER b)` by  (MATCH_MP_TAC PROB_ADDITIVE)) THENL[
   RW_TAC std_ss[] THENL[
       MATCH_MP_TAC EVENTS_INTER THEN
       RW_TAC std_ss[compl_pspace_def] THEN
@@ -468,7 +447,8 @@ REAL_ARITH_TAC]
 QED
 (*----------prob_compl_subset-----------------*)
 Theorem prob_compl_subset :
-!p s t. prob_space p /\ s IN events p /\ t IN events p /\ t SUBSET s ==> (prob p (s DIFF t) = prob p s - prob p t)
+!p s t. prob_space p /\ s IN events p /\ t IN events p /\ t SUBSET s ==>
+        (prob p (s DIFF t) = prob p s - prob p t)
 Proof
 METIS_TAC [MEASURE_COMPL_SUBSET,prob_space_def,events_def,prob_def,p_space_def]
 QED
@@ -543,7 +523,9 @@ QED
 
 (*-----------prob_indep_compl_event_big_inter_list-----------------*)
 Theorem prob_indep_compl_event_big_inter_list :
-!L1 n h p.  mutual_indep p (h::L1) /\ (!x.  MEM x (h::L1)  ==>  x  IN  events p) /\ ( prob_space p) /\ (LENGTH L1 = 1) ==> ( prob p ((p_space p DIFF h) INTER  big_inter p (TAKE n (compl_list p L1))) =
+!L1 n h p.  mutual_indep p (h::L1) /\ (!x.  MEM x (h::L1)  ==>  x  IN  events p) /\
+            ( prob_space p) /\ (LENGTH L1 = 1) ==>
+            ( prob p ((p_space p DIFF h) INTER  big_inter p (TAKE n (compl_list p L1))) =
 prob p (p_space p DIFF (h:'a ->bool)) *
 list_prod (list_prob p (TAKE n (compl_list p L1))))
 Proof
@@ -557,19 +539,21 @@ THEN1(RW_TAC list_ss[])
       THEN RW_TAC std_ss[LENGTH,LENGTH_NIL]
       THEN RW_TAC real_ss[compl_list_def,MAP,TAKE_def,big_inter_def,list_prob_def,list_prod_def]
       THEN  RW_TAC std_ss[DIFF_INTER,INTER_IDEMPOT]
-      THEN (`(p_space p INTER  (p_space p DIFF ((h':('a ->bool))))) = ((p_space p DIFF (h':('a ->bool)))) ` by (MATCH_MP_TAC INTER_PSPACE))
+      THEN (`(p_space p INTER  (p_space p DIFF ((h':('a ->bool))))) =
+            ((p_space p DIFF (h':('a ->bool)))) ` by (MATCH_MP_TAC INTER_PSPACE))
       THEN1(RW_TAC std_ss[]
        THEN MATCH_MP_TAC EVENTS_DIFF
        THEN RW_TAC std_ss[EVENTS_SPACE]
        THEN FULL_SIMP_TAC list_ss[])
       THEN ONCE_ASM_REWRITE_TAC[] THEN POP_ASSUM (K ALL_TAC)
       THEN RW_TAC std_ss[GSYM DIFF_UNION]
-      THEN (`prob p (p_space p DIFF (h'  UNION  h)) = 1 - prob p ((((h':('a ->bool)))  UNION  h)) `by (MATCH_MP_TAC PROB_COMPL))
+      THEN (`prob p (p_space p DIFF (h'  UNION  h)) =
+            1 - prob p ((((h':('a ->bool)))  UNION  h)) `by (MATCH_MP_TAC PROB_COMPL))
        THEN1 (FULL_SIMP_TAC list_ss[EVENTS_UNION])
       THEN ONCE_ASM_REWRITE_TAC[] THEN POP_ASSUM (K ALL_TAC)
       THEN (`prob p ((h':('a ->bool))  UNION  h) =
- prob p h' + prob p ((h:('a ->bool))) -
-      prob p (h' INTER  h) ` by (MATCH_MP_TAC Prob_Incl_excl))
+             prob p h' + prob p ((h:('a ->bool))) -
+              prob p (h' INTER  h) ` by (MATCH_MP_TAC Prob_Incl_excl))
        THEN1 (FULL_SIMP_TAC list_ss[])
       THEN ONCE_ASM_REWRITE_TAC[] THEN POP_ASSUM (K ALL_TAC)
       THEN FULL_SIMP_TAC std_ss[mutual_indep_def]
@@ -617,7 +601,8 @@ THEN1(RW_TAC real_ss[compl_list_def,MAP,TAKE_def,big_inter_def,list_prob_def,lis
  THEN POP_ASSUM (MP_TAC o Q.SPEC `LENGTH ((Q::L2):('a ->bool)list)`)
  THEN RW_TAC real_ss[]
  THEN FULL_SIMP_TAC list_ss[PERM_REFL,big_inter_def]
- THEN (`(p_space p INTER (Q INTER big_inter p ((L2:('a ->bool)list)))) = (Q INTER big_inter p (L2))` by (MATCH_MP_TAC INTER_PSPACE))
+ THEN (`(p_space p INTER (Q INTER big_inter p ((L2:('a ->bool)list)))) =
+        (Q INTER big_inter p (L2))` by (MATCH_MP_TAC INTER_PSPACE))
  THEN1( RW_TAC std_ss[]
   THEN MATCH_MP_TAC EVENTS_INTER
   THEN RW_TAC std_ss[]
@@ -750,7 +735,8 @@ THEN1( NTAC 5(POP_ASSUM MP_TAC)
  THEN POP_ASSUM (K ALL_TAC)
  THEN FULL_SIMP_TAC std_ss[LENGTH]
  THEN FULL_SIMP_TAC list_ss[])
- THEN (`big_inter p (TAKE n (compl_list p L1)) INTER Q INTER big_inter p L2 INTER p_space p = big_inter p (TAKE n (compl_list p L1)) INTER big_inter p (Q::L2)` by (RW_TAC list_ss[big_inter_def]))
+ THEN (`big_inter p (TAKE n (compl_list p L1)) INTER Q INTER big_inter p L2 INTER p_space p =
+        big_inter p (TAKE n (compl_list p L1)) INTER big_inter p (Q::L2)` by (RW_TAC list_ss[big_inter_def]))
  THEN1( RW_TAC std_ss[GSYM INTER_ASSOC]
   THEN (`big_inter p L2 INTER p_space p =  big_inter p L2` by (ONCE_REWRITE_TAC [INTER_COMM]))
   THEN1(MATCH_MP_TAC INTER_PSPACE
@@ -786,7 +772,8 @@ THEN1( MATCH_MP_TAC mutual_indep_cons_append1
  THEN (` LENGTH (L1 ++ Q::h::L2) =  LENGTH (h::L1 ++ Q::L2)` by (RW_TAC list_ss[]))
  THEN FULL_SIMP_TAC std_ss[]
  THEN POP_ASSUM (K ALL_TAC)
- THEN (`(big_inter p (TAKE n (compl_list p L1)) INTER Q INTER big_inter p L2 INTER h) =(big_inter p (TAKE n (compl_list p L1)) INTER big_inter p (Q::h::L2)) ` by (RW_TAC list_ss[big_inter_def]))
+ THEN (`(big_inter p (TAKE n (compl_list p L1)) INTER Q INTER big_inter p L2 INTER h) =
+        (big_inter p (TAKE n (compl_list p L1)) INTER big_inter p (Q::h::L2)) ` by (RW_TAC list_ss[big_inter_def]))
  THEN1(`(h INTER big_inter p L2) = (big_inter p L2 INTER h)` by (RW_TAC std_ss[INTER_COMM])
  THEN POP_ORW
  THEN RW_TAC std_ss[INTER_ASSOC])
@@ -812,7 +799,10 @@ QED
 
 (*-------------prob_big_inter_compl_list--------------*)
 Theorem prob_big_inter_compl_list :
-!(L1:('a ->bool) list) n p . prob_space p  /\ mutual_indep p (L1) /\ (!x. MEM x (L1) ==> x IN events p ) /\ 1 <=  (LENGTH (L1)) ==> (prob p (big_inter p (TAKE (n)(compl_list p L1) )) =
+!(L1:('a ->bool) list) n p .
+        prob_space p  /\ mutual_indep p (L1) /\ (!x. MEM x (L1) ==> x IN events p ) /\
+        1 <=  (LENGTH (L1)) ==>
+        (prob p (big_inter p (TAKE (n)(compl_list p L1) )) =
         list_prod (list_prob p (TAKE (n)(compl_list p L1) )))
 Proof
 Induct
@@ -825,8 +815,10 @@ Induct
 >> RW_TAC std_ss[parallel_rbd_lem6]
 >> (`prob p
   (big_inter p (TAKE n (compl_list p (L1:('a ->bool) list))) INTER  p_space p DIFF
-   big_inter p (TAKE n (compl_list p L1)) INTER  (h:('a ->bool)) ) = prob p
-  (big_inter p (TAKE n (compl_list p L1)) INTER  p_space p ) - prob p (big_inter p (TAKE n (compl_list p L1)) INTER  h)` by (MATCH_MP_TAC prob_compl_subset))
+   big_inter p (TAKE n (compl_list p L1)) INTER  (h:('a ->bool)) ) =
+   prob p
+    (big_inter p (TAKE n (compl_list p L1)) INTER  p_space p ) -
+  prob p (big_inter p (TAKE n (compl_list p L1)) INTER  h)` by (MATCH_MP_TAC prob_compl_subset))
 >- (RW_TAC std_ss[]
    >- (MATCH_MP_TAC EVENTS_INTER
        >> RW_TAC std_ss[]
@@ -852,7 +844,8 @@ Induct
             >> RW_TAC std_ss[]
             >> FULL_SIMP_TAC list_ss[])
          >> FULL_SIMP_TAC list_ss[])
-   >> (`big_inter p (TAKE n (compl_list p L1)) INTER p_space p =  big_inter p (TAKE n (compl_list p L1))` by (ONCE_REWRITE_TAC [INTER_COMM]))
+   >> (`big_inter p (TAKE n (compl_list p L1)) INTER p_space p =
+        big_inter p (TAKE n (compl_list p L1))` by (ONCE_REWRITE_TAC [INTER_COMM]))
    >- (MATCH_MP_TAC INTER_PSPACE
       >> RW_TAC std_ss[]
       >> MATCH_MP_TAC in_events_big_inter
@@ -867,7 +860,8 @@ Induct
    >> POP_ORW
    >> RW_TAC std_ss[INTER_SUBSET])
 >> POP_ORW
->> (`big_inter p (TAKE n (compl_list p L1)) INTER p_space p =  big_inter p (TAKE n (compl_list p L1))` by (ONCE_REWRITE_TAC [INTER_COMM]))
+>> (`big_inter p (TAKE n (compl_list p L1)) INTER p_space p =
+    big_inter p (TAKE n (compl_list p L1))` by (ONCE_REWRITE_TAC [INTER_COMM]))
 >- (MATCH_MP_TAC INTER_PSPACE
    >> RW_TAC std_ss[]
    >> MATCH_MP_TAC in_events_big_inter
@@ -896,7 +890,8 @@ Induct
 >> FULL_SIMP_TAC std_ss[LENGTH,LE_SUC]
 >- (FULL_SIMP_TAC std_ss[]
    >> (`(prob p (big_inter p (TAKE (n)(compl_list p L1) ) INTER  big_inter p ((h::[]) )) =
-        list_prod (list_prob p (TAKE (n)(compl_list p L1) )) * list_prod (list_prob p ((( h::[]):('a ->bool) list) )))` by (MATCH_MP_TAC prob_indep_big_inter1))
+        list_prod (list_prob p (TAKE (n)(compl_list p L1) )) *
+        list_prod (list_prob p ((( h::[]):('a ->bool) list) )))` by (MATCH_MP_TAC prob_indep_big_inter1))
    >- (RW_TAC std_ss[]
       >- (MATCH_MP_TAC mutual_indep_cons_swap
          >> RW_TAC std_ss[])
@@ -1010,7 +1005,8 @@ QED
 (*----------- parallel_lem2---------------*)
 Theorem parallel_lem2 :
 !p  (L:('a  -> bool) list).  prob_space p /\ (!x. MEM x L ==> x IN  events p)  ==>
-         ( rbd_struct p (series (rbd_list (compl_list p L))) = p_space p DIFF (rbd_struct p ( parallel (rbd_list L)) ))
+         ( rbd_struct p (series (rbd_list (compl_list p L))) =
+         p_space p DIFF (rbd_struct p ( parallel (rbd_list L)) ))
 Proof
 GEN_TAC
 >> Induct
@@ -1041,8 +1037,9 @@ QED
 (*----------------parallel_lem4----------------------*)
 Theorem parallel_lem4 :
 !p L. (!x. MEM x L ==> x IN events p) /\
-prob_space p /\
-  ((rbd_struct p (parallel (rbd_list L))) IN events p) ==> ((rbd_struct p (parallel (rbd_list L))) SUBSET p_space p )
+      prob_space p /\
+        ((rbd_struct p (parallel (rbd_list L))) IN events p) ==>
+        ((rbd_struct p (parallel (rbd_list L))) SUBSET p_space p )
 Proof
 GEN_TAC
 >> Induct
@@ -1060,11 +1057,12 @@ GEN_TAC
 >> (`(!x. MEM x L ==> x IN events p)` by (FULL_SIMP_TAC list_ss[]))
 >> FULL_SIMP_TAC std_ss[parallel_lem3]
 QED
+
 (*----------------parallel_lem5----------------------*)
 Theorem parallel_lem5 :
 !p L. rbd_struct p (series (rbd_list L)) = big_inter p L
 Proof
- RW_TAC std_ss[]
+RW_TAC std_ss[]
 >> Induct_on `L`
 >- (RW_TAC list_ss[rbd_list_def,rbd_struct_def,big_inter_def])
 >> RW_TAC list_ss[rbd_list_def,rbd_struct_def,big_inter_def]
@@ -1073,15 +1071,17 @@ QED
 (*-----------------parallel_lem6---------------------*)
 
 Theorem parallel_lem6 :
-!p x L.  prob_space p /\ (!x'. MEM x' L ==> x' IN events p)                                ==>
-(prob p (rbd_struct p (parallel (rbd_list L))) = 1 - prob p (rbd_struct p (series (rbd_list (compl_list p ( L))))))
+!p x L.  prob_space p /\ (!x'. MEM x' L ==> x' IN events p) ==>
+        (prob p (rbd_struct p (parallel (rbd_list L))) =
+        1 - prob p (rbd_struct p (series (rbd_list (compl_list p ( L))))))
 Proof
 RW_TAC std_ss[]
 >> (`rbd_struct p (parallel (rbd_list L)) SUBSET p_space p` by (MATCH_MP_TAC  parallel_lem4))
 >- (RW_TAC std_ss[]
    >> MATCH_MP_TAC parallel_lem3
    >> RW_TAC std_ss[])
->>  (`(1 - prob p (rbd_struct p (series (rbd_list (compl_list p L)))))  = (prob p (p_space p DIFF (rbd_struct p (series (rbd_list (compl_list p L))))))` by (MATCH_MP_TAC EQ_SYM))
+>>  (`(1 - prob p (rbd_struct p (series (rbd_list (compl_list p L)))))  =
+      (prob p (p_space p DIFF (rbd_struct p (series (rbd_list (compl_list p L))))))` by (MATCH_MP_TAC EQ_SYM))
 >- (MATCH_MP_TAC PROB_COMPL
    >>  RW_TAC std_ss[]
    >>  RW_TAC std_ss[parallel_lem5]
@@ -1096,7 +1096,8 @@ RW_TAC std_ss[]
 QED
 (*--------------parallel_lem7----------------------*)
 Theorem parallel_lem7 :
-!p (L). prob_space p /\ (!x'. MEM x' L ==> x'  IN  events p )   ==> (one_minus_list (list_prob p L) = list_prob p ( compl_list p L))
+!p (L). prob_space p /\ (!x'. MEM x' L ==> x'  IN  events p )   ==>
+        (one_minus_list (list_prob p L) = list_prob p ( compl_list p L))
 Proof
 RW_TAC std_ss[]
 >> Induct_on `L`
@@ -1120,11 +1121,13 @@ QED
 (*-----------Parallel_struct_thm------*)
 (*------------------------------------*)
 Theorem parallel_struct_thm :
-!p L . ~NULL L /\ (!x'. MEM x' L ==> x' IN events p) /\ prob_space p  /\ mutual_indep p L  ==> (prob p (rbd_struct p (parallel (rbd_list L))) =
+!p L . ~NULL L /\ (!x'. MEM x' L ==> x' IN events p) /\ prob_space p  /\ mutual_indep p L  ==>
+      (prob p (rbd_struct p (parallel (rbd_list L))) =
        1 -  list_prod (one_minus_list (list_prob p L)))
 Proof
 RW_TAC real_ss[parallel_lem6,real_sub,REAL_EQ_LADD,REAL_EQ_NEG]
->> (`prob p (rbd_struct p (series (rbd_list (compl_list p L)))) = list_prod (list_prob p (compl_list p L))` by (MATCH_MP_TAC series_struct_thm))
+>> (`prob p (rbd_struct p (series (rbd_list (compl_list p L)))) =
+      list_prod (list_prob p (compl_list p L))` by (MATCH_MP_TAC series_struct_thm))
 >- (RW_TAC std_ss[]
    >- (RW_TAC std_ss[GSYM LENGTH_NOT_NULL]
        >> RW_TAC std_ss[compl_list_def,LENGTH_MAP]
@@ -1623,7 +1626,8 @@ QED
 (*-------------------------------------------*)
 
 Theorem in_events_parallel_series :
- !p L. prob_space p /\ (!x. MEM x (FLAT L) ==> x IN events p )==> (rbd_struct p (parallel (MAP (\a. series (rbd_list a)) L)) IN events p)
+ !p L. prob_space p /\ (!x. MEM x (FLAT L) ==> x IN events p )==>
+      (rbd_struct p (parallel (MAP (\a. series (rbd_list a)) L)) IN events p)
 Proof
 RW_TAC std_ss[]
 >> Induct_on `L`
@@ -1643,9 +1647,10 @@ QED
 
 (*-------series_rbd_append----*)
 Theorem series_rbd_append :
-!p h L1. prob_space p /\ (!x. MEM x (h++L1) ==> x IN events p )==> (rbd_struct p (series (rbd_list h)) INTER
-rbd_struct p (series (rbd_list L1)) =
-rbd_struct p (series (rbd_list (h ++ L1))))
+!p h L1. prob_space p /\ (!x. MEM x (h++L1) ==> x IN events p )==>
+        (rbd_struct p (series (rbd_list h)) INTER
+        rbd_struct p (series (rbd_list L1)) =
+        rbd_struct p (series (rbd_list (h ++ L1))))
 Proof
 REPEAT GEN_TAC
 >> Induct_on `h`
@@ -1685,13 +1690,17 @@ QED
 (*----series_rbd_append2----------*)
 
 Theorem series_rbd_append2 :
-!p h L1. prob_space p /\ (!x. MEM x (h++L1) ==> x IN events p ) /\ (~NULL h) /\ (~NULL L1) /\ mutual_indep p (h++L1) ==> (prob p (rbd_struct p (series (rbd_list (h ++ L1)))) = prob p (rbd_struct p (series (rbd_list (h)))) * prob p (rbd_struct p (series (rbd_list (L1)))))
+!p h L1. prob_space p /\ (!x. MEM x (h++L1) ==> x IN events p ) /\
+        (~NULL h) /\ (~NULL L1) /\ mutual_indep p (h++L1) ==>
+        (prob p (rbd_struct p (series (rbd_list (h ++ L1)))) =
+        prob p (rbd_struct p (series (rbd_list (h)))) * prob p (rbd_struct p (series (rbd_list (L1)))))
 Proof
 GEN_TAC
 >> Induct
 >- (RW_TAC list_ss[rbd_list_def, rbd_struct_def])
 >> RW_TAC std_ss[]
->> (`prob p (rbd_struct p (series (rbd_list (h'::h ++ L1))))= list_prod (list_prob p (h'::h ++ L1)) ` by (MATCH_MP_TAC series_struct_thm ))
+>> (`prob p (rbd_struct p (series (rbd_list (h'::h ++ L1))))=
+    list_prod (list_prob p (h'::h ++ L1)) ` by (MATCH_MP_TAC series_struct_thm ))
 >- (RW_TAC list_ss[])
 >> POP_ORW
 >> RW_TAC list_ss[list_prob_def,list_prod_def]
@@ -1768,11 +1777,15 @@ QED
 
 (*----series_rbd_indep_parallel_series_rbd---*)
 Theorem series_rbd_indep_parallel_series_rbd :
-!p L L1. prob_space p /\(!x. MEM x (L1::L) ==> ~NULL x) /\ (!x. MEM x (FLAT ((L1::L):'a  event list list)) ==> x IN events p) /\ mutual_indep p (FLAT (L1::L)) ==> (prob p
-  (rbd_struct p (series (rbd_list L1)) INTER
-   rbd_struct p (parallel (MAP (\a. series (rbd_list a)) L))) =  prob p
-  (rbd_struct p (series (rbd_list L1)))*
-   prob p (rbd_struct p (parallel (MAP (\a. series (rbd_list a)) L))))
+!p L L1. prob_space p /\(!x. MEM x (L1::L) ==> ~NULL x) /\
+        (!x. MEM x (FLAT ((L1::L):'a  event list list)) ==> x IN events p) /\
+        mutual_indep p (FLAT (L1::L)) ==>
+  (prob p
+    (rbd_struct p (series (rbd_list L1)) INTER
+     rbd_struct p (parallel (MAP (\a. series (rbd_list a)) L))) =
+   prob p
+    (rbd_struct p (series (rbd_list L1)))*
+     prob p (rbd_struct p (parallel (MAP (\a. series (rbd_list a)) L))))
 Proof
 GEN_TAC
 >> Induct
@@ -1924,7 +1937,10 @@ QED
 (*-------------------------------------------*)
 
 Theorem Parallel_Series_struct_thm :
-!p L.  (!z. MEM z (L)  ==>  ~NULL z) /\ prob_space p /\ (!x'. MEM x' (FLAT (L)) ==> (x' IN events p)) /\ ( mutual_indep p (FLAT L)) ==> (prob p (rbd_struct p (parallel (MAP (\a. series (rbd_list a)) L))) =
+!p L.  (!z. MEM z (L)  ==>  ~NULL z) /\
+        prob_space p /\ (!x'. MEM x' (FLAT (L)) ==> (x' IN events p)) /\
+        ( mutual_indep p (FLAT L)) ==>
+        (prob p (rbd_struct p (parallel (MAP (\a. series (rbd_list a)) L))) =
         1 -  list_prod (one_minus_list (list_prod_rel  p L) ))
 Proof
 GEN_TAC
@@ -1973,7 +1989,9 @@ QED
 
 (*-------------rel_parallel_series_rbd----------*)
 Theorem rel_parallel_series_rbd :
-!p L.  (!z. MEM z (L)  ==>  ~NULL z) /\ prob_space p /\ (!x'. MEM x' (FLAT (L)) ==> (x' IN events p)) /\ ( mutual_indep p (FLAT L)) ==> (prob p (rbd_struct p ((parallel of (\a. series (rbd_list a))) L)) =
+!p L.  (!z. MEM z (L)  ==>  ~NULL z) /\
+        prob_space p /\ (!x'. MEM x' (FLAT (L)) ==> (x' IN events p)) /\ ( mutual_indep p (FLAT L)) ==>
+        (prob p (rbd_struct p ((parallel of (\a. series (rbd_list a))) L)) =
         1 -  list_prod (one_minus_list (list_prod_rel  p L) ))
 Proof
 RW_TAC list_ss[of_DEF,o_DEF]
@@ -1982,9 +2000,11 @@ RW_TAC list_ss[of_DEF,o_DEF]
 QED
 (*-------------------------------*)
 Theorem one_minus_eq_lemm :
- ! p L. prob_space p ==> (list_prod
+ ! p L. prob_space p ==>
+ (list_prod
   (one_minus_list
-     (MAP (\a. list_prod (one_minus_list (list_prob p a))) L)) = list_prod (MAP (\a. 1 - list_prod (one_minus_list (list_prob p a))) L) )
+     (MAP (\a. list_prod (one_minus_list (list_prob p a))) L)) =
+  list_prod (MAP (\a. 1 - list_prod (one_minus_list (list_prob p a))) L) )
 Proof
 GEN_TAC
 >> Induct
@@ -2006,7 +2026,6 @@ Theorem parallel_series_struct_rbd_v2 :
         1 - (list_prod o (one_minus_list) of
         (\a. list_prod (list_prob p a))) L)
 Proof
-
 RW_TAC std_ss[]
 >> (`1 - list_prod ((one_minus_list of (λa. list_prod (list_prob p a))) L) =
      1 − list_prod (one_minus_list (list_prod_rel p L)) `
@@ -2023,7 +2042,8 @@ QED
 (*---------------------------*)
 
 Theorem in_events_series_parallel :
- !p L. prob_space p /\ (!x. MEM x (FLAT L) ==> x IN events p )==> (rbd_struct p (series (MAP (\a. parallel (rbd_list a)) L)) IN events p)
+ !p L. prob_space p /\ (!x. MEM x (FLAT L) ==> x IN events p ) ==>
+      (rbd_struct p (series (MAP (\a. parallel (rbd_list a)) L)) IN events p)
 Proof
 GEN_TAC
 >> Induct
@@ -2059,7 +2079,8 @@ GEN_TAC
 >> Induct
 >- (RW_TAC list_ss[rbd_list_def,rbd_struct_def,INTER_EMPTY,PROB_UNIV]
    >> RW_TAC real_ss[]
-   >> (`(rbd_struct p (series (rbd_list L1)) INTER  p_space p) = (rbd_struct p (series (rbd_list L1)))` by (ONCE_REWRITE_TAC[INTER_COMM]))
+   >> (`(rbd_struct p (series (rbd_list L1)) INTER  p_space p) =
+        (rbd_struct p (series (rbd_list L1)))` by (ONCE_REWRITE_TAC[INTER_COMM]))
    >- (MATCH_MP_TAC INTER_PSPACE
       >> RW_TAC std_ss[]
       >> REWRITE_TAC[series_rbd_eq_big_inter]
@@ -2135,17 +2156,19 @@ prob p ( rbd_struct p (series (MAP (\a. parallel (rbd_list a)) L)))` by (ALL_TAC
       >> EXISTS_TAC(``h:'a  event list``)
       >> RW_TAC std_ss[])
    >> FULL_SIMP_TAC std_ss[]
-   >> (`rbd_struct p (series (rbd_list L1)) INTER  h' = rbd_struct p (series (rbd_list (h'::L1)))` by (RW_TAC list_ss[rbd_list_def,rbd_struct_def]>> RW_TAC std_ss[INTER_COMM]))
+   >> (`rbd_struct p (series (rbd_list L1)) INTER  h' =
+        rbd_struct p (series (rbd_list (h'::L1)))` by (RW_TAC list_ss[rbd_list_def,rbd_struct_def]>> RW_TAC std_ss[INTER_COMM]))
    >> POP_ORW
    >> RW_TAC list_ss[rbd_list_def,rbd_struct_def])
 >> POP_ORW
 >> (`prob p
-  (rbd_struct p (series (rbd_list L1)) INTER
-   rbd_struct p (parallel (rbd_list h)) INTER
-   rbd_struct p (series (MAP (\a. parallel (rbd_list a)) L))) = prob p
-  (rbd_struct p (series (rbd_list L1)))*
-  prob p ( rbd_struct p (parallel (rbd_list h)) INTER
-   rbd_struct p (series (MAP (\a. parallel (rbd_list a)) L)))` by (RW_TAC std_ss[]))
+      (rbd_struct p (series (rbd_list L1)) INTER
+       rbd_struct p (parallel (rbd_list h)) INTER
+       rbd_struct p (series (MAP (\a. parallel (rbd_list a)) L))) =
+    prob p
+      (rbd_struct p (series (rbd_list L1)))*
+    prob p ( rbd_struct p (parallel (rbd_list h)) INTER
+             rbd_struct p (series (MAP (\a. parallel (rbd_list a)) L)))` by (RW_TAC std_ss[]))
 >- (NTAC 4 (POP_ASSUM MP_TAC)
    >> POP_ASSUM (MP_TAC o Q.SPEC `L1`)
    >> RW_TAC std_ss[]
@@ -2238,7 +2261,8 @@ prob p ( rbd_struct p (series (MAP (\a. parallel (rbd_list a)) L)))` by (ALL_TAC
 >> (` prob p (rbd_struct p (series (rbd_list [h']))) *
  prob p
    (rbd_struct p (parallel (rbd_list h)) INTER
-    rbd_struct p (series (MAP (\a. parallel (rbd_list a)) L))) =  prob p (rbd_struct p (series (rbd_list [h'])) INTER rbd_struct p (parallel (rbd_list h)) INTER
+    rbd_struct p (series (MAP (\a. parallel (rbd_list a)) L))) =
+prob p (rbd_struct p (series (rbd_list [h'])) INTER rbd_struct p (parallel (rbd_list h)) INTER
     rbd_struct p (series (MAP (\a. parallel (rbd_list a)) L)))` by (MATCH_MP_TAC EQ_SYM))
 >- (NTAC 4 (POP_ASSUM MP_TAC)
    >> POP_ASSUM (MP_TAC o Q.SPEC `[h']`)
@@ -2386,7 +2410,8 @@ GEN_TAC
       >> FULL_SIMP_TAC list_ss[])
    >> FULL_SIMP_TAC std_ss[])
 >> POP_ORW
->> (`prob p (h INTER rbd_struct p (series (MAP (\a. parallel (rbd_list a)) L))) = prob p (h) * prob p ( rbd_struct p (series (MAP (\a. parallel (rbd_list a)) L)))` by (ALL_TAC))
+>> (`prob p (h INTER rbd_struct p (series (MAP (\a. parallel (rbd_list a)) L))) =
+    prob p (h) * prob p ( rbd_struct p (series (MAP (\a. parallel (rbd_list a)) L)))` by (ALL_TAC))
 >- ((`h = rbd_struct p (series (rbd_list [h]))` by (RW_TAC list_ss[rbd_list_def,rbd_struct_def]))
    >- (ONCE_REWRITE_TAC[INTER_COMM]
       >> MATCH_MP_TAC (GSYM INTER_PSPACE)

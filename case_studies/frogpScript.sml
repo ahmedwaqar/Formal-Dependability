@@ -35,30 +35,7 @@ fun K_TAC _ = ALL_TAC;
 open HolKernel boolLib bossLib Parse;
 val _ = new_theory "frogp";
 
-(*------new tactics for set simplification----*)
 (*--------------------*)
-(*infixr 0 ++ << || ORELSEC ## --> THENC;
-infix 1 >> |->;
-fun parse_with_goal t (asms, g) =
-  let
-    val ctxt = free_varsl (g::asms)
-  in
-    Parse.parse_in_context ctxt t
-  end;
-
-val PARSE_TAC = fn tac => fn q => W (tac o parse_with_goal q
-QED
-val Suff = PARSE_TAC SUFF_TAC;
-val POP_ORW = POP_ASSUM (fn thm => ONCE_REWRITE_TAC [thm]
-QED
-val !! = REPEAT;
-val op++ = op THEN;
-val op<< = op THENL;
-val op|| = op ORELSE;
-val op>> = op THEN1;
-val std_ss' = simpLib.++ (std_ss, boolSimps.ETA_ss
-QED
-*)
 val op by = BasicProvers.byA;
 val POP_ORW = POP_ASSUM (fn thm => ONCE_REWRITE_TAC [thm]);
 (*---------------------------*)

@@ -34,30 +34,7 @@ fun K_TAC _ = ALL_TAC;
 open HolKernel boolLib bossLib Parse;
 val _ = new_theory "Availability";
 
-(*------new tactics for set simplification----*)
 (*--------------------*)
-(*infixr 0 ++ << || ORELSEC ## --> THENC;
-infix 1 >> |->;
-fun parse_with_goal t (asms, g) =
-  let
-    val ctxt = free_varsl (g::asms)
-  in
-    Parse.parse_in_context ctxt t
-  end;
-
-val PARSE_TAC = fn tac => fn q => W (tac o parse_with_goal q
-QED
-val Suff = PARSE_TAC SUFF_TAC;
-val POP_ORW = POP_ASSUM (fn thm => ONCE_REWRITE_TAC [thm]
-QED
-val !! = REPEAT;
-val op++ = op THEN;
-val op<< = op THENL;
-val op|| = op ORELSE;
-val op>> = op THEN1;
-val std_ss' = simpLib.++ (std_ss, boolSimps.ETA_ss
-QED
-*)
 val op by = BasicProvers.byA;
 val POP_ORW = POP_ASSUM (fn thm => ONCE_REWRITE_TAC [thm]);
 (*---------------------------*)
@@ -317,7 +294,8 @@ Theorem avail_ge_rel1 :
           prob p (union_avail_events L (LENGTH L) (t)))
 Proof
 RW_TAC std_ss[]
->> (`prob p (union_avail_events L (LENGTH L) t) = sum (0,LENGTH L) (prob p o (\a. avail_event L a (Normal t)))`  by (MATCH_MP_TAC EQ_SYM))
+>> (`prob p (union_avail_events L (LENGTH L) t) =
+      sum (0,LENGTH L) (prob p o (\a. avail_event L a (Normal t)))`  by (MATCH_MP_TAC EQ_SYM))
 >- (MATCH_MP_TAC PROB_FINITELY_ADDITIVE
    >> RW_TAC std_ss[]
    >> RW_TAC std_ss[union_avail_events_def]
@@ -331,7 +309,6 @@ RW_TAC std_ss[]
 QED
 
 
-(*-------------------------------*)
 (*-------------------------neg_exp_tend0_new-------------------------------------------*)
 Theorem neg_exp_tend0_new :
 !t (c:real). (0 < c) ==> (\t. exp (&t*(-c)))--> 0
@@ -778,7 +755,7 @@ GEN_TAC
 >> GEN_TAC
 >> Induct
 >- (RW_TAC list_ss[])
-++ (RW_TAC std_ss[])
+>> (RW_TAC std_ss[])
 >> RW_TAC list_ss[list_union_avail_event_list_def,steady_state_avail_prod_def,one_minus_list_def,list_prod_def]
 >> (`(λt.
    (1 − list_prod (list_prob p (union_avail_event_list1 h (&t)))) *
@@ -796,7 +773,8 @@ GEN_TAC
 >> POP_ORW
 >> MATCH_MP_TAC SEQ_MUL
 >> RW_TAC std_ss[]
->- ((`(\t. 1 − list_prod (list_prob p (union_avail_event_list1 h (&t)))) = (\t. (\t. 1)t − (\t. list_prod (list_prob p (union_avail_event_list1 h (&t)))) t)` by RW_TAC real_ss[])
+>- ((`(\t. 1 − list_prod (list_prob p (union_avail_event_list1 h (&t)))) =
+    (\t. (\t. 1)t − (\t. list_prod (list_prob p (union_avail_event_list1 h (&t)))) t)` by RW_TAC real_ss[])
    >> POP_ORW
    >> MATCH_MP_TAC SEQ_SUB
    >> RW_TAC std_ss[SEQ_CONST]
@@ -1076,28 +1054,28 @@ End
 (*--- Definition. AND unavail FT gate     ----  *)
 (* ------------------------------------------------------------------------- *)
 Definition AND_unavail_FT_gate_def :
-!L p. AND_unavail_FT_gate p L t =
+ AND_unavail_FT_gate p L t =
        FTree p (AND (gate_list (union_unavail_event_list p L t)))
 End
 (* ------------------------------------------------------------------------- *)
 (* Definition. OR unavail FT gate                                 *)
 (* ------------------------------------------------------------------------- *)
 Definition OR_unavail_FT_gate_def :
-!L p. OR_unavail_FT_gate p L t =
+ OR_unavail_FT_gate p L t =
        FTree p (OR (gate_list (union_unavail_event_list p L t)))
 End
 (* ------------------------------------------------------------------------- *)
 (* Definition. NOR unavail FT gate                                 *)
 (* ------------------------------------------------------------------------- *)
 Definition NOR_unavail_FT_gate_def :
-!L p. NOR_unavail_FT_gate p L t  =
+ NOR_unavail_FT_gate p L t  =
        p_space p DIFF FTree p (OR (gate_list (union_unavail_event_list p L t)))
 End
 (* ------------------------------------------------------------------------- *)
 (* Definition. NAND unavail FT gate                                 *)
 (* ------------------------------------------------------------------------- *)
 Definition NAND_unavail_FT_gate_def :
-!L1 L2 p t. NAND_unavail_FT_gate p L1 L2 t  =
+ NAND_unavail_FT_gate p L1 L2 t  =
              FTree p
                (AND (gate_list (compl_list p (union_unavail_event_list p L1 t) ++
                                              (union_unavail_event_list p L2 t))))
@@ -1107,7 +1085,7 @@ End
 (* Definition. XOR unavail FT gate                                 *)
 (* ------------------------------------------------------------------------- *)
 Definition XOR_unavail_FT_gate_def :
-!p X Y t. XOR_unavail_FT_gate p X Y t  =
+ XOR_unavail_FT_gate p X Y t  =
            (XOR_FT_gate p (atomic (union_unavail_events p X t))
                           (atomic (union_unavail_events p Y t)))
 End
@@ -1238,7 +1216,8 @@ GEN_TAC
 >> POP_ORW
 >> MATCH_MP_TAC SEQ_MUL
 >> RW_TAC std_ss[]
->- ( (`(\t. 1 − prob p (union_unavail_events p h (&t))) = (\t. (\t. 1)t − (\t. prob p (union_unavail_events p h (&t))) t)` by RW_TAC real_ss[])
+>- ( (`(\t. 1 − prob p (union_unavail_events p h (&t))) =
+    (\t. (\t. 1)t − (\t. prob p (union_unavail_events p h (&t))) t)` by RW_TAC real_ss[])
    >> POP_ORW
    >> MATCH_MP_TAC SEQ_SUB
    >> RW_TAC std_ss[SEQ_CONST]
@@ -1538,7 +1517,7 @@ RW_TAC std_ss[]
    >> FULL_SIMP_TAC list_ss[]
 QED
 (*---------------------*)
-Theorem inst_XOR_tends_steadty :
+Theorem inst_XOR_tends_steady :
 !p X1 m1.
        inst_unavail_exp p X1 m1 /\
        (0 < FST m1 /\ 0 < SND m1) ==>
@@ -1594,17 +1573,20 @@ Theorem XOR_steady_unavail :
 Proof
 RW_TAC std_ss[]
 >> (`!t. prob p
-       (XOR_FT_gate p (atomic (union_unavail_events p X1 &t))
-                      (atomic (union_unavail_events p X2 &t))) =  prob p(union_unavail_events p X1 (&t))  * (1 - prob p (union_unavail_events p X2 (&t))) + prob p  (union_unavail_events p X2 (&t)) * (1- prob p (union_unavail_events p X1 (&t)))` by RW_TAC std_ss[])
+           (XOR_FT_gate p (atomic (union_unavail_events p X1 &t))
+                      (atomic (union_unavail_events p X2 &t))) =
+        prob p(union_unavail_events p X1 (&t))  *
+        (1 - prob p (union_unavail_events p X2 (&t))) +
+        prob p  (union_unavail_events p X2 (&t)) * (1- prob p (union_unavail_events p X1 (&t)))` by RW_TAC std_ss[])
 >- (MATCH_MP_TAC XOR_FT_gate_thm
    >> METIS_TAC[])
 >> POP_ORW
 >> MATCH_MP_TAC SEQ_UNIQ
 >> EXISTS_TAC(``(\t.
-       prob p (union_unavail_events p X1 (&t)) *
-       (1 − prob p (union_unavail_events p X2 (&t))) +
-       prob p (union_unavail_events p X2 (&t)) *
-       (1 − prob p (union_unavail_events p X1 (&t))))``)
+                 prob p (union_unavail_events p X1 (&t)) *
+                 (1 − prob p (union_unavail_events p X2 (&t))) +
+                 prob p (union_unavail_events p X2 (&t)) *
+                 (1 − prob p (union_unavail_events p X1 (&t))))``)
 >> RW_TAC std_ss[GSYM SEQ_LIM,convergent]
 >- (EXISTS_TAC(``
 (steady_state_unavail m1 * (1 − steady_state_unavail m2) +
@@ -1631,7 +1613,8 @@ RW_TAC std_ss[]
      >> RW_TAC std_ss[]
      >- ( MATCH_MP_TAC inst_XOR_tends_steady
         >> METIS_TAC[])
-     >> (`(\t. 1 − prob p (union_unavail_events p X2 (&t))) =(\t. (\t. 1) t − (\t. prob p (union_unavail_events p X2 (&t))) t) `  by RW_TAC real_ss[])
+     >> (`(\t. 1 − prob p (union_unavail_events p X2 (&t))) =
+          (\t. (\t. 1) t − (\t. prob p (union_unavail_events p X2 (&t))) t) `  by RW_TAC real_ss[])
      >> POP_ORW
      >> MATCH_MP_TAC SEQ_SUB
      >> RW_TAC std_ss[SEQ_CONST]
@@ -1647,7 +1630,8 @@ RW_TAC std_ss[]
   >> RW_TAC std_ss[]
   >- (MATCH_MP_TAC inst_XOR_tends_steady
      >> METIS_TAC[])
-  >> (`(\t. 1 − prob p (union_unavail_events p X1 (&t))) =(\t. (\t. 1) t − (\t. prob p (union_unavail_events p X1 (&t))) t) `  by RW_TAC real_ss[])
+  >> (`(\t. 1 − prob p (union_unavail_events p X1 (&t))) =
+      (\t. (\t. 1) t − (\t. prob p (union_unavail_events p X1 (&t))) t) `  by RW_TAC real_ss[])
   >> POP_ORW
   >> MATCH_MP_TAC SEQ_SUB
   >> RW_TAC std_ss[SEQ_CONST]
@@ -1667,7 +1651,8 @@ RW_TAC std_ss[]
 >> RW_TAC std_ss[]
 >- ( (`(\t.
    prob p (union_unavail_events p X1 (&t)) *
-   (1 − prob p (union_unavail_events p X2 (&t)))) = (\t.
+   (1 − prob p (union_unavail_events p X2 (&t)))) =
+   (\t.
    (\t. prob p (union_unavail_events p X1 (&t))) t *
   (\t.  (1 − prob p (union_unavail_events p X2 (&t)))) t)` by RW_TAC real_ss[])
      >> POP_ORW
@@ -1675,23 +1660,26 @@ RW_TAC std_ss[]
      >> RW_TAC std_ss[]
      >- ( MATCH_MP_TAC inst_XOR_tends_steady
         >> METIS_TAC[])
-     >> (`(\t. 1 − prob p (union_unavail_events p X2 (&t))) =(\t. (\t. 1) t − (\t. prob p (union_unavail_events p X2 (&t))) t) `  by RW_TAC real_ss[])
+     >> (`(\t. 1 − prob p (union_unavail_events p X2 (&t))) =
+          (\t. (\t. 1) t − (\t. prob p (union_unavail_events p X2 (&t))) t) `  by RW_TAC real_ss[])
      >> POP_ORW
      >> MATCH_MP_TAC SEQ_SUB
      >> RW_TAC std_ss[SEQ_CONST]
      >> MATCH_MP_TAC inst_XOR_tends_steady
      >> METIS_TAC[])
 >> (`(\t.
-   prob p (union_unavail_events p X2 (&t)) *
-   (1 − prob p (union_unavail_events p X1 (&t)))) = (\t.
-   (\t. prob p (union_unavail_events p X2 (&t))) t *
-  (\t.  (1 − prob p (union_unavail_events p X1 (&t)))) t)` by RW_TAC real_ss[])
+     prob p (union_unavail_events p X2 (&t)) *
+     (1 − prob p (union_unavail_events p X1 (&t)))) =
+     (\t.
+     (\t. prob p (union_unavail_events p X2 (&t))) t *
+    (\t.  (1 − prob p (union_unavail_events p X1 (&t)))) t)` by RW_TAC real_ss[])
   >> POP_ORW
   >> MATCH_MP_TAC SEQ_MUL
   >> RW_TAC std_ss[]
   >- (MATCH_MP_TAC inst_XOR_tends_steady
      >> METIS_TAC[])
-  >> (`(\t. 1 − prob p (union_unavail_events p X1 (&t))) =(\t. (\t. 1) t − (\t. prob p (union_unavail_events p X1 (&t))) t) `  by RW_TAC real_ss[])
+  >> (`(\t. 1 − prob p (union_unavail_events p X1 (&t))) =
+       (\t. (\t. 1) t − (\t. prob p (union_unavail_events p X1 (&t))) t) `  by RW_TAC real_ss[])
   >> POP_ORW
   >> MATCH_MP_TAC SEQ_SUB
   >> RW_TAC std_ss[SEQ_CONST]
@@ -1699,5 +1687,4 @@ RW_TAC std_ss[]
   >> METIS_TAC[]
 QED
 
-val _ = export_theory(
-QED
+val _ = export_theory();
