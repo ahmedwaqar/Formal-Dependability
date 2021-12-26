@@ -1,0 +1,13 @@
+*Theory.sml
+
+*.ui
+
+*.uo
+
+*.sig
+
+*.dat
+
+.HOLMK
+.hollogs
+*sml~
